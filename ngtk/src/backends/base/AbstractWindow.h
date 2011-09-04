@@ -26,13 +26,14 @@ namespace Ngtk
       class AbstractWindow : public AbstractWidget
       {
       protected:
-        int rows, cols;
         WindowCloseBehaviour OnClose;
         bool visible;
 
       public:
-        AbstractWindow (std::string title, int rows, int cols, WindowCloseBehaviour OnClose);
+        AbstractWindow (std::string title, WindowCloseBehaviour OnClose);
         virtual ~AbstractWindow ();
+
+        virtual void PutWidget (AbstractWidget *widget, int x, int y, int width, int height) = 0;
 
         virtual void SetVisible (bool visible);
       };

@@ -9,8 +9,8 @@ namespace Ngtk
     namespace Base
     {
 
-      AbstractWindow::AbstractWindow (std::string title, int rows, int cols, WindowCloseBehaviour OnClose)
-      : AbstractWidget (title, NULL), rows (rows), cols (cols), OnClose (OnClose) { }
+      AbstractWindow::AbstractWindow (std::string title, WindowCloseBehaviour OnClose)
+      : AbstractWidget (title, NULL), OnClose (OnClose) { }
 
       AbstractWindow::~AbstractWindow () { }
 

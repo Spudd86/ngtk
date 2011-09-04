@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <string>
 
+#include "../base/AbstractWidget.h"
 #include "../base/AbstractWindow.h"
 #include "../../utils/DynamicLibrary.h"
 
@@ -28,8 +29,10 @@ namespace Ngtk
         HWND hwnd;
 
       public:
-        NGTK_DLL_FUNC WindowsWindow (std::string title, int rows, int cols, Base::WindowCloseBehaviour OnClose);
+        NGTK_DLL_FUNC WindowsWindow (std::string title, Base::WindowCloseBehaviour OnClose);
         NGTK_DLL_FUNC ~WindowsWindow ();
+
+        NGTK_DLL_FUNC void PutWidget (Base::AbstractWidget *widget, int x, int y, int width, int height);
 
         NGTK_DLL_FUNC void SetVisible (bool visible);
       };

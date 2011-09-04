@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include "../base/AbstractWidget.h"
+#include "WindowsWindow.h"
 
 namespace Ngtk
 {
@@ -28,6 +29,8 @@ namespace Ngtk
       public:
         WindowsWidget (std::string text, AbstractWidget *parent);
         virtual ~WindowsWidget ();
+
+        friend WindowsWindow;
       };
 
     }

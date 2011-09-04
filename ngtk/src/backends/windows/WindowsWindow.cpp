@@ -120,8 +120,8 @@ namespace Ngtk
         return 0;
       }
 
-      WindowsWindow::WindowsWindow (std::string title, int rows, int cols, Base::WindowCloseBehaviour OnClose)
-      : AbstractWindow (title, rows, cols, OnClose)
+      WindowsWindow::WindowsWindow (std::string title, Base::WindowCloseBehaviour OnClose)
+      : AbstractWindow (title, OnClose)
       {
         if (!WindowsWindow::NgtkClassRegistered) WindowsWindow::NgtkRegisterClass ();
 
@@ -143,6 +143,16 @@ namespace Ngtk
 
       WindowsWindow::~WindowsWindow () {
  }
+
+      void
+      WindowsWindow::PutWidget (Base::AbstractWidget *widget, int x, int y, int width, int height)
+      {
+        WindowsWidget *ww;
+        if (ww = dynamic_cast<WindowsWidget*>(widget)) /* Is this really a WindowsWidget? */
+          {
+            SwtWindowPos (ww->hwnd, NULL, x, y, width, height, SWP_NOZORDER);
+          }
+      }
 
       void
       WindowsWindow::SetVisible (bool visible)
