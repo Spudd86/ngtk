@@ -150,7 +150,7 @@ namespace Ngtk
         WindowsWidget *ww;
         if (ww = dynamic_cast<WindowsWidget*>(widget)) /* Is this really a WindowsWidget? */
           {
-            SwtWindowPos (ww->hwnd, NULL, x, y, width, height, SWP_NOZORDER);
+            SetWindowPos (ww->hwnd, NULL, x, y, width, height, SWP_NOZORDER);
           }
       }
 

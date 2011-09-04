@@ -30,7 +30,7 @@ namespace Ngtk
         WindowsWidget (std::string text, AbstractWidget *parent);
         virtual ~WindowsWidget ();
 
-        friend WindowsWindow;
+        friend class WindowsWindow;
       };
 
     }
