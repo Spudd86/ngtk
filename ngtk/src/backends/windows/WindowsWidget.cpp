@@ -15,7 +15,11 @@ namespace Ngtk
       LRESULT CALLBACK
       WindowsWidget::WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       {
-        WindowsWidget *widget = (WindowsWidget *) GetFromHwnd (hwnd);
+        Base::AbstractWidget *widget = dynamic_cast <Base::AbstractWidget *> (WindowsComponent::GetFromHwnd (hwnd));
+        
+        /* If this is not really a widget but just some other HWND, "pass on" */
+        if (widget == NULL)
+          return DefWindowProc (hwnd, msg, wParam, lParam);
 
         switch (msg)
           {
@@ -44,53 +48,13 @@ namespace Ngtk
             }
 
           case WM_DESTROY:
-            widget->hwnd = NULL;
+            delete widget;
             break;
 
           default:
             return DefWindowProc (hwnd, msg, wParam, lParam);
           }
         return 0;
-      }
-
-      /**
-       * Each HWND (of a window) holds a pointer to it's WindowsWindow
-       */
-      void*
-      WindowsWidget::GetFromHwnd (HWND hwnd)
-      {
-        return (WindowsWidget*) GetWindowLongPtr (hwnd, GWLP_USERDATA);
-      }
-
-      void
-      WindowsWidget::SetToHwnd (HWND hwnd, void* ww)
-      {
-        SetWindowLongPtr (hwnd, GWLP_USERDATA, (LONG_PTR) ww);
-      }
-
-      WindowsWidget::WindowsWidget (std::string text, AbstractWidget *parent)
-      : AbstractWidget (text, parent)
-      {
-        this->hwnd = NULL;
-      }
-
-      void
-      WindowsWidget::RealDestroyChildren (bool ChildHwndsAreValid)
-      {
-        for (std::list<AbstractWidget*>::iterator iter = children.begin (); iter != children.end (); iter++)
-          {
-            WindowsWidget *child = (WindowsWidget*) * iter;
-            if (ChildHwndsAreValid && child->hwnd != NULL)
-              DestroyWindow (child->hwnd);
-            child->RealDestroyChildren (ChildHwndsAreValid);
-            delete child;
-          }
-        children.clear ();
-      }
-
-      WindowsWidget::~WindowsWidget ()
-      {
-        RealDestroyChildren ((this->hwnd == NULL) ? false : true);
       }
     }
   }

@@ -41,7 +41,7 @@ namespace Ngtk
 
         /* Amount of extra bytes to allocate for each window instance in memory.
          * We will use that space to point to the WindowsWindow containing this HWND */
-        wc.cbWndExtra = WindowsWidget::cbWndExtraSize;
+        wc.cbWndExtra = cbWndExtraSize;
 
         /* hInstace is a parameter representing the instance of the current windows
          * program/dll/module. */
@@ -79,7 +79,7 @@ namespace Ngtk
       LRESULT CALLBACK
       WindowsWindow::WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       {
-        WindowsWindow *window = (WindowsWindow *) WindowsWidget::GetFromHwnd (hwnd);
+        WindowsWindow *window = (WindowsWindow *) GetFromHwnd (hwnd);
 
         switch (msg)
           {
@@ -121,7 +121,7 @@ namespace Ngtk
       }
 
       WindowsWindow::WindowsWindow (std::string title, Base::WindowCloseBehaviour OnClose)
-      : AbstractWindow (title, OnClose)
+      : Base::AbstractWindow (title, OnClose), Base::AbstractWidget (title, true), WindowsComponent (NULL), WindowsContainer ()
       {
         if (!WindowsWindow::NgtkClassRegistered) WindowsWindow::NgtkRegisterClass ();
 
@@ -138,40 +138,11 @@ namespace Ngtk
                                       NULL /* The lParam value that will be passed to the window function on the WM_CREATE message */
                                       );
 
-        WindowsWidget::SetToHwnd (this->hwnd, const_cast<WindowsWindow*> (this));
+        SetToHwnd (this->hwnd, const_cast<WindowsWindow*> (this));
       }
 
-      WindowsWindow::~WindowsWindow () {
- }
+      WindowsWindow::~WindowsWindow () { }
 
-      void
-      WindowsWindow::PutWidget (Base::AbstractWidget *widget, int x, int y, int width, int height)
-      {
-        WindowsWidget *ww;
-        if (ww = dynamic_cast<WindowsWidget*>(widget)) /* Is this really a WindowsWidget? */
-          {
-            SetWindowPos (ww->hwnd, NULL, x, y, width, height, SWP_NOZORDER);
-          }
-      }
-
-      void
-      WindowsWindow::SetVisible (bool visible)
-      {
-        if (visible)
-          {
-            /* Activate and Show the window in it's original size and position, restore if min/maximized */
-            ShowWindow (hwnd, SW_SHOWNORMAL);
-            /* Redraw the window, just in case */
-            UpdateWindow (hwnd);
-          }
-        else
-          {
-            /* Hide the window */
-            ShowWindow (this->hwnd, SW_HIDE);
-          }
-
-        AbstractWindow::SetVisible (visible);
-      }
     }
   }
 }

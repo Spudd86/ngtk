@@ -10,7 +10,7 @@ namespace Ngtk
     namespace Base
     {
 
-      class AbstractBackend
+      class NGTK_DLL_CLASS AbstractBackend
       {
       protected:
         bool FatalWarnings;
@@ -20,7 +20,7 @@ namespace Ngtk
         ~AbstractBackend ();
 
         virtual void StartMainLoop () = 0;
-        virtual void NGTK_DLL_FUNC QuitMainLoop () = 0;
+        virtual void QuitMainLoop () = 0;
 
         virtual void Debug (const char* format, ...) = 0;
         virtual void Error (const char* format, ...) = 0;

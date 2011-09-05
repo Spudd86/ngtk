@@ -10,15 +10,9 @@ namespace Ngtk
     {
 
       AbstractWindow::AbstractWindow (std::string title, WindowCloseBehaviour OnClose)
-      : AbstractWidget (title, NULL), OnClose (OnClose) { }
+      : OnClose (OnClose) { }
 
       AbstractWindow::~AbstractWindow () { }
-
-      void
-      AbstractWindow::SetVisible (bool visible)
-      {
-        this->visible = visible;
-      }
     }
   }
 }

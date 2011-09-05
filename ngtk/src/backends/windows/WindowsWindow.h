@@ -7,6 +7,8 @@
 #include "../base/AbstractWidget.h"
 #include "../base/AbstractWindow.h"
 #include "../../utils/DynamicLibrary.h"
+#include "WindowsContainer.h"
+#include "WindowsComponent.h"
 
 namespace Ngtk
 {
@@ -14,8 +16,7 @@ namespace Ngtk
   {
     namespace Windows
     {
-
-      class WindowsWindow : public Base::AbstractWindow
+      class WindowsWindow : public Base::AbstractWindow, public Base::AbstractWidget, public WindowsComponent, public WindowsContainer
       {
       protected:
         static LPCSTR WinClassNameA;
@@ -25,16 +26,9 @@ namespace Ngtk
 
         static LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-      protected:
-        HWND hwnd;
-
       public:
         NGTK_DLL_FUNC WindowsWindow (std::string title, Base::WindowCloseBehaviour OnClose);
         NGTK_DLL_FUNC ~WindowsWindow ();
-
-        NGTK_DLL_FUNC void PutWidget (Base::AbstractWidget *widget, int x, int y, int width, int height);
-
-        NGTK_DLL_FUNC void SetVisible (bool visible);
       };
     }
   }

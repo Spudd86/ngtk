@@ -33,13 +33,17 @@ OBJECTDIR=build/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/src/backends/base/AbstractComponent.o \
+	${OBJECTDIR}/src/backends/windows/WindowsComponent.o \
 	${OBJECTDIR}/src/backends/base/AbstractWidget.o \
+	${OBJECTDIR}/src/backends/windows/WindowsContainer.o \
 	${OBJECTDIR}/src/backends/base/AbstractBackend.o \
 	${OBJECTDIR}/src/events/MouseEvent.o \
 	${OBJECTDIR}/src/backends/windows/WindowsWidget.o \
 	${OBJECTDIR}/src/backends/windows/WindowsBackend.o \
 	${OBJECTDIR}/src/backends/base/AbstractWindow.o \
-	${OBJECTDIR}/src/backends/windows/WindowsWindow.o
+	${OBJECTDIR}/src/backends/windows/WindowsWindow.o \
+	${OBJECTDIR}/src/backends/base/AbstractContainer.o
 
 
 # C Compiler Flags
@@ -66,10 +70,25 @@ dist/Debug/MinGW-Windows/libngtk.dll: ${OBJECTFILES}
 	${MKDIR} -p dist/Debug/MinGW-Windows
 	${LINK.cc} -shared -shared -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libngtk.dll ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
+${OBJECTDIR}/src/backends/base/AbstractComponent.o: src/backends/base/AbstractComponent.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/base
+	${RM} $@.d
+	$(COMPILE.cc) -g  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/base/AbstractComponent.o src/backends/base/AbstractComponent.cpp
+
+${OBJECTDIR}/src/backends/windows/WindowsComponent.o: src/backends/windows/WindowsComponent.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
+	${RM} $@.d
+	$(COMPILE.cc) -g  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/WindowsComponent.o src/backends/windows/WindowsComponent.cpp
+
 ${OBJECTDIR}/src/backends/base/AbstractWidget.o: src/backends/base/AbstractWidget.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src/backends/base
 	${RM} $@.d
 	$(COMPILE.cc) -g  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/base/AbstractWidget.o src/backends/base/AbstractWidget.cpp
+
+${OBJECTDIR}/src/backends/windows/WindowsContainer.o: src/backends/windows/WindowsContainer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
+	${RM} $@.d
+	$(COMPILE.cc) -g  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/WindowsContainer.o src/backends/windows/WindowsContainer.cpp
 
 ${OBJECTDIR}/src/backends/base/AbstractBackend.o: src/backends/base/AbstractBackend.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src/backends/base
@@ -100,6 +119,11 @@ ${OBJECTDIR}/src/backends/windows/WindowsWindow.o: src/backends/windows/WindowsW
 	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
 	${RM} $@.d
 	$(COMPILE.cc) -g  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/WindowsWindow.o src/backends/windows/WindowsWindow.cpp
+
+${OBJECTDIR}/src/backends/base/AbstractContainer.o: src/backends/base/AbstractContainer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/base
+	${RM} $@.d
+	$(COMPILE.cc) -g  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/base/AbstractContainer.o src/backends/base/AbstractContainer.cpp
 
 # Subprojects
 .build-subprojects:
