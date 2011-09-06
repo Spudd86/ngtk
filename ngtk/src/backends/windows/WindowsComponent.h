@@ -29,6 +29,7 @@ namespace Ngtk
       public:
         virtual void SetVisible (bool visible);
         virtual void Redraw ();
+        HWND GetHwnd ();
 
         friend class WindowsContainer;
       };

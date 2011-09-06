@@ -22,6 +22,7 @@ namespace Ngtk
         AbstractContainer ();
         virtual ~AbstractContainer ();
 
+		void RegisterChild (AbstractComponent* child);
         virtual void SetChildRect (AbstractComponent *comp, int x, int y, int width, int height) = 0;
       };
 

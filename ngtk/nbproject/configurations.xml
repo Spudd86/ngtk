@@ -35,6 +35,7 @@
                          projectFiles="true"
                          kind="SOURCE_LOGICAL_FOLDER">
             <itemPath>src/backends/windows/WindowsBackend.h</itemPath>
+            <itemPath>src/backends/windows/WindowsButton.h</itemPath>
             <itemPath>src/backends/windows/WindowsComponent.h</itemPath>
             <itemPath>src/backends/windows/WindowsContainer.h</itemPath>
             <itemPath>src/backends/windows/WindowsWidget.h</itemPath>
@@ -109,6 +110,7 @@
                          projectFiles="true"
                          kind="SOURCE_LOGICAL_FOLDER">
             <itemPath>src/backends/windows/WindowsBackend.cpp</itemPath>
+            <itemPath>src/backends/windows/WindowsButton.cpp</itemPath>
             <itemPath>src/backends/windows/WindowsComponent.cpp</itemPath>
             <itemPath>src/backends/windows/WindowsContainer.cpp</itemPath>
             <itemPath>src/backends/windows/WindowsWidget.cpp</itemPath>

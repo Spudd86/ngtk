@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/backends/windows/WindowsWidget.o \
 	${OBJECTDIR}/src/backends/windows/WindowsBackend.o \
 	${OBJECTDIR}/src/backends/base/AbstractWindow.o \
+	${OBJECTDIR}/src/backends/windows/WindowsButton.o \
 	${OBJECTDIR}/src/backends/windows/WindowsWindow.o \
 	${OBJECTDIR}/src/backends/base/AbstractContainer.o
 
@@ -114,6 +115,11 @@ ${OBJECTDIR}/src/backends/base/AbstractWindow.o: src/backends/base/AbstractWindo
 	${MKDIR} -p ${OBJECTDIR}/src/backends/base
 	${RM} $@.d
 	$(COMPILE.cc) -O2  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/base/AbstractWindow.o src/backends/base/AbstractWindow.cpp
+
+${OBJECTDIR}/src/backends/windows/WindowsButton.o: src/backends/windows/WindowsButton.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
+	${RM} $@.d
+	$(COMPILE.cc) -O2  -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/WindowsButton.o src/backends/windows/WindowsButton.cpp
 
 ${OBJECTDIR}/src/backends/windows/WindowsWindow.o: src/backends/windows/WindowsWindow.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src/backends/windows

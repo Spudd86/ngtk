@@ -30,6 +30,12 @@ namespace Ngtk
         SetWindowLongPtr (hwnd, GWLP_USERDATA, (LONG_PTR) ww);
       }
 
+      HWND
+      WindowsComponent::GetHwnd ()
+      {
+        return this->hwnd;
+      }
+      
       void
       WindowsComponent::SetVisible (bool visible)
       {

@@ -15,7 +15,7 @@ namespace Ngtk
       {
       public:
         AbstractComponent (AbstractContainer *parent);
-        virtual NGTK_DLL_CLASS ~AbstractComponent ();
+        virtual ~AbstractComponent ();
 
       protected:
         AbstractContainer *parent;

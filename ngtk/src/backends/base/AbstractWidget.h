@@ -39,11 +39,11 @@ namespace Ngtk
                                 ) : ListenFunc (ListenFunc), Data (Data), FreeFunc (FreeFunc) { }
       };
 
-      class AbstractWidget
+      class NGTK_DLL_CLASS AbstractWidget
       {
       public:
-        NGTK_DLL_CLASS AbstractWidget (std::string text, bool enabled);
-        virtual NGTK_DLL_CLASS ~AbstractWidget ();
+        AbstractWidget (std::string text, bool enabled);
+        virtual ~AbstractWidget ();
 
         /**
          * A text field for storing the text of the widget. Most widgets do have
@@ -89,18 +89,18 @@ namespace Ngtk
          * listener is released from this widget. Note that the FreeFunc can be
          * NULL and then no function would be called.
          */
-        void NGTK_DLL_CLASS AddMouseEventListener (MouseEventListener ListenFunc, void *Data, DataFreeFunc FreeFunc);
+        void AddMouseEventListener (MouseEventListener ListenFunc, void *Data, DataFreeFunc FreeFunc);
         /**
          * Simulate a mouse event. This should be EXACTLY equivalent to a real
          * mouse click - meaning that it will be ignored if the widget isn't
          * enabled, and it will follow the regular restrictions of catching
          * mouse clicks (as defined in NaturalMouseClickHandler)
          */
-        void NGTK_DLL_CLASS SendMouseEvent (Events::MouseEvent &evnt);
+        void SendMouseEvent (Events::MouseEvent &evnt);
         /**
          * Detach all the Mouse Event Listeners that were added to the widget
          */
-        void NGTK_DLL_CLASS ClearMouseEventListeners ();
+        void ClearMouseEventListeners ();
       };
 
     }

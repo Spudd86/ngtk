@@ -19,6 +19,11 @@ namespace Ngtk
           }
         children.clear ();
       }
+
+	  void AbstractContainer::RegisterChild (AbstractComponent* child)
+	  {
+		  this->children.push_back (child);
+	  }
     }
   }
 }
