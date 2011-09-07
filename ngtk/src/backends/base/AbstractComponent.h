@@ -5,35 +5,34 @@
 
 namespace Ngtk
 {
-  namespace Backends
-  {
-    namespace Base
-    {
-      class AbstractContainer;
-      
-      class NGTK_DLL_CLASS AbstractComponent
-      {
-      public:
-        AbstractComponent (AbstractContainer *parent);
-        virtual ~AbstractComponent ();
+	namespace Backends
+	{
+		namespace Base
+		{
+			class AbstractContainer;
 
-      protected:
-        AbstractContainer *parent;
-      public:
-        virtual AbstractContainer* GetParent ();
+			class NGTK_DLL_CLASS AbstractComponent
+			{
+			public:
+				AbstractComponent (AbstractContainer *parent);
+				virtual ~AbstractComponent ();
 
-      protected:
-        bool visible;
-      public:
-        virtual bool GetVisible ();
-        virtual void SetVisible (bool visible);
+			protected:
+				AbstractContainer *parent;
+			public:
+				virtual AbstractContainer* GetParent ();
 
-      public:
-        virtual void Redraw () = 0;
-      };
+			protected:
+				bool visible;
+			public:
+				virtual bool GetVisible ();
+				virtual void SetVisible (bool visible);
 
-    }
-  }
+			public:
+				virtual void Redraw () = 0;
+			};
+		}
+	}
 }
 
 #endif

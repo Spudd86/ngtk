@@ -7,35 +7,35 @@
 
 namespace Ngtk
 {
-  namespace Backends
-  {
-    namespace Windows
-    {
+	namespace Backends
+	{
+		namespace Windows
+		{
 
-      class WindowsComponent : public Base::AbstractComponent
-      {
-      public:
-        const static int cbWndExtraSize = sizeof (WindowsComponent*);
-        static WindowsComponent* GetFromHwnd (HWND hwnd);
-        static void SetToHwnd (HWND hwnd, WindowsComponent* ww);
+			class WindowsComponent : public Base::AbstractComponent
+			{
+			public:
+				const static int cbWndExtraSize = sizeof (WindowsComponent*);
+				static WindowsComponent* GetFromHwnd (HWND hwnd);
+				static void SetToHwnd (HWND hwnd, WindowsComponent* ww);
 
-      public:
-        WindowsComponent (WindowsContainer *parent);
-        virtual ~WindowsComponent ();
+			public:
+				WindowsComponent (WindowsContainer *parent);
+				virtual ~WindowsComponent ();
 
-      protected:
-        HWND hwnd;
+			protected:
+				HWND hwnd;
 
-      public:
-        virtual void SetVisible (bool visible);
-        virtual void Redraw ();
-        HWND GetHwnd ();
+			public:
+				virtual void SetVisible (bool visible);
+				virtual void Redraw ();
+				HWND GetHwnd ();
 
-        friend class WindowsContainer;
-      };
+				friend class WindowsContainer;
+			};
 
-    }
-  }
+		}
+	}
 }
 
 #endif

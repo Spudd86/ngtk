@@ -8,17 +8,17 @@
 
 namespace Ngtk
 {
-  namespace Backends
-  {
-    namespace Windows
-    {
-      class WindowsWidget
-      {
-      public:
-        static LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-      };
-    }
-  }
+	namespace Backends
+	{
+		namespace Windows
+		{
+			class WindowsWidget
+			{
+			public:
+				static LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+			};
+		}
+	}
 }
 
 #endif

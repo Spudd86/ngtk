@@ -12,26 +12,26 @@
 
 namespace Ngtk
 {
-  namespace Backends
-  {
-    namespace Windows
-    {
-      class WindowsButton : public Base::AbstractWidget, public WindowsComponent
-      {
-      protected:
-        static LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	namespace Backends
+	{
+		namespace Windows
+		{
+			class WindowsButton : public Base::AbstractWidget, public WindowsComponent
+			{
+			protected:
+				static LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-      public:
-        NGTK_DLL_FUNC WindowsButton (WindowsContainer *parent, std::string text);
-        NGTK_DLL_FUNC ~WindowsButton ();
+			public:
+				NGTK_DLL_FUNC WindowsButton (WindowsContainer *parent, std::string text);
+				NGTK_DLL_FUNC ~WindowsButton ();
 
-		void
-	  WindowsButton::SetText (std::string text);
-        virtual bool NaturalMouseClickHandler (Events::MouseEvent &evnt, bool external);
-        virtual void SetEnabled (bool enabled);
-      };
-    }
-  }
+				void
+					WindowsButton::SetText (std::string text);
+				virtual bool NaturalMouseClickHandler (Events::MouseEvent &evnt, bool external);
+				virtual void SetEnabled (bool enabled);
+			};
+		}
+	}
 }
 
 #endif

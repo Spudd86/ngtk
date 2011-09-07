@@ -6,25 +6,25 @@
 
 namespace Ngtk
 {
-  namespace Backends
-  {
-    namespace Windows
-    {
+	namespace Backends
+	{
+		namespace Windows
+		{
 
-      class WindowsComponent;
+			class WindowsComponent;
 
-      class WindowsContainer : public Base::AbstractContainer
-      {
-      public:
-        WindowsContainer ();
-        virtual ~WindowsContainer ();
+			class WindowsContainer : public Base::AbstractContainer
+			{
+			public:
+				WindowsContainer ();
+				virtual ~WindowsContainer ();
 
-        virtual void SetChildRect (Base::AbstractComponent *comp, int x, int y, int width, int height);
-      };
+				virtual void SetChildRect (Base::AbstractComponent *comp, int x, int y, int width, int height);
+			};
 
 
-    }
-  }
+		}
+	}
 }
 
 #endif

@@ -3,39 +3,36 @@
 
 namespace Ngtk
 {
-  namespace Backends
-  {
-    namespace Base
-    {
+	namespace Backends
+	{
+		namespace Base
+		{
+			AbstractComponent::AbstractComponent (AbstractContainer *parent)
+			{
+				this->parent = parent;
+			}
 
-      AbstractComponent::AbstractComponent (AbstractContainer *parent)
-      {
-        this->parent = parent;
-      }
+			AbstractComponent::~AbstractComponent () { }
 
-      AbstractComponent::~AbstractComponent () { }
+			AbstractContainer* AbstractComponent::GetParent ()
+			{
+				return this->parent;
+			}
 
-      AbstractContainer*
-      AbstractComponent::GetParent ()
-      {
-        return this->parent;
-      }
+			bool AbstractComponent::GetVisible ()
+			{
+				return this->visible;
+			}
 
-      bool
-      AbstractComponent::GetVisible ()
-      {
-        return this->visible;
-      }
-
-      void
-      AbstractComponent::SetVisible (bool visible)
-      {
-        bool NeedsRedraw = visible && ! this->visible;
-        this->visible = visible;
-        if (NeedsRedraw)
-          Redraw ();
-      }
-
-    }
-  }
+			void AbstractComponent::SetVisible (bool visible)
+			{
+				bool NeedsRedraw = visible && ! this->visible;
+				this->visible = visible;
+				if (NeedsRedraw)
+				{
+					Redraw ();
+				}
+			}
+		}
+	}
 }
