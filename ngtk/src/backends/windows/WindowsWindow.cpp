@@ -114,6 +114,28 @@ namespace Ngtk
 
             }
 
+		  case WM_SIZING:
+			{
+				/* The lParam is now a pointer to the new screen size of the
+				 * window. That is NOT the size of the area inside the window that we
+				 * can actually use! To get that, use GetClientRect. But, GetClientRect
+				 * will return the size before the new resizing...
+				 * So, we will compute the difference between a Client Rect and the
+				 * Screen Rect, and we will add that to the new Screen Rect.
+				 */
+			  RECT rectC, rectW, *rectN, rect;
+			  GetClientRect (window->GetHwnd(), &rectC); /* Coordinates relative to client area, i.e. from (0,0) */
+			  GetWindowRect (window->GetHwnd(), &rectW); /* Absolute Screen Coordinates, i.e. where the window really is */
+			  rectN = (RECT*) lParam;
+
+			  rect.left   = rectN->left   + (rectC.left   - rectW.left);
+			  rect.right  = rectN->right  + (rectC.right  - rectW.right);
+			  rect.top    = rectN->top    + (rectC.top    - rectW.top);
+			  rect.bottom = rectN->bottom + (rectC.bottom - rectW.bottom);
+			  window->CallOnResize (rect.right - rect.left, rect.bottom - rect.top);
+			  break;
+			}
+
           default:
             return WindowsWidget::WndProc (hwnd, msg, wParam, lParam);
           }
@@ -141,6 +163,13 @@ namespace Ngtk
         SetToHwnd (this->hwnd, const_cast<WindowsWindow*> (this));
       }
 
+	  void WindowsWindow::GetSize (int *width, int *height)
+	  {
+		  RECT rect;
+		  GetClientRect (this->hwnd, &rect);
+		  *width = rect.right - rect.left;
+		  *height = rect.bottom - rect.top;
+	  }
       WindowsWindow::~WindowsWindow () { }
 
     }

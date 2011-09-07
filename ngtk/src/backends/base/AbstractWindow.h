@@ -10,7 +10,6 @@ namespace Ngtk
   {
     namespace Base
     {
-
       /* Note that we need a prefix for the enum names for this enum,
        * since IGNORE is actually defined as a windows macro... */
       enum WindowCloseBehaviour
@@ -30,6 +29,7 @@ namespace Ngtk
 
       public:
         AbstractWindow (std::string title, WindowCloseBehaviour OnClose);
+		virtual void GetSize (int *width, int *height) = 0;
         virtual ~AbstractWindow ();
       };
     }

@@ -29,6 +29,8 @@ namespace Ngtk
       public:
         NGTK_DLL_FUNC WindowsWindow (std::string title, Base::WindowCloseBehaviour OnClose);
         NGTK_DLL_FUNC ~WindowsWindow ();
+
+		void NGTK_DLL_FUNC WindowsWindow::GetSize (int *width, int *height);
       };
     }
   }
