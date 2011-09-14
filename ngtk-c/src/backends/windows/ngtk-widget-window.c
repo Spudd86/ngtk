@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "ngtk-win-defs.h"
 #include "../../object-system/ngtk-object.h"
 #include "ngtk-widget-window.h"
 
@@ -63,8 +64,7 @@ LRESULT CALLBACK ngtk_win_window_WndProc (HWND hwnd, UINT msg, WPARAM wParam, LP
 			//	/* Quit the main loop and destroy the window */
 			//	WindowsBackend::QuitMainLoop ();
 			//}
-			PostQuitMessage (0);
-
+			ngtk_win_quit_main_loop ();
 			break;
 
 		}
@@ -127,13 +127,19 @@ LRESULT CALLBACK ngtk_win_window_WndProc (HWND hwnd, UINT msg, WPARAM wParam, LP
 		//		}
 		//	}
 
+#if FALSE
 	default:
+#else
+	}
+#endif
 		if (ww == NULL)
 			return DefWindowProc (hwnd, msg, wParam, lParam);
 		else
 			return CallWindowProc (NGTK_WINBASE_O2D (ww)->base_wndproc, hwnd, msg, wParam, lParam);
+#if FALSE
 	}
 	return 0;
+#endif
 }
 
 static void ngtk_win_window_widget_register_class ()

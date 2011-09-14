@@ -44,9 +44,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/widgets/ngtk-container.o \
 	${OBJECTDIR}/src/backends/windows/ngtk-win-component.o \
 	${OBJECTDIR}/src/widgets/ngtk-component.o \
+	${OBJECTDIR}/src/backends/windows/ngtk-win-defs.o \
 	${OBJECTDIR}/src/utils/ngtk-list.o \
-	${OBJECTDIR}/src/backends/windows/ngtk-win-event-generator.o \
-	${OBJECTDIR}/src/backends/windows/ngtk-win-container.o
+	${OBJECTDIR}/src/backends/windows/ngtk-win-container.o \
+	${OBJECTDIR}/src/backends/windows/ngtk-win-event-generator.o
 
 
 # C Compiler Flags
@@ -128,20 +129,25 @@ ${OBJECTDIR}/src/widgets/ngtk-component.o: src/widgets/ngtk-component.c
 	${RM} $@.d
 	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/widgets/ngtk-component.o src/widgets/ngtk-component.c
 
+${OBJECTDIR}/src/backends/windows/ngtk-win-defs.o: src/backends/windows/ngtk-win-defs.c 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
+	${RM} $@.d
+	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/ngtk-win-defs.o src/backends/windows/ngtk-win-defs.c
+
 ${OBJECTDIR}/src/utils/ngtk-list.o: src/utils/ngtk-list.c 
 	${MKDIR} -p ${OBJECTDIR}/src/utils
 	${RM} $@.d
 	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/utils/ngtk-list.o src/utils/ngtk-list.c
 
-${OBJECTDIR}/src/backends/windows/ngtk-win-event-generator.o: src/backends/windows/ngtk-win-event-generator.c 
-	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
-	${RM} $@.d
-	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/ngtk-win-event-generator.o src/backends/windows/ngtk-win-event-generator.c
-
 ${OBJECTDIR}/src/backends/windows/ngtk-win-container.o: src/backends/windows/ngtk-win-container.c 
 	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
 	${RM} $@.d
 	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/ngtk-win-container.o src/backends/windows/ngtk-win-container.c
+
+${OBJECTDIR}/src/backends/windows/ngtk-win-event-generator.o: src/backends/windows/ngtk-win-event-generator.c 
+	${MKDIR} -p ${OBJECTDIR}/src/backends/windows
+	${RM} $@.d
+	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/backends/windows/ngtk-win-event-generator.o src/backends/windows/ngtk-win-event-generator.c
 
 # Subprojects
 .build-subprojects:

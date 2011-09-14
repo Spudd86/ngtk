@@ -27,6 +27,7 @@
             <itemPath>src/backends/windows/ngtk-win-base.h</itemPath>
             <itemPath>src/backends/windows/ngtk-win-component.h</itemPath>
             <itemPath>src/backends/windows/ngtk-win-container.h</itemPath>
+            <itemPath>src/backends/windows/ngtk-win-defs.h</itemPath>
             <itemPath>src/backends/windows/ngtk-win-event-generator.h</itemPath>
             <itemPath>src/backends/windows/ngtk-win-widget-types.h</itemPath>
           </logicalFolder>
@@ -91,6 +92,7 @@
             <itemPath>src/backends/windows/ngtk-win-base.c</itemPath>
             <itemPath>src/backends/windows/ngtk-win-component.c</itemPath>
             <itemPath>src/backends/windows/ngtk-win-container.c</itemPath>
+            <itemPath>src/backends/windows/ngtk-win-defs.c</itemPath>
             <itemPath>src/backends/windows/ngtk-win-event-generator.c</itemPath>
           </logicalFolder>
         </logicalFolder>
