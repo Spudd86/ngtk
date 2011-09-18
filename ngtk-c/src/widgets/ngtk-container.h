@@ -13,6 +13,10 @@ typedef struct _NGtkContainerF {
 	void               (*remove_child)  (NGtkContainer *self, NGtkComponent* child);
 
 	void               (*place_child)   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
+
+	void               (*set_layout)    (NGtkContainer *self, NGtkLayout *layout);
+
+	void               (*pack)          (NGtkContainer *self);
 } NGtkContainerF;
 
 #define NGTK_CONTAINER_O2F(comp) NGTK_O2F_CAST(comp,NGTK_CONTAINER_TYPE,NGtkContainerF)
@@ -27,4 +31,7 @@ void               ngtk_container_add_child     (NGtkContainer *self, NGtkCompon
 void               ngtk_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
 
 void               ngtk_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
+
+void               ngtk_container_set_layout    (NGtkContainer *self, NGtkLayout *layout);
+void               ngtk_container_pack          (NGtkContainer *self);
 #endif

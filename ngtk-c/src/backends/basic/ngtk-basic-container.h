@@ -5,6 +5,7 @@
 
 typedef struct _ngtk_basic_container_d {
 	NGtkComponentList* children;
+	NGtkLayout*        layout;
 } NGtkBasicContainerD;
 
 #define NGTK_BASIC_CONTAINER_O2D(comp) NGTK_O2D_CAST(comp,NGTK_CONTAINER_TYPE,NGtkBasicContainerD,0)
@@ -18,5 +19,8 @@ void               ngtk_basic_container_add_child     (NGtkContainer *self, NGtk
 void               ngtk_basic_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
 
 void               ngtk_basic_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
+
+void               ngtk_basic_container_set_layout    (NGtkContainer *self, NGtkLayout *layout);
+void               ngtk_basic_container_pack          (NGtkContainer *self);
 
 #endif

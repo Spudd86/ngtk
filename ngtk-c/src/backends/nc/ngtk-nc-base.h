@@ -19,7 +19,7 @@ typedef struct _ngtk_win_base_d {
 #define NGTK_NCBASE_O2D(comp) NGTK_O2D_CAST(comp,NGTK_NCBASE_TYPE,NGtkNcBaseD,0)
 #define NGTK_NCBASE_I2D(comp) NGTK_I2D_CAST(comp,NGTK_NCBASE_TYPE,NGtkNcBaseD,0)
 
-NGtkWinBaseI*         ngtk_nc_base_create_interface  ();
+NGtkNcBaseI*          ngtk_nc_base_create_interface  ();
 void                  ngtk_nc_base_d_free            (void *d);
 
 WINDOW*               ngtk_nc_base_get_window        (NGtkNcBase *self);

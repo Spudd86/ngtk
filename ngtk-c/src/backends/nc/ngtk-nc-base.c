@@ -1,6 +1,6 @@
 #include "ngtk-nc-base.h"
 
-NGtkWinBaseI*   ngtk_nc_base_create_interface  ()
+NGtkNcBaseI*   ngtk_nc_base_create_interface  ()
 {
 	NGtkInterface *in = ngtk_interface_new (NGTK_NCBASE_TYPE);
 	NGtkNcBaseD   *nbd;
@@ -11,7 +11,7 @@ NGtkWinBaseI*   ngtk_nc_base_create_interface  ()
 	nbd->area.w = 0;
 	nbd->area.h = 0;
 	nbd->wnd = NULL;
-	nbd->d_free = ngtk_nc_base_d_free;
+	in->d_free[0] = ngtk_nc_base_d_free;
 
 	return in;
 }
@@ -60,5 +60,3 @@ const NGtkRectangle*  ngtk_nc_base_get_abs_rect (NGtkNcBase *self)
 {
 	return &(NGTK_NCBASE_O2D (self) -> area);
 }
-
-#endif

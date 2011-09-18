@@ -4,6 +4,7 @@
 #include "ngtk-widget-types.h"
 
 #include "ngtk-component.h"
+#include "ngtk-layout.h"
 #include "ngtk-container.h"
 #include "ngtk-event-generator.h"
 

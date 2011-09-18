@@ -19,3 +19,13 @@ void ngtk_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtk
 {
 	NGTK_CONTAINER_O2F (self)->place_child (self, child, rect);
 }
+
+void ngtk_container_set_layout (NGtkContainer *self, NGtkLayout *layout)
+{
+	NGTK_CONTAINER_O2F (self)->set_layout (self, layout);
+}
+
+void ngtk_container_pack (NGtkContainer *self)
+{
+	NGTK_CONTAINER_O2F (self)->pack (self);
+}

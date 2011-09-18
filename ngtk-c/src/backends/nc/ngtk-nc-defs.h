@@ -1,16 +1,20 @@
 #ifndef __NGtk_nc_defs__
 #define __NGtk_nc_defs__
 
-#include "ngtk-nc-widget-types.h"
+#include "../../widgets/ngtk-widgets.h"
 
-#include "ngtk-nc-base.h"
-#include "ngtk-nc-component.h"
-#include "ngtk-nc-container.h"
-#include "ngtk-nc-event-generator.h"
+void            ngtk_nc_init                ();
+void            ngtk_nc_start_main_loop     ();
+void            ngtk_nc_quit_main_loop      ();
+void            ngtk_nc_quit                ();
 
-#include "ngtk-widget-window.h"
+NGtkContainer*  ngtk_nc_create_root_window  (const char* title);
+NGtkComponent*  ngtk_nc_create_button       (const char* text);
+NGtkComponent*  ngtk_nc_create_label        (const char* text);
+NGtkComponent*  ngtk_nc_create_text_entry   (const char* text);
 
-void     ngtk_nc_start_main_loop      ();
-void     ngtk_nc_quit_main_loop       ();
+/* Utility functions of this backend */
+void                ngtk_nc_set_focus_holder (NGtkEventGenerator* eg);
+NGtkEventGenerator* ngtk_nc_get_focus_holder ();
 
 #endif
