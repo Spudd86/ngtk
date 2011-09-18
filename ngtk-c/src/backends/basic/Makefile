@@ -3,10 +3,10 @@ OBJS = \
 	ngtk-basic-container.o \
 	ngtk-basic-event-generator.o
 
-all: ngtk-backend-basic.a
+all: libngtk-backend-basic.a
 
-ngtk-backend-basic.a: $(OBJS)
-	$(AR) $(ARFLAGS) ngtk-backend-basic.a $(OBJS)
+libngtk-backend-basic.a: $(OBJS)
+	$(NGTK_MKS) libngtk-backend-basic.a $(OBJS)
 
 %.o: %.c
 	$(CC) -c $<

@@ -5,10 +5,10 @@ OBJS = \
 	ngtk-nc-defs.o \
 	ngtk-nc-event-generator.o
 
-all: ngtk-backend-nc.a
+all: libngtk-backend-nc.a
 
-ngtk-backend-nc.a: $(OBJS)
-	$(AR) $(ARFLAGS) ngtk-backend-nc.a $(OBJS)
+libngtk-backend-nc.a: $(OBJS)
+	$(NGTK_MKS) libngtk-backend-nc.a $(OBJS)
 
 %.o: %.c
 	$(CC) -c $<

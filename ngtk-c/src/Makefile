@@ -1,4 +1,7 @@
-all:   dist/ngtk.a
+export NGTK_MKS=$(AR) rcs
+export NGTK_MKD=ld --whole-archive -shared -fPIC -o
+
+all:   dist/libngtk.so
 
 clean: .SUBDIRS-CLEAN
 	rm -rf dist
@@ -15,9 +18,9 @@ clean: .SUBDIRS-CLEAN
 	cd widgets;       $(MAKE) clean
 	cd backends;      $(MAKE) clean-backend-nc
 
-dist/ngtk.a: .SUBDIRS
+dist/libngtk.so: .SUBDIRS
 	mkdir -p dist
-	$(AR) $(ARFLAGS) dist/ngtk.a backends/*.a object-system/*.a utils/*.a widgets/*.a
+	$(NGTK_MKD) dist/libngtk.so object-system/*.a utils/*.a widgets/*.a
 
 .PHONY:
 	true

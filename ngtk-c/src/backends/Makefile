@@ -1,4 +1,4 @@
-single_target_name=ngtk_backend.a
+dist_dir=dist
 
 backend-basic: .PHONY
 	cd basic; $(MAKE) $(MFLAGS)
@@ -6,15 +6,16 @@ backend-basic: .PHONY
 clean-backend-basic: .PHONY
 	cd basic; $(MAKE) clean
 
-
-backend-nc: .PHONY backend-basic
+backend-nc: .PHONY backend-basic dist_dir
 	cd nc; $(MAKE) $(MFLAGS)
-	$(AR) $(ARFLAGS) $(single_target_name) basic/ngtk-backend-basic.a nc/ngtk-backend-nc.a
+	$(NGTK_MKD) $(dist_dir)/libngtk-backend-nc.so basic/libngtk-backend-basic.a nc/libngtk-backend-nc.a
 
 clean-backend-nc: .PHONY clean-backend-basic
 	cd nc; $(MAKE) clean
-	rm $(single_target_name)
+	rm -rf $(dist_dir)
 
+dist_dir:
+	mkdir -p $(dist_dir)
 
 .PHONY:
 	true

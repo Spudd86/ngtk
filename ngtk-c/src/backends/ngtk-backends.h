@@ -5,7 +5,7 @@
 
 #ifdef     NGTK_USE_NC
 #  include "nc/ngtk-nc.h"
-#elseifdef NGTK_USE_WINDOWS
+#elif defined NGTK_USE_WINDOWS
 #  include "windows/ngtk-windows-defs.h"
 #else
 #  error   "No backend selected for NGtk!"

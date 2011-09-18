@@ -4,10 +4,10 @@ OBJS = \
 	ngtk-event-generator.o \
 	ngtk-layout.o
 
-all: ngtk-widgets.a
+all: libngtk-widgets.a
 
-ngtk-widgets.a: $(OBJS)
-	$(AR) $(ARFLAGS) ngtk-widgets.a $(OBJS)
+libngtk-widgets.a: $(OBJS)
+	$(NGTK_MKS) libngtk-widgets.a $(OBJS)
 
 %.o: %.c
 	$(CC) -c $<
