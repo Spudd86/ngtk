@@ -118,7 +118,11 @@ void ngtk_nc_start_main_loop ()
 		}
 		else if (ch == KEY_RESIZE)
 		{
-			clear ();
+//			WINDOW *prev = ngtk_nc_base_get_window (ngtk_nc_root_window);
+			
+//			wclear (prev);
+//			wrefresh (prev);
+
 			ngtk_container_pack (ngtk_nc_root_window);
 		}
 		else
@@ -189,7 +193,9 @@ NGtkComponent* ngtk_nc_create_button (const char* text)
 NGtkComponent* ngtk_nc_create_label (const char* text)
 {
 	/* if (! ngtk_nc_focus_holder) ngtk_nc_focus_holder = ... */
-	return ngtk_nc_create_label_imp (text, FALSE);
+	NGtkObject *lab = ngtk_nc_create_label_imp (text, FALSE);
+	ngtk_list_append (ngtk_nc_components, lab);
+	return lab;
 }
 
 NGtkComponent* ngtk_nc_create_text_entry (const char* text)

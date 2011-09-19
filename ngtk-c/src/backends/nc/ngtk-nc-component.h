@@ -5,14 +5,6 @@
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
-typedef struct _ngtk_nc_component_d {
-	NGtkRectangle  area;
-	
-} NGtkNcComponentD;
-
-#define NGTK_NC_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
-#define NGTK_NC_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
-
 NGtkInterface* ngtk_nc_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible);
 
 #define  ngtk_nc_component_get_parent   ngtk_basic_component_get_parent

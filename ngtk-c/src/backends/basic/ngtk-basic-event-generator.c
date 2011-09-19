@@ -15,7 +15,7 @@ NGtkInterface* ngtk_basic_event_generator_create_interface ()
 	
 	in->d_free[0] = ngtk_basic_event_generator_d_free;
 
-	in->f = ngtk_new (NGtkContainerF);
+	in->f = ngtk_new (NGtkEventGeneratorF);
 	NGTK_EVENT_GENERATOR_I2F (in) -> add_mouse_listener       = ngtk_basic_event_generator_add_mouse_listener;
 	NGTK_EVENT_GENERATOR_I2F (in) -> clear_mouse_listeners    = ngtk_basic_event_generator_clear_mouse_listeners;
 	NGTK_EVENT_GENERATOR_I2F (in) -> fire_mouse_event         = ngtk_basic_event_generator_fire_mouse_event;

@@ -14,6 +14,7 @@ typedef struct _ngtk_basic_component_d {
 #define NGTK_BASIC_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkBasicComponentD,0)
 
 NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible);
+void           ngtk_basic_component_d_free           (void *d);
 
 NGtkContainer* ngtk_basic_component_get_parent  (NGtkComponent *self);
 

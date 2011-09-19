@@ -6,8 +6,7 @@ static void pack_main_window (NGtkContainer *self)
 	NGtkListNode  *iter;
 	
 	new_area.x = new_area.y = 0;
-	new_area.w = COLS;
-	new_area.h = LINES;
+	getmaxyx (stdscr, new_area.h, new_area.w);
 	ngtk_nc_base_map_to (self, &new_area);
 
 	if (NGTK_BASIC_CONTAINER_O2D(self)->layout != NULL)

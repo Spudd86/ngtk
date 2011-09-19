@@ -5,12 +5,14 @@ NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer
 	NGtkInterface *in = ngtk_interface_new (NGTK_COMPONENT_TYPE);
 	NGtkBasicComponentD *bcd;
 
-	in->d[0] = bcd = ngtk_new (NGtkBasicComponentD);
+	bcd = ngtk_new (NGtkBasicComponentD);
 	bcd->enabled = enabled;
 	bcd->parent = parent;
 	bcd->text = text;
 	bcd->visible = visible;
-	in->d_free[0] = ngtk_free;
+
+	in->d[0] = bcd;
+	in->d_free[0] = ngtk_basic_component_d_free;
 
 	in->f = ngtk_new (NGtkComponentF);
 	NGTK_COMPONENT_I2F (in) -> get_enabled = ngtk_basic_component_get_enabled;
@@ -26,6 +28,11 @@ NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer
 	return in;
 }
 
+void ngtk_basic_component_d_free (void *d)
+{
+	NGtkBasicComponentD *d_real = (NGtkBasicComponentD*) d;
+	ngtk_free (d_real);
+}
 NGtkContainer* ngtk_basic_component_get_parent  (NGtkComponent *self)
 {
 	return NGTK_BASIC_COMPONENT_O2D (self) -> parent;

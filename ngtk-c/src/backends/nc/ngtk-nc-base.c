@@ -45,18 +45,40 @@ void ngtk_nc_base_unmap_window (NGtkNcBase *self)
 void ngtk_nc_base_map_to (NGtkNcBase *self, const NGtkRectangle *area)
 {
 	NGtkRectangle *rect = &(NGTK_NCBASE_O2D (self) -> area);
+	WINDOW       **wnd  = &(NGTK_NCBASE_O2D (self) -> wnd);
 
-	ngtk_nc_base_unmap_window (self);
-	
 	rect->x = area->x;
 	rect->y = area->y;
 	rect->w = area->w;
 	rect->h = area->h;
 
-	NGTK_NCBASE_O2D (self) -> wnd = newwin (area->h, area->w, area->y, area->x);
+#if FALSE
+	ngtk_nc_base_unmap_window (self);
+	*wnd = newwin (area->h, area->w, area->y, area->x);
+#else
+	if (*wnd == NULL)
+		*wnd = newwin (area->h, area->w, area->y, area->x);
+	else
+	{
+		wresize (*wnd, area->h, area->w);
+		wmove (*wnd, area->x, area->y);
+	}
+#endif
 }
 
 const NGtkRectangle*  ngtk_nc_base_get_abs_rect (NGtkNcBase *self)
 {
 	return &(NGTK_NCBASE_O2D (self) -> area);
+}
+
+void ngtk_nc_base_clear_window_area (NGtkNcBase *self)
+{
+	wclear (NGTK_NCBASE_O2D (self) -> wnd);
+	ngtk_nc_base_publish_window (self);
+}
+/** Publish the window content to the screen */
+void ngtk_nc_base_publish_window (NGtkNcBase *self)
+{
+	overwrite (NGTK_NCBASE_O2D (self) -> wnd, stdscr);
+	refresh ();
 }

@@ -28,4 +28,9 @@ const NGtkRectangle*  ngtk_nc_base_get_abs_rect      (NGtkNcBase *self);
 void                  ngtk_nc_base_map_to            (NGtkNcBase *self, const NGtkRectangle *area);
 void                  ngtk_nc_base_unmap_window      (NGtkNcBase *self);
 
+/** Fill the area of the window with spaces, and then show it to the screen */
+void                  ngtk_nc_base_clear_window_area (NGtkNcBase *self);
+/** Publish the window content to the screen */
+void                  ngtk_nc_base_publish_window    (NGtkNcBase *self);
+
 #endif
