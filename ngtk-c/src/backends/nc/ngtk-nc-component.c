@@ -72,5 +72,9 @@ void ngtk_nc_component_redraw (NGtkComponent *self)
 	if (! dReal->enabled)
 		wattroff (wnd, A_DIM);
 
+	refresh ();
 	wrefresh (wnd);
+
+	/* Base will redraw the children if needed */
+	ngtk_basic_component_redraw (self);
 }

@@ -2,15 +2,17 @@
 #define __NGtk_event_codes_h__
 
 typedef enum {
+	NGTK_MBUT_NONE = 0,
 	NGTK_MBUT_L,
 	NGTK_MBUT_R,
 	NGTK_MBUT_M,
-	NGTK_MBUT_W
 } NGtkMouseEventButton;
 
 typedef enum {
 	NGTK_MET_UP,
-	NGTK_MET_DOWN
+	NGTK_MET_DOWN,
+	NGTK_MET_CLICK,
+	NGTK_MET_MOVE
 } NGtkMouseEventType;
 
 typedef enum {

@@ -1,6 +1,7 @@
 export NGTK_MKS=$(AR) rcs
 export NGTK_MKD=ld --whole-archive -shared -fPIC -o
-
+CC+=-g -Wall -Werror
+export CC
 all:   dist/libngtk.so
 
 clean: .SUBDIRS-CLEAN

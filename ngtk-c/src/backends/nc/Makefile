@@ -3,7 +3,8 @@ OBJS = \
 	ngtk-nc-component.o \
 	ngtk-nc-container.o \
 	ngtk-nc-defs.o \
-	ngtk-nc-event-generator.o
+	ngtk-nc-event-generator.o \
+	ngtk-nc-window.o
 
 all: libngtk-backend-nc.a
 

@@ -8,7 +8,7 @@ NGtkInterface* ngtk_basic_container_create_interface ()
 	in->d[0] = bcd = ngtk_new (NGtkBasicContainerD);
 	bcd->children  = ngtk_list_new ();
 	bcd->layout    = NULL;
-	in->d_free[0]  = ngtk_free;
+	in->d_free[0]  = ngtk_basic_container_free_d;
 
 	in->f = ngtk_new (NGtkContainerF);
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_basic_container_get_children;
@@ -20,6 +20,12 @@ NGtkInterface* ngtk_basic_container_create_interface ()
 	return in;
 }
 
+void ngtk_basic_container_free_d (void *d)
+{
+	NGtkBasicContainerD *d_real = (NGtkBasicContainerD*)d;
+	ngtk_list_free (d_real->children);
+	ngtk_free (d);
+}
 NGtkComponentList* ngtk_basic_container_get_children (NGtkContainer *self)
 {
 	return NGTK_BASIC_CONTAINER_O2D (self) -> children;

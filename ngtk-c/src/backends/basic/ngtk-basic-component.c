@@ -62,4 +62,13 @@ void ngtk_basic_component_set_text (NGtkComponent *self, const char *text)
 
 void ngtk_basic_component_redraw (NGtkComponent *self)
 {
+	/* Let's break some abstraction */
+	if (ngtk_object_is_a (self, NGTK_CONTAINER_TYPE))
+	{
+		NGtkListNode *iter;
+		ngtk_list_foreach (iter, ngtk_container_get_children (self))
+		{
+			ngtk_component_redraw ((NGtkComponent*) iter->data);
+		}
+	}
 }

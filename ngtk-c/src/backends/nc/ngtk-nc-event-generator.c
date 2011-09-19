@@ -15,6 +15,8 @@ NGtkInterface* ngtk_nc_event_generator_create_interface ()
 	NGTK_EVENT_GENERATOR_I2F (in) -> fire_keyboard_event      = ngtk_nc_event_generator_fire_keyboard_event;
 	
 	NGTK_EVENT_GENERATOR_I2F (in) -> grab_keyboard_focus      = ngtk_nc_event_generator_grab_keyboard_focus;
+
+	return in;
 }
 
 void ngtk_nc_event_generator_grab_keyboard_focus (NGtkEventGenerator *self)

@@ -10,6 +10,7 @@
 #include "ngtk-nc-container.h"
 #include "ngtk-nc-event-generator.h"
 
+#include "ngtk-nc-window.h"
 
 #define ngtk_init                ngtk_nc_init
 #define ngtk_start_main_loop     ngtk_nc_start_main_loop

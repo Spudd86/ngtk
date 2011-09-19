@@ -29,6 +29,6 @@ void ngtk_nc_container_remove_child (NGtkContainer *self, NGtkComponent* child)
 void ngtk_nc_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)
 {
 	/* TODO: since we allow only one window in the NCurses backend */
-	ngtk_nc_base_map_to (self, rect);
+	ngtk_nc_base_map_to (child, rect);
 	ngtk_basic_container_place_child (self, child, rect);
 }

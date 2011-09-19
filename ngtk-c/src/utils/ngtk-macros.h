@@ -19,12 +19,13 @@
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
+#define NGTK_IN_RANGE(val,min,max) ((min) <= (val) && (val) <= (max))
 #define NGTK_BIT_MASK(bit) (1 << ((bit)-1))
 
 #define NGTK_FIELD_OFFSET(field,type) ((int)(&(((type*)NULL)->field)))
 
-#define NGTK_LONG_MACRO_BEGIN do
-#define NGTK_LONG_MACRO_END   while(FALSE);
+#define NGTK_LONG_MACRO_BEGIN do {
+#define NGTK_LONG_MACRO_END   } while (FALSE)
 
 #ifndef NGTK_OPTIMIZE
 #define ngtk_assert(expr) assert(expr)
