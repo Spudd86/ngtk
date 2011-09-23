@@ -7,6 +7,8 @@
 #  include "nc/ngtk-nc.h"
 #elif defined NGTK_USE_WINDOWS
 #  include "windows/ngtk-windows-defs.h"
+#elif defined NGTK_USE_XLIB
+#  include "xlib/ngtk-xlib.h"
 #else
 #  error   "No backend selected for NGtk!"
 #endif

@@ -11,13 +11,15 @@ clean: .SUBDIRS-CLEAN
 	cd object-system; $(MAKE) $(MFLAGS)
 	cd utils;         $(MAKE) $(MFLAGS)
 	cd widgets;       $(MAKE) $(MFLAGS)
-	cd backends;      $(MAKE) backend-nc
+	cd backends;      $(MAKE) $(MFLAGS) backend-nc
+	cd backends;      $(MAKE) $(MFLAGS) backend-xlib
 
 .SUBDIRS-CLEAN: .PHONY
-	cd object-system; $(MAKE) clean
-	cd utils;         $(MAKE) clean
-	cd widgets;       $(MAKE) clean
-	cd backends;      $(MAKE) clean-backend-nc
+	cd object-system; $(MAKE) $(MFLAGS) clean
+	cd utils;         $(MAKE) $(MFLAGS) clean
+	cd widgets;       $(MAKE) $(MFLAGS) clean
+	cd backends;      $(MAKE) $(MFLAGS) clean-backend-nc
+	cd backends;      $(MAKE) $(MFLAGS) clean-backend-xlib
 
 dist/libngtk.so: .SUBDIRS
 	mkdir -p dist
