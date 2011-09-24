@@ -1,16 +1,17 @@
+#include "ngtk-xlib-defs.h"
 #include "ngtk-xlib-base.h"
 
-NGtkXlibBaseI* ngtk_xlib_base_create_interface  ()
+NGtkXlibBaseI* ngtk_xlib_base_create_interface  (Window xlib_wnd)
 {
 	NGtkInterface *in = ngtk_interface_new (NGTK_XLIBBASE_TYPE);
-	NGtkXlibBaseD  xbd;
+	NGtkXlibBaseD *xbd;
 	
 	in->d[0] = xbd = ngtk_new (NGtkXlibBaseD);
 	xbd->area.x = 0;
 	xbd->area.y = 0;
 	xbd->area.w = 0;
 	xbd->area.h = 0;
-	xbd->wnd = NULL;
+	xbd->wnd = xlib_wnd;
 	in->d_free[0] = ngtk_xlib_base_d_free;
 
 	return in;
@@ -20,65 +21,40 @@ void ngtk_xlib_base_d_free (void *d)
 {
 	NGtkXlibBaseD *dReal = (NGtkXlibBaseD*) d;
 
-	if (dReal->wnd != NULL)
-		XDestroyWindow ()
+	if (dReal->wnd != BadWindow)
+		XDestroyWindow (ngtk_xlib_get_display (), dReal->wnd);
 
 	ngtk_free (dReal);
 }
 
 
-WINDOW* ngtk_xlib_base_get_window (NGtkXlibBase *self)
+Window ngtk_xlib_base_get_window (NGtkXlibBase *self)
 {
-	return NGTK_NCBASE_O2D (self) -> wnd;
+	return NGTK_XLIBBASE_O2D (self) -> wnd;
 }
 
-void ngtk_xlib_base_unmap_window (NGtkXlibBase *self)
+void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area)
 {
-	WINDOW** wnd = &(NGTK_NCBASE_O2D (self) -> wnd);
-	if (*wnd != NULL)
-	{
-		delwin (*wnd);
-		*wnd = NULL;
-	}
-}
-
-void ngtk_xlib_base_map_to (NGtkXlibBase *self, const NGtkRectangle *area)
-{
-	NGtkRectangle *rect = &(NGTK_NCBASE_O2D (self) -> area);
-	WINDOW       **wnd  = &(NGTK_NCBASE_O2D (self) -> wnd);
+	NGtkRectangle *rect = &(NGTK_XLIBBASE_O2D (self) -> area);
+	Window         wnd  = NGTK_XLIBBASE_O2D (self) -> wnd;
 
 	rect->x = area->x;
 	rect->y = area->y;
 	rect->w = area->w;
 	rect->h = area->h;
 
-#if FALSE
-	ngtk_xlib_base_unmap_window (self);
-	*wnd = newwin (area->h, area->w, area->y, area->x);
-#else
-	if (*wnd == NULL)
-		*wnd = newwin (area->h, area->w, area->y, area->x);
-	else
-	{
-		wresize (*wnd, area->h, area->w);
-		wmove (*wnd, area->x, area->y);
-	}
-#endif
+	XMoveWindow (ngtk_xlib_get_display (), wnd, area->x, area->y);
+	XResizeWindow (ngtk_xlib_get_display (), wnd, area->w, area->h);
+	XMapWindow (ngtk_xlib_get_display (), wnd);
 }
 
-const NGtkRectangle*  ngtk_xlib_base_get_abs_rect (NGtkXlibBase *self)
+const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self)
 {
-	return &(NGTK_NCBASE_O2D (self) -> area);
+	return &(NGTK_XLIBBASE_O2D (self) -> area);
 }
 
-void ngtk_xlib_base_clear_window_area (NGtkXlibBase *self)
-{
-	wclear (NGTK_NCBASE_O2D (self) -> wnd);
-	ngtk_xlib_base_publish_window (self);
-}
 /** Publish the window content to the screen */
 void ngtk_xlib_base_publish_window (NGtkXlibBase *self)
 {
-	overwrite (NGTK_NCBASE_O2D (self) -> wnd, stdscr);
-	refresh ();
+	
 }

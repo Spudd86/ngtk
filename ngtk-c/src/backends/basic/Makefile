@@ -12,4 +12,4 @@ libngtk-backend-basic.a: $(OBJS)
 	$(CC) -c $<
 
 clean:
-	rm *.o *.a
+	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete

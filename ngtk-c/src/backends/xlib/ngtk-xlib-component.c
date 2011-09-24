@@ -1,3 +1,4 @@
+#include "ngtk-xlib-defs.h"
 #include "ngtk-xlib-base.h"
 #include "ngtk-xlib-component.h"
 #include "../basic/ngtk-basic.h"
@@ -23,23 +24,15 @@ void ngtk_xlib_component_set_enabled (NGtkComponent *self, int enabled)
 void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 {
 	int old_val = ngtk_component_get_visible (self);
-	ngtk_basic_component_set_visible (self, visible);
-	ngtk_xlib_component_redraw (self);
 
-	/* Clear the widget if it wasn't visible */
-	if (old_val && ! visible)
+	if (old_val != visible)
 	{
-		/* TODO: The behaviour is underfined for widgets that overlap one
-		 * another. This is not a bug, but it should be documented. Since
-		 * redrawing an invisible area clears the area below it, then
-		 * redrawing an invisible widget will lead to unexpected results.
-		 * maybe fix this by asking the parent to redraw... */
-		ngtk_xlib_base_clear_window_area (self);
+		if (visible)
+			XMapWindow (ngtk_xlib_get_display (), NGTK_XLIBBASE_O2D (self) -> wnd);
+		else
+			XUnmapWindow (ngtk_xlib_get_display (), NGTK_XLIBBASE_O2D (self) -> wnd);
 	}
-	else if (! old_val && visible)
-	{
-		ngtk_component_redraw (self);
-	}
+	ngtk_basic_component_set_visible (self, visible);
 }
 
 void ngtk_xlib_component_set_text (NGtkComponent *self, const char *text)
@@ -50,19 +43,19 @@ void ngtk_xlib_component_set_text (NGtkComponent *self, const char *text)
 
 void ngtk_xlib_component_redraw (NGtkComponent *self)
 {
-	const NGtkBasicComponentD *dReal = NGTK_BASIC_COMPONENT_O2D (self);
-	WINDOW *wnd = ngtk_xlib_base_get_window (self);
-	const NGtkRectangle *area = ngtk_xlib_base_get_abs_rect (self);
-
-	int max_x, max_y, min_x, min_y;
-	
-	if (wnd == NULL || ! dReal->visible)
-		return;
-
-	/* TODO redraw */
-
-	ngtk_xlib_base_publish_window (self);
-	
-	/* Base will redraw the children if needed */
+//	const NGtkBasicComponentD *dReal = NGTK_BASIC_COMPONENT_O2D (self);
+//	WINDOW *wnd = ngtk_xlib_base_get_window (self);
+//	const NGtkRectangle *area = ngtk_xlib_base_get_abs_rect (self);
+//
+//	int max_x, max_y, min_x, min_y;
+//	
+//	if (wnd == NULL || ! dReal->visible)
+//		return;
+//
+//	/* TODO redraw */
+//
+//	ngtk_xlib_base_publish_window (self);
+//	
+//	/* Base will redraw the children if needed */
 	ngtk_basic_component_redraw (self);
 }

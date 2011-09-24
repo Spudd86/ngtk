@@ -1,6 +1,7 @@
 #ifndef __NGtk_xlib_defs__
 #define __NGtk_xlib_defs__
 
+#include <X11/Xlib.h>
 #include "../../widgets/ngtk-widgets.h"
 
 void            ngtk_xlib_init                ();
@@ -32,10 +33,27 @@ NGtkComponent*  ngtk_xlib_create_text_entry   (NGtkContainer* parent, const char
 	/* The mouse was moved while one or more of it's buttons was       \
 	 * pressed. This will generate an event of type MotionNotify */    \
 	ButtonMotionMask                                                   \
+	/* The window structure was modified. We will use this to be       \
+	 * notified when the window was closed. This will generate an      \
+	 * event of several types, we will catch just DestroyNotify */     \
+	StructureNotifyMask                                                \
 	)
+
+/* Colors used by this backend */
+typedef enum {
+	NGTK_XLIB_WHITE = 0,
+	NGTK_XLIB_BLACK = 1,
+	NGTK_XLIB_GRAY  = 2,
+
+	NGTK_XLIB_COLOR_MAX = 3
+} NGtkXlibColorName;
+
 
 /* Utility functions of this backend */
 void                ngtk_xlib_set_focus_holder (NGtkEventGenerator* eg);
 NGtkEventGenerator* ngtk_xlib_get_focus_holder ();
 
+Display*            ngtk_xlib_get_display ();
+Window              ngtk_xlib_get_root_window ();
+unsigned long       ngtk_xlib_get_color (NGtkXlibColorName cn);
 #endif

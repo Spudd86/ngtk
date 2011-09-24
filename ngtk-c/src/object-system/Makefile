@@ -7,4 +7,4 @@ libngtk-object-system.a: ngtk-object.o
 	$(CC) -c $<
 
 clean:
-	rm *.o *.a
+	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete

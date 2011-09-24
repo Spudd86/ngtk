@@ -13,4 +13,4 @@ libngtk-widgets.a: $(OBJS)
 	$(CC) -c $<
 
 clean:
-	rm *.o *.a
+	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete

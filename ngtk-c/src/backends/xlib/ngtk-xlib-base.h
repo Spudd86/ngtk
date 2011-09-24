@@ -19,14 +19,13 @@ typedef struct _ngtk_xlib_base_d {
 #define NGTK_XLIBBASE_O2D(comp) NGTK_O2D_CAST(comp,NGTK_XLIBBASE_TYPE,NGtkXlibBaseD,0)
 #define NGTK_XLIBBASE_I2D(comp) NGTK_I2D_CAST(comp,NGTK_XLIBBASE_TYPE,NGtkXlibBaseD,0)
 
-NGtkXlibBaseI*        ngtk_xlib_base_create_interface  ();
+NGtkXlibBaseI*        ngtk_xlib_base_create_interface  (Window xlib_wnd);
 void                  ngtk_xlib_base_d_free            (void *d);
 
 Window                ngtk_xlib_base_get_window        (NGtkXlibBase *self);
-const NGtkRectangle*  ngtk_xlib_base_get_abs_rect      (NGtkXlibBase *self);
+const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self);
 
-void                  ngtk_xlib_base_map_to            (NGtkXlibBase *self, const NGtkRectangle *area);
-void                  ngtk_xlib_base_unmap_window      (NGtkXlibBase *self);
+void                  ngtk_xlib_base_put_to            (NGtkXlibBase *self, const NGtkRectangle *area);
 
 /** Publish the window content to the screen */
 void                  ngtk_xlib_base_publish_window    (NGtkXlibBase *self);
