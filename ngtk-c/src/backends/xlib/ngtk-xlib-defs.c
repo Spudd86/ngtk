@@ -198,6 +198,7 @@ void ngtk_xlib_start_main_loop ()
 			if (NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd == wnd)
 			{
 				ngtk_xlib_quit_main_loop ();
+				printf ("Quit main loop!\n");
 			}
 			break;
 		}
@@ -207,8 +208,7 @@ void ngtk_xlib_start_main_loop ()
 				&& event.xclient.window == NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd)
 			{
 				printf ("Received destroy message from WM!\n");
-				//XDestroyWindow (xlib_display, NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd);
-				ngtk_xlib_quit_main_loop ();
+				XDestroyWindow (xlib_display, NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd);
 			}
 			else
 			{

@@ -32,7 +32,7 @@ NGtkComponent*  ngtk_xlib_create_text_entry   (NGtkContainer* parent, const char
 	PointerMotionMask |                                                \
 	/* The mouse was moved while one or more of it's buttons was       \
 	 * pressed. This will generate an event of type MotionNotify */    \
-	ButtonMotionMask                                                   \
+	ButtonMotionMask |                                                 \
 	/* The window structure was modified. We will use this to be       \
 	 * notified when the window was closed. This will generate an      \
 	 * event of several types, we will catch just DestroyNotify */     \
