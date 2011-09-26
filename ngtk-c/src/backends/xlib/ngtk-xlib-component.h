@@ -18,6 +18,6 @@ void     ngtk_xlib_component_set_visible  (NGtkComponent *self, int visible);
 #define  ngtk_xlib_component_get_text     ngtk_basic_component_get_text
 void     ngtk_xlib_component_set_text     (NGtkComponent *self, const char *text);
 
-void     ngtk_xlib_component_redraw       (NGtkComponent *self);
+#define  ngtk_xlib_component_redraw       ngtk_basic_component_redraw
 
 #endif

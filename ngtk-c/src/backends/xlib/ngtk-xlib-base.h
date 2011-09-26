@@ -27,7 +27,4 @@ const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self);
 
 void                  ngtk_xlib_base_put_to            (NGtkXlibBase *self, const NGtkRectangle *area);
 
-/** Publish the window content to the screen */
-void                  ngtk_xlib_base_publish_window    (NGtkXlibBase *self);
-
 #endif

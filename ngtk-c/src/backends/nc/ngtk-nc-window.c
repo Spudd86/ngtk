@@ -3,8 +3,7 @@
 static void pack_main_window (NGtkContainer *self)
 {
 	NGtkRectangle new_area;
-	NGtkListNode  *iter;
-	
+	NGtkListNode *iter;
 	new_area.x = new_area.y = 0;
 	getmaxyx (stdscr, new_area.h, new_area.w);
 	ngtk_nc_base_map_to (self, &new_area);
@@ -12,12 +11,23 @@ static void pack_main_window (NGtkContainer *self)
 	if (NGTK_BASIC_CONTAINER_O2D(self)->layout != NULL)
 		ngtk_layout_pack (NGTK_BASIC_CONTAINER_O2D(self)->layout, self, COLS, LINES);
 
-	ngtk_component_redraw (self);
-
+	/* NCURSES has a bug that means that if any WINDOW became partially
+	 * outside the screen, it will erdraaw uglylly. So we must refresh
+	 * the windows when resizing to avoid this.
+	 * 
+	 * The put_to function of the ncbase class will delete the existing
+	 * WINDOW and will crate a new one. We will do this for all the
+	 * children since we have no (easy) way to know which one was
+	 * resized by the packing and which one wasn't.
+	 */
 	ngtk_list_foreach (iter, ngtk_container_get_children (self))
 	{
-		ngtk_component_redraw ((NGtkComponent*) iter->data);
+		NGtkComponent *child = (NGtkComponent*) iter->data;
+		ngtk_nc_base_map_to (child, ngtk_nc_base_get_abs_rect (child));
 	}
+	
+	/* Note that the redraw method also redraws the children */
+	ngtk_component_redraw (self);
 }
 
 NGtkObject* ngtk_nc_create_label_imp (const char* title, int visible)

@@ -45,16 +45,9 @@ void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area)
 
 	XMoveWindow (ngtk_xlib_get_display (), wnd, area->x, area->y);
 	XResizeWindow (ngtk_xlib_get_display (), wnd, area->w, area->h);
-	XMapWindow (ngtk_xlib_get_display (), wnd);
 }
 
 const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self)
 {
 	return &(NGTK_XLIBBASE_O2D (self) -> area);
-}
-
-/** Publish the window content to the screen */
-void ngtk_xlib_base_publish_window (NGtkXlibBase *self)
-{
-	
 }

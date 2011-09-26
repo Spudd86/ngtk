@@ -23,17 +23,101 @@ typedef struct _NGtkComponentF {
 
 /* The following functions only wrap calls instead of doing them
  * directly from the NGtkComponentF object */
+
+/**
+ * Return the parent container of this component
+ * 
+ * @param self The component who's parent should be returned
+ * @return The parent container of the component
+ *
+ * @since 0.9
+ */
 NGtkContainer* ngtk_component_get_parent  (NGtkComponent *self);
 
+/**
+ * Check if a component is enabled. Depending on the component, the
+ * enabled status may change which events does it receive (if it's also
+ * an event generator) and/or the way it's being drawn.
+ * 
+ * @param self The component
+ * @return The enabled status of the component
+ *
+ * @since 0.9
+ */
 int            ngtk_component_get_enabled (NGtkComponent *self);
+
+/**
+ * Set the enabled status of a component.
+ * 
+ * @param self The component
+ * @param enabled The new enabled status of the component
+ *
+ * @see ngtk_component_get_enabled
+ *
+ * @since 0.9
+ */
 void           ngtk_component_set_enabled (NGtkComponent *self, int enabled);
 
+/**
+ * Check whether a component is visible. Note that a visible component
+ * inside a hidden parent will not be shown since the parent is hidden.
+ * 
+ * @param self The component
+ * @return Whether this component is visible
+ *
+ * @since 0.9
+ */
 int            ngtk_component_get_visible (NGtkComponent *self);
+
+/**
+ * Set the visibility of a component
+ * 
+ * @param self The component
+ * @param visible The new visibility statues of the component
+ *
+ * @see ngtk_component_get_visible
+ *
+ * @since 0.9
+ */
 void           ngtk_component_set_visible (NGtkComponent *self, int visible);
 
+/**
+ * Get the text content of the component. This is component dependant
+ * (for example, for windows the text is the title, for labels this is
+ * the actual text displayed, ...)
+ * 
+ * @param self The component
+ * @return The text content of the component.
+ *
+ * @since 0.9
+ */
 const char*    ngtk_component_get_text    (NGtkComponent *self);
+
+/**
+ * Set the text of a component
+ * 
+ * @param self The component
+ * @param text The new visibility text content of the component
+ *
+ * @see ngtk_component_get_text
+ *
+ * @since 0.9
+ */
 void           ngtk_component_set_text    (NGtkComponent *self, const char *text);
 
+/**
+ * Ask a component to be redrawn.
+ *
+ * @param self The component
+ * @return The text content of the component.
+ *
+ * @warning This method should not be called outside of NGtk - it's for
+ *          internal use only. Furthermore, it should not be needed
+ *          outside of NGtk since it's invoked automatically whenever
+ *          needed.
+ * 
+ * @since 0.9
+ */
 void           ngtk_component_redraw      (NGtkComponent *self);
 
 #endif

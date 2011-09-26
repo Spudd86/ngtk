@@ -52,7 +52,7 @@ void ngtk_nc_base_map_to (NGtkNcBase *self, const NGtkRectangle *area)
 	rect->w = area->w;
 	rect->h = area->h;
 
-#if FALSE
+#if TRUE
 	ngtk_nc_base_unmap_window (self);
 	*wnd = newwin (area->h, area->w, area->y, area->x);
 #else

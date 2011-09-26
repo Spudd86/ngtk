@@ -22,7 +22,6 @@ void ngtk_xlib_container_add_child (NGtkContainer *self, NGtkComponent* child)
 
 void ngtk_xlib_container_remove_child (NGtkContainer *self, NGtkComponent* child)
 {
-//	ngtk_xlib_base_unmap_window (child);
 	ngtk_basic_container_remove_child (self, child);
 }
 
