@@ -152,6 +152,14 @@ static void draw_label (NGtkComponent *label)
 	const char *text = ngtk_component_get_text (label);
 
 	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+
+	/* The color is gray if we are disabled */
+	if (! ngtk_component_get_enabled (label))
+		XSetForeground (disp, gc, ngtk_xlib_get_color (NGTK_XLIB_GRAY));
+	else
+		XSetForeground (disp, gc, ngtk_xlib_get_color (NGTK_XLIB_BLACK));
+
+	/* Labels are not and can not be focus holders! */
 	draw_aligned_text (disp, wnd, gc, rect, TRUE, 0, 2, 0.5f, 2, text);
 
 	XFreeGC (disp, gc);
@@ -167,8 +175,19 @@ static void draw_button (NGtkComponent *but)
 	const char *text = ngtk_component_get_text (but);
 
 	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+
+	/* The color is gray if we are disabled */
+	if (! ngtk_component_get_enabled (but))
+		XSetForeground (disp, gc, ngtk_xlib_get_color (NGTK_XLIB_GRAY));
+	else
+		XSetForeground (disp, gc, ngtk_xlib_get_color (NGTK_XLIB_BLACK));
+	
 	draw_aligned_text (disp, wnd, gc, rect, TRUE, 0.5f, 2, 0.5f, 2, text);
+
+	/* Draw a border, or a double border if we hold the focus */
 	XDrawRectangle (disp, wnd, gc, 0, 0, rect->w - 1, rect->h - 1);
+	if (ngtk_xlib_get_focus_holder () == but)
+		XDrawRectangle (disp, wnd, gc, 1, 1, rect->w - 3, rect->h - 3);
 
 	XFreeGC (disp, gc);
 }

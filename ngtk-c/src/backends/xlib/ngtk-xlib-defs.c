@@ -421,6 +421,7 @@ NGtkComponent* ngtk_xlib_create_text_entry (NGtkContainer* parent, const char* t
 
 void ngtk_xlib_set_focus_holder (NGtkEventGenerator* eg)
 {
+	XSetInputFocus (xlib_display, ngtk_xlib_base_get_window (eg), RevertToParent, CurrentTime);
 	ngtk_xlib_focus_holder = eg;
 }
 
