@@ -81,4 +81,7 @@ typedef struct {
 #define ngtk_rect_contains(prect,x0,y0) \
 	(  NGTK_IN_RANGE (x0, (prect)->x, (prect)->x + (prect)->w - 1) \
 	&& NGTK_IN_RANGE (y0, (prect)->y, (prect)->y + (prect)->h - 1) )
+
+typedef void (*NGtkFreeFunc) (void *data);
+typedef void (*NGtkDFreeFunc) (void *data, void *extra_data);
 #endif

@@ -21,6 +21,8 @@
 #ifndef __NGtk_list_h__
 #define __NGtk_list_h__
 
+#include "ngtk-misc-types.h"
+
 typedef struct _ngtk_list_node {
 	void *data;
 	struct _ngtk_list_node* prev;
@@ -33,6 +35,9 @@ typedef struct {
 } NGtkList;
 
 #define NGTK_EMPTY_LIST_CONST { NULL, NULL }
+
+typedef void (*NGtkListApplyFunc) (void *data);
+typedef void (*NGtkListDataApplyFunc) (void *data, void *extra_data);
 
 NGtkListNode* ngtk_list_node_new              (void* data);
 
@@ -61,6 +66,8 @@ void          ngtk_list_append                (NGtkList *list, void *data);
 void          ngtk_list_prepend               (NGtkList *list, void *data);
 
 void          ngtk_list_free                  (NGtkList *list);
+
+void          ngtk_list_clear_with_free_func  (NGtkList *list, NGtkFreeFunc func);
 
 void          ngtk_list_clear                 (NGtkList *list);
 

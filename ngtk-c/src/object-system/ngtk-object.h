@@ -34,16 +34,13 @@ typedef unsigned short     NGtkType;
 
 #define NGTK_TYPE_NONE 0
 
-typedef void (*NGtkObjectListener)    (NGtkObject *obj,   const char *signame, NGtkValue *data);
-typedef void (*NGtkInterfaceListener) (NGtkInterface *in, const char *signame, NGtkValue *data);
+typedef void (*NGtkListener) (void *signal_src, const char *signame, NGtkValue *data);
 
-typedef struct _ngtk_listener {
-	union {
-		NGtkObjectListener    obj_l;
-		NGtkInterfaceListener in_l;
-	} func;
-	const char *signame;
-} NGtkListener;
+#define NGTK_ALL_SIGNALS NULL
+typedef struct _ngtk_listener_info {
+	NGtkListener  func;
+	const char   *signame;
+} NGtkListenerInfo;
 
 struct _ngtk_object {
 	NGtkObjectTypeMask  iBits;
@@ -57,7 +54,7 @@ struct _ngtk_object {
 	 * object itself */
 	int                 interfaces_ref_count;
 
-	NGtkList           *listeners;
+	NGtkList            listeners;
 };
 
 struct _ngtk_inteface {
@@ -72,7 +69,7 @@ struct _ngtk_inteface {
 	 * one from the object itself */
 	int                 ref_count;
 
-	NGtkList           *listeners;
+	NGtkList            listeners;
 };
 
 NGtkObject*    ngtk_object_new           ();
@@ -81,6 +78,8 @@ NGtkInterface* ngtk_object_cast          (NGtkObject* obj, NGtkType iType);
 int            ngtk_object_is_a          (NGtkObject* obj, NGtkType iType);
 void           ngtk_object_ref           (NGtkObject* obj);
 void           ngtk_object_unref         (NGtkObject* obj);
+void           ngtk_object_connect_to    (NGtkObject *obj, const char* signal, NGtkListener listener);
+void           ngtk_object_send_signal   (NGtkObject* obj, const char* signal, NGtkValue *data);
 
 NGtkInterface* ngtk_interface_new        (NGtkType iType);
 void           ngtk_interface_free       (NGtkInterface *in);
@@ -89,6 +88,8 @@ int            ngtk_interface_is_a       (NGtkInterface* in, NGtkType iType);
 NGtkObject*    ngtk_interface_get_object (NGtkInterface *in);
 void           ngtk_interface_ref        (NGtkInterface *in);
 void           ngtk_interface_unref      (NGtkInterface *in);
+void           ngtk_interface_connect_to (NGtkInterface *in, const char* signal, NGtkListener listener);
+void           ngtk_interface_send_signal(NGtkInterface *in, const char* signal, NGtkValue *data, int also_object);
 
 void           ngtk_object_implement     (NGtkObject *obj, NGtkInterface *in);
 

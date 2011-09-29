@@ -149,6 +149,18 @@ void ngtk_list_prepend (NGtkList *list, void *data)
 	}
 }
 
+void ngtk_list_clear_with_free_func  (NGtkList *list, NGtkFreeFunc func)
+{
+	NGtkListNode *iter, *next = NULL;
+
+	for (iter = list->first; iter != NULL; iter = next)
+	{
+		next = iter->next;
+		func (iter->data);
+		ngtk_list_node_free (iter);
+	}
+}
+
 void ngtk_list_clear (NGtkList *list)
 {
 	NGtkListNode *iter, *next = NULL;

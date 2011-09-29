@@ -33,5 +33,4 @@
 #define ngtk_malloc      malloc
 #define ngtk_free        free
 
-typedef void (*NGtkFreeFunc) (void *data);
 #endif
