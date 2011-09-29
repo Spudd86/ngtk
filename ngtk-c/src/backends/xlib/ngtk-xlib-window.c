@@ -14,7 +14,7 @@ static void pack_main_window (NGtkContainer *self)
 	XGetGeometry (ngtk_xlib_get_display (), ngtk_xlib_base_get_window (self), &root,
 		&new_area.x, &new_area.y, &w, &h, &border_width, &depth);
 	new_area.w = w;
-	new_area.w = h;
+	new_area.h = h;
 	
 	ngtk_xlib_base_put_to (self, &new_area, TRUE);
 
@@ -109,7 +109,7 @@ NGtkObject* ngtk_xlib_create_window_imp (const char* title, int visible)
 	ngtk_xlib_base_put_to (obj, &entire_screen, FALSE);
 	NGTK_CONTAINER_O2F (obj)->pack = pack_main_window;
 
-	XSelectInput (ngtk_xlib_get_display (), xlib_wnd, NGTK_XLIB_EVENT_MASK | ResizeRedirectMask);
+	XSelectInput (ngtk_xlib_get_display (), xlib_wnd, NGTK_XLIB_EVENT_MASK);
 
 	NGTK_COMPONENT_O2F (obj) -> redraw = checkers_draw;
 	
