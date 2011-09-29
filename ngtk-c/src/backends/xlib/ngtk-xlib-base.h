@@ -12,8 +12,11 @@
  */
  
 typedef struct _ngtk_xlib_base_d {
-	NGtkRectangle area;
-	Window        wnd;
+	NGtkRectangle  area;
+	Window        _wnd; /* This field must not be accessed directly! It
+	                     * must be a constant field so that the mapping
+	                     * we will maintain from Window->NGtkListBaseI
+	                     * will remain valid */
 } NGtkXlibBaseD;
 
 #define NGTK_XLIBBASE_O2D(comp) NGTK_O2D_CAST(comp,NGTK_XLIBBASE_TYPE,NGtkXlibBaseD,0)
@@ -27,4 +30,6 @@ const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self);
 
 void                  ngtk_xlib_base_put_to            (NGtkXlibBase *self, const NGtkRectangle *area);
 
+NGtkXlibBase*         ngtk_xlib_base_get_for_window    (Window xlib_wnd);
+NGtkXlibBase*         ngtk_xlib_base_call_on_window_destroyed (Window xlib_wnd);
 #endif

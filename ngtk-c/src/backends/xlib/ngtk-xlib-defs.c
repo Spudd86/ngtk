@@ -87,11 +87,114 @@ void ngtk_xlib_init ()
 	ngtk_xlib_initialized = TRUE;
 }
 
-#if FALSE
-static void component_moused (NGtkComponent* comp, XButtonEvent evnt)
+/* You want to read the man page for XButtonEvent in order to understand
+ * the following function. */
+static void handle_mouse_button_event (XButtonEvent evnt)
 {
+	/* In order to determine where a mouse press and release together
+	 * from a click, we must check that the press and release of the
+	 * button both happen on the same component */
+	static Window last_but_press_here[4] = { 0, BadWindow, BadWindow, BadWindow };
+
+	/* The Xlib Window where the event occured */
+	Window wnd = evnt.window;
+
+	/* A mask of pressed mouse buttons and keyboard modifiers just
+	 * before the event occured */
+	/* unsigned int state_before = evnt.state; */
+
+	/* The mouse button that triggered the event */
+	unsigned int event_button = evnt.button;
+	
+	/* The evnt.type is either ButtonPress or ButtonRelease */
+	int is_release = (evnt.type == ButtonRelease);
+
+	/* This is the NGtkMouseEvent that we will construct from this Xlib
+	 * event, in order to send it to the component */
+	NGtkMouseEvent nevent;
+
+	/* An index between 1-3 of the mouse button that is clicked. */
+	int mouse_but_index = 0;
+	
+	/* If this is a mouse button release event that also completes a
+	 * click, then we should fire a click event after firing a release
+	 * event. This variable is an indicator for that */
+	int also_fire_click = FALSE;
+
+	NGtkXlibBase *widget = ngtk_xlib_base_get_for_window (wnd);
+
+	/* An event should be ignored in any of the following cases:
+	 * 
+	 * 1. The Widget matching the Xlib Window where the event happened
+	 *    is not an event generator.
+	 * 2. The Widget matching the Xlib Window where the event happened
+	 *    is a component that has it's "enabled" state as FALSE.
+	 * 3. No NGtk widget matches this Xlib window (should not happen!)
+	 * 
+	 * However, since mouse events do require some handling which isn't
+	 * specific to one widget (i.e. it has some global effects), then we
+	 * will finish handling the event properly (instead of just
+	 * returning from the function) and we'll just skip sending the
+	 * event.
+	 */
+	int ignore_event = FALSE;
+
+	switch (event_button)
+	{
+	case Button1:
+		mouse_but_index = 1;
+		nevent.button = NGTK_MBUT_L;
+		break;
+	case Button2:
+		mouse_but_index = 2;
+		nevent.button = NGTK_MBUT_R;
+		break;
+	case Button3:
+		mouse_but_index = 3;
+		nevent.button = NGTK_MBUT_M;
+		break;
+	default:
+		/* Unknown mouse button. Therefore, don't handle the event */
+		ignore_event = FALSE;
+		break;
+	}
+	
+	if (! is_release)
+	{
+		nevent.type = NGTK_MET_DOWN;
+		last_but_press_here[mouse_but_index] = evnt.window;
+
+		/* A clicked object should receive the keyboard focus, iff it's
+		 * an event-generator.
+		 * TODO: Fix focus handling in the Xlib backend. Specifically,
+		 * do we need to manually keep track of focus for widgets inside
+		 * a window? */
+		if (widget != NULL && ngtk_object_is_a (widget, NGTK_EVENT_GENERATOR_TYPE))
+			ngtk_event_generator_grab_keyboard_focus (widget);
+	}
+	else /* if (type == ButtonRelease) */
+	{
+		if (last_but_press_here[mouse_but_index] == evnt.window)
+			also_fire_click = TRUE;
+
+		nevent.type = NGTK_MET_UP;
+		last_but_press_here[mouse_but_index] = BadWindow;
+	}
+
+	/* Now, if th ecomponent is an event generator, fire the mouse
+	 * event(s). */
+	if (! ignore_event && ngtk_object_is_a (widget, NGTK_EVENT_GENERATOR_TYPE))
+	{
+		ngtk_event_generator_fire_mouse_event (widget, &nevent);
+		if (also_fire_click)
+		{
+			nevent.type = NGTK_MET_CLICK;
+			ngtk_event_generator_fire_mouse_event (widget, &nevent);
+		}
+	}
 }
 
+#if FALSE
 static void component_keyed (NGtkComponent* comp, XKeyEvent evnt)
 {
 }
@@ -117,41 +220,28 @@ void ngtk_xlib_start_main_loop ()
 		case Expose: /* This is the case were we need to redraw */
 		{
 			/* The window that was exposed */
-//			Window wnd = event.xexpose.window;
+			Window wnd = event.xexpose.window;
+			NGtkXlibBase *base = ngtk_xlib_base_get_for_window (wnd);
+			
 			/* If we have several pending expose events, to avoid
 			 * flickering we will handle just the last one. */
 			if (event.xexpose.count > 0) break;
 
-			/* TODO: handle the event here */
-			
+			if (base != NULL && ngtk_object_is_a (base, NGTK_COMPONENT_TYPE))
+				ngtk_component_redraw (base);
+
 			break;
 		}
 
 		case ButtonPress:
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			ngtk_xlib_quit_main_loop ();
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
-			/* TODO: remove me!!!!!!!!!!!!!!!! */
 		case ButtonRelease:
+		{
+			handle_mouse_button_event (event.xbutton);
+			break;
+		}
+		
 		case MotionNotify:
 		{
-//			Window wnd = event.xbutton.window;
-//			unsigned long state = event.xbutton.state;
-			/* Valid masks are:
-			 * Button1Mask, Button1MotionMask
-			 * Button2Mask, Button2MotionMask
-			 * Button3Mask, Button3MotionMask
-			 *
-			 * distinguish the event type by checking event.type
-			 */
 			 
 			 /* TODO: handle the event here */
 			 
@@ -195,7 +285,8 @@ void ngtk_xlib_start_main_loop ()
 		{
 			printf ("Received destroy notification!\n");
 			Window wnd = event.xdestroywindow.window;
-			if (NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd == wnd)
+			NGtkXlibBase *xb = ngtk_xlib_base_call_on_window_destroyed (wnd);
+			if (xb == ngtk_xlib_root_window)
 			{
 				ngtk_xlib_quit_main_loop ();
 				printf ("Quit main loop!\n");
@@ -205,10 +296,10 @@ void ngtk_xlib_start_main_loop ()
 
 		case ClientMessage:
 			if (event.xclient.data.l[0] == xlib_window_close_atom
-				&& event.xclient.window == NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd)
+				&& event.xclient.window == ngtk_xlib_base_get_window (ngtk_xlib_root_window))
 			{
 				printf ("Received destroy message from WM!\n");
-				XDestroyWindow (xlib_display, NGTK_XLIBBASE_O2D (ngtk_xlib_root_window)-> wnd);
+				XDestroyWindow (xlib_display, ngtk_xlib_base_get_window (ngtk_xlib_root_window));
 			}
 			else
 			{
@@ -267,7 +358,7 @@ NGtkContainer* ngtk_xlib_create_root_window (const char* title)
 	if (ngtk_xlib_root_window == NULL)
 		ngtk_xlib_root_window = ngtk_xlib_create_window_imp (title, FALSE);
 
-	XSetWMProtocols (xlib_display, NGTK_XLIBBASE_O2D (ngtk_xlib_root_window) -> wnd, &xlib_window_close_atom, 1);
+	XSetWMProtocols (xlib_display, ngtk_xlib_base_get_window (ngtk_xlib_root_window), &xlib_window_close_atom, 1);
 	return ngtk_xlib_root_window;
 }
 

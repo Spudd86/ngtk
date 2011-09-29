@@ -136,3 +136,8 @@ void ngtk_list_free (NGtkList *list)
 	
 	ngtk_free (list);
 }
+
+int ngtk_list_is_empty (NGtkList *list)
+{
+	return list->first == NULL;
+}

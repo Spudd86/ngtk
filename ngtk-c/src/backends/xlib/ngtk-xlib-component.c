@@ -26,10 +26,11 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 
 	if (old_val != visible)
 	{
+		Window wnd = ngtk_xlib_base_get_window (self);
 		if (visible)
-			XMapWindow (ngtk_xlib_get_display (), NGTK_XLIBBASE_O2D (self) -> wnd);
+			XMapWindow (ngtk_xlib_get_display (), wnd);
 		else
-			XUnmapWindow (ngtk_xlib_get_display (), NGTK_XLIBBASE_O2D (self) -> wnd);
+			XUnmapWindow (ngtk_xlib_get_display (), wnd);
 	}
 	ngtk_basic_component_set_visible (self, visible);
 }

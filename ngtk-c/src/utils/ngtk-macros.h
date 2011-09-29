@@ -27,10 +27,13 @@
 #define NGTK_LONG_MACRO_BEGIN do {
 #define NGTK_LONG_MACRO_END   } while (FALSE)
 
+#define NGTK_MACRO_DO_NOTHING() NGTK_LONG_MACRO_BEGIN NGTK_LONG_MACRO_END
+
 #ifndef NGTK_OPTIMIZE
 #define ngtk_assert(expr) assert(expr)
 #else
-#define ngtk_assert(expr) NGTK_LONG_MACRO_BEGIN if (FALSE && (expr)) { } NGTK_LONG_MACRO_END
+#define ngtk_assert(expr) NGTK_MACRO_DO_NOTHING ()
 #endif
 
+#define ngtk_assert_not_reached() assert (FALSE)
 #endif

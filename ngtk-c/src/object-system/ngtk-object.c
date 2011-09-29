@@ -72,6 +72,11 @@ void ngtk_interface_free (NGtkInterface *in)
 	int i;
 	ngtk_assert (in != NULL);
 
+	if (in->obj != NULL)
+	{
+		ngtk_object_detach (in->obj, in);
+	}
+		
 	for (i = 0; i < NGTK_MAX_INTERFACE_IMP_LEVELS; i++)
 	{
 		if (in->d[i] && in->d_free[i])
@@ -100,12 +105,35 @@ void ngtk_object_free (NGtkObject* obj)
 	ngtk_free (obj);
 }
 
+NGtkObject* ngtk_interface_get_object (NGtkInterface *in)
+{
+	ngtk_assert (in);
+	return in->obj;
+}
+
 void ngtk_object_implement (NGtkObject *obj, NGtkInterface *in)
 {
 	ngtk_assert (obj);
 	ngtk_assert (in);
 	ngtk_assert (in->iType != NGTK_TYPE_NONE);
+	ngtk_assert (in->obj == NULL);
 
 	obj->iBits            |= NGTK_BIT_MASK (in->iType);
 	obj->iImps[in->iType]  = in;
+	in->obj                = obj;
+}
+
+void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in)
+{
+	ngtk_assert (obj);
+	ngtk_assert (in);
+	ngtk_assert (in->iType != NGTK_TYPE_NONE);
+	ngtk_assert (in->obj == obj);
+	ngtk_assert (ngtk_object_is_a (obj, in->iType));
+	ngtk_assert (ngtk_object_cast (obj, in->iType) == in);
+
+	/* To flip a bit, XOR with it's bit mask */
+	obj->iBits            ^= NGTK_BIT_MASK (in->iType);
+	obj->iImps[in->iType]  = NULL;
+	in->obj                = NULL;
 }

@@ -12,6 +12,8 @@ typedef struct {
 	NGtkListNode *last;
 } NGtkList;
 
+#define NGTK_EMPTY_LIST_CONST { NULL, NULL }
+
 NGtkListNode* ngtk_list_node_new              (void* data);
 
 void          ngtk_list_node_free             (NGtkListNode *node);
@@ -38,6 +40,13 @@ void          ngtk_list_prepend               (NGtkList *list, void *data);
 
 void          ngtk_list_free                  (NGtkList *list);
 
+int           ngtk_list_is_empty              (NGtkList *list);
+
+/**
+ * A read-only iterator on the list. This means you may not modify the
+ * list structure while the iteration is in process (you may however
+ * modify the list data).
+ */
 #define       ngtk_list_foreach(iter,list)    for ((iter) = (list)->first; (iter) != NULL; (iter) = (iter)->next)
 
 #endif
