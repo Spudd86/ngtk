@@ -64,10 +64,15 @@ void ngtk_list_node_link (NGtkListNode *first, NGtkListNode *second)
 	if (second != NULL) second->prev = first;
 }
 
+void ngtk_list_init (NGtkList* list)
+{
+	list->first = list->last = NULL;
+}
+
 NGtkList* ngtk_list_new ()
 {
 	NGtkList *list = ngtk_new (NGtkList);
-	list->first = list->last = NULL;
+	ngtk_list_init (list);
 	return list;
 }
 
@@ -144,7 +149,7 @@ void ngtk_list_prepend (NGtkList *list, void *data)
 	}
 }
 
-void ngtk_list_free (NGtkList *list)
+void ngtk_list_clear (NGtkList *list)
 {
 	NGtkListNode *iter, *next = NULL;
 
@@ -153,7 +158,11 @@ void ngtk_list_free (NGtkList *list)
 		next = iter->next;
 		ngtk_list_node_free (iter);
 	}
+}
 
+void ngtk_list_free (NGtkList *list)
+{
+	ngtk_list_clear (list);
 	ngtk_free (list);
 }
 

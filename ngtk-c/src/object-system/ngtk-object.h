@@ -34,11 +34,30 @@ typedef unsigned short     NGtkType;
 
 #define NGTK_TYPE_NONE 0
 
+typedef void (*NGtkObjectListener)    (NGtkObject *obj,   const char *signame, NGtkValue *data);
+typedef void (*NGtkInterfaceListener) (NGtkInterface *in, const char *signame, NGtkValue *data);
+
+typedef struct _ngtk_listener {
+	union {
+		NGtkObjectListener    obj_l;
+		NGtkInterfaceListener in_l;
+	} func;
+	const char *signame;
+} NGtkListener;
+
 struct _ngtk_object {
 	NGtkObjectTypeMask  iBits;
 	NGtkInterface      *iImps[NGTK_MAX_INTERFACES];
 	void               *d;
 	NGtkFreeFunc        d_free;
+
+	/* Amount of references directly to this object */
+	int                 direct_ref_count;
+	/* Amount of references to the interfaces (not including by the
+	 * object itself */
+	int                 interfaces_ref_count;
+
+	NGtkList           *listeners;
 };
 
 struct _ngtk_inteface {
@@ -48,21 +67,30 @@ struct _ngtk_inteface {
 	NGtkFreeFunc        d_free[NGTK_MAX_INTERFACE_IMP_LEVELS];
 	void               *f;
 	NGtkFreeFunc        f_free;
+
+	/* Amount of references to the interface directly, INCLUDING the
+	 * one from the object itself */
+	int                 ref_count;
+
+	NGtkList           *listeners;
 };
 
 NGtkObject*    ngtk_object_new           ();
 void           ngtk_object_free          (NGtkObject* obj);
 NGtkInterface* ngtk_object_cast          (NGtkObject* obj, NGtkType iType);
 int            ngtk_object_is_a          (NGtkObject* obj, NGtkType iType);
+void           ngtk_object_ref           (NGtkObject* obj);
+void           ngtk_object_unref         (NGtkObject* obj);
 
 NGtkInterface* ngtk_interface_new        (NGtkType iType);
 void           ngtk_interface_free       (NGtkInterface *in);
 NGtkInterface* ngtk_interface_cast       (NGtkInterface* in, NGtkType iType);
 int            ngtk_interface_is_a       (NGtkInterface* in, NGtkType iType);
 NGtkObject*    ngtk_interface_get_object (NGtkInterface *in);
+void           ngtk_interface_ref        (NGtkInterface *in);
+void           ngtk_interface_unref      (NGtkInterface *in);
 
 void           ngtk_object_implement     (NGtkObject *obj, NGtkInterface *in);
-void           ngtk_object_detach        (NGtkObject *obj, NGtkInterface *in);
 
 #define NGTK_O2F_CAST(o,bit,type) ((type*)(ngtk_object_cast(o,bit)->f))
 #define NGTK_O2D_CAST(o,bit,type,pos) ((type*)(ngtk_object_cast(o,bit)->d[(pos)]))

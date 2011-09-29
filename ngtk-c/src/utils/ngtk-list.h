@@ -46,6 +46,8 @@ void          ngtk_list_node_link             (NGtkListNode *first, NGtkListNode
 
 NGtkList*     ngtk_list_new                   ();
 
+void          ngtk_list_init                  (NGtkList* list);
+
 NGtkListNode* ngtk_list_find                  (const NGtkList *list, void *data);
 
 int           ngtk_list_contains              (const NGtkList *list, void *data);
@@ -59,6 +61,8 @@ void          ngtk_list_append                (NGtkList *list, void *data);
 void          ngtk_list_prepend               (NGtkList *list, void *data);
 
 void          ngtk_list_free                  (NGtkList *list);
+
+void          ngtk_list_clear                 (NGtkList *list);
 
 int           ngtk_list_is_empty              (NGtkList *list);
 

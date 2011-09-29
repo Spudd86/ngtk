@@ -21,6 +21,10 @@
 #include "../utils/ngtk-utils.h"
 #include "ngtk-object.h"
 
+/* Gluing together an interface and an object is a one way operation,
+ * which is not reversible for now to make things a bit more sane */
+static void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in);
+
 NGtkObject* ngtk_object_new ()
 {
 	int i;
@@ -33,6 +37,10 @@ NGtkObject* ngtk_object_new ()
 
 	obj->d = NULL;
 	obj->d_free = NULL;
+
+	obj->direct_ref_count = 1; /* We will return one ref */
+	obj->interfaces_ref_count = 0; /* No interfaces, so no references to
+	                                * them */
 
 	return obj;
 }
@@ -120,7 +128,7 @@ void ngtk_object_free (NGtkObject* obj)
 
 	for (i = 0; i < NGTK_MAX_INTERFACES; i++)
 		if (obj->iImps[i])
-			ngtk_interface_free (obj->iImps[i]);
+			ngtk_object_detach (obj, obj->iImps[i]);
 
 	ngtk_free (obj);
 }
@@ -138,11 +146,17 @@ void ngtk_object_implement (NGtkObject *obj, NGtkInterface *in)
 	ngtk_assert (in->iType != NGTK_TYPE_NONE);
 	ngtk_assert (in->obj == NULL);
 
-	obj->iBits            |= NGTK_BIT_MASK (in->iType);
-	obj->iImps[in->iType]  = in;
-	in->obj                = obj;
+	obj->iBits                |= NGTK_BIT_MASK (in->iType);
+	obj->iImps[in->iType]      = in;
+	obj->interfaces_ref_count += in->ref_count;
+	in->obj                    = obj;
+
+	ngtk_interface_ref (in);
 }
 
+/* For now, detaching interfaces is only an internal operation that
+ * happens when freeing an interface. Nevertheless, write code which is
+ * prepared for the day where this can happen externally */
 void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in)
 {
 	ngtk_assert (obj);
@@ -153,7 +167,46 @@ void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in)
 	ngtk_assert (ngtk_object_cast (obj, in->iType) == in);
 
 	/* To flip a bit, XOR with it's bit mask */
-	obj->iBits            ^= NGTK_BIT_MASK (in->iType);
-	obj->iImps[in->iType]  = NULL;
-	in->obj                = NULL;
+	obj->iBits                ^= NGTK_BIT_MASK (in->iType);
+	obj->iImps[in->iType]      = NULL;
+	obj->interfaces_ref_count -= in->ref_count;
+	in->obj                    = NULL;
+	
+	ngtk_interface_unref (in);
+}
+
+void ngtk_object_ref (NGtkObject* obj)
+{
+	++ obj->direct_ref_count;
+}
+
+void ngtk_object_unref (NGtkObject* obj)
+{
+	ngtk_assert (-- obj->direct_ref_count >= 0);
+	if (obj->direct_ref_count == 0 && obj->interfaces_ref_count == 0)
+		ngtk_object_free (obj);
+}
+
+void ngtk_interface_ref (NGtkInterface* in)
+{
+	++ in->ref_count;
+	if (in->obj != NULL)
+		++ in->obj->interfaces_ref_count;
+}
+
+void ngtk_interface_unref (NGtkInterface* in)
+{
+	ngtk_assert (-- in->ref_count >= 0);
+
+	if (in->obj != NULL)
+		-- in->obj->interfaces_ref_count;
+	
+	/* If no reference, not from an object and not externally then free
+	 * the interface implementation */
+	if (in->ref_count == 0)
+	{
+		ngtk_assert (in->obj == NULL); /* The ref count should include
+		                                * the object ref */
+		ngtk_interface_free (in);
+	}
 }
