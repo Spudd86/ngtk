@@ -386,12 +386,12 @@ NGtkContainer* ngtk_xlib_create_root_window (const char* title)
 
 NGtkComponent* ngtk_xlib_create_button (NGtkContainer* parent, const char* text)
 {
-	return NULL;
+	return ngtk_xlib_create_button_imp (text, FALSE, parent);
 }
 
 NGtkComponent* ngtk_xlib_create_label (NGtkContainer* parent, const char* text)
 {
-	return NULL;
+	return ngtk_xlib_create_label_imp (text, FALSE, parent);
 }
 
 NGtkComponent* ngtk_xlib_create_text_entry (NGtkContainer* parent, const char* text)
@@ -412,6 +412,11 @@ NGtkEventGenerator* ngtk_xlib_get_focus_holder ()
 Display* ngtk_xlib_get_display ()
 {
 	return xlib_display;
+}
+
+int ngtk_xlib_get_screen ()
+{
+	return xlib_screen;
 }
 
 Window ngtk_xlib_get_root_window ()

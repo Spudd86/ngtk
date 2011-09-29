@@ -1,5 +1,6 @@
 #include "ngtk-xlib.h"
 #include <stdio.h>
+#include <string.h>
 
 static void pack_main_window (NGtkContainer *self)
 {
@@ -29,24 +30,53 @@ static void pack_main_window (NGtkContainer *self)
 	}
 }
 
-#if FALSE
-NGtkObject* ngtk_xlib_create_label_imp (const char* title, int visible)
+static void draw_aligned_text (Display *disp, Drawable d, GC gc,
+	const NGtkRectangle *rect, int ignoreXY,
+	float halign, int hpad,
+	float valign, int vpad,
+	const char* text)
 {
-	NGtkObject *obj = ngtk_object_new ();
+	XFontStruct *font;
+	int str_w, str_h, len = strlen (text);
+	int xoff, yoff;
 
-	NGtkInterface *in_base = ngtk_xlib_base_create_interface ();
-	NGtkInterface *in_comp = ngtk_xlib_component_create_interface (TRUE, NULL, title, visible);
-	NGtkInterface *in_evgn = ngtk_xlib_event_generator_create_interface ();
+	/* In theory, to get the default Font, pass the default GC to
+	 * XQueryFont, instead of passing an actual font ID (as returned from
+	 * XGetGCValues). Created GC's simply do not have a font set to them
+	 * and only the default GC has.
+	 *
+	 * See (merge the link into one line):
+	 *   http://books.google.co.il/books?id=d8tByjvMmIwC&lpg=PA146
+	 *   &ots=mnQJfk48K5&dq=xlib%20get%20default%20font&hl=en&pg=PA146
+	 *   #v=onepage&q=xlib%20get%20default%20font&f=false
+	 */
 
-	ngtk_object_implement (obj, in_base);
-	ngtk_object_implement (obj, in_comp);
-	ngtk_object_implement (obj, in_evgn);
+	font = XQueryFont (disp, XGContextFromGC (DefaultGC (disp, ngtk_xlib_get_screen ())));
+	ngtk_assert (font != NULL);
+	str_w = XTextWidth (font, text, len);
+	/* The Glyphs (shapes) of a font are in coordinates relative to
+	 * some imaginary line called baseline. The ascent is how much above
+	 * the line does the highest glyph go, and the descent is the how
+	 * much below the line do glyphs go. Therefor, their sum is the
+	 * maximal height of the text */
+	str_h = font->ascent + font->descent;
 
-	return obj;
+	xoff = (int) (hpad + (rect->w - 2 * hpad - str_w) * halign);
+	yoff = (int) (vpad + (rect->h - 2 * vpad - str_h) * valign);
+	if (! ignoreXY)
+	{
+		xoff += rect->x;
+		yoff += rect->y;
+	}
+
+	/* Since the point we specify is the origin (the y is the baseline),
+	 * we must add the ascent if we wish to specify the top side)
+	 */
+	XDrawString (disp, d, gc, xoff, yoff + font->ascent, text, len);
+	XFreeFontInfo (NULL, font, 1);
 }
-#endif
-
-void checkers_draw (NGtkXlibBase *xb)
+#if FALSE
+static void checkers_draw (NGtkXlibBase *xb)
 {
 	Window wnd = ngtk_xlib_base_get_window (xb);
 	Display* disp = ngtk_xlib_get_display ();
@@ -76,42 +106,120 @@ void checkers_draw (NGtkXlibBase *xb)
 
 	XFreeGC (disp, gc);
 }
-NGtkObject* ngtk_xlib_create_window_imp (const char* title, int visible)
+#endif
+static void draw_window (NGtkComponent *window)
 {
-	Window xlib_wnd = XCreateSimpleWindow (
+	Display* disp = ngtk_xlib_get_display ();
+	Window wnd = ngtk_xlib_base_get_window (window);
+	GC gc = XCreateGC (disp, wnd, 0, 0);
+	
+	const NGtkRectangle *rect = ngtk_xlib_base_get_relative_rect (window);
+
+	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+
+	XFreeGC (disp, gc);
+
+	ngtk_basic_component_redraw (window);
+}
+
+static void draw_label (NGtkComponent *label)
+{
+	Display* disp = ngtk_xlib_get_display ();
+	Window wnd = ngtk_xlib_base_get_window (label);
+	GC gc = XCreateGC (disp, wnd, 0, 0);
+	
+	const NGtkRectangle *rect = ngtk_xlib_base_get_relative_rect (label);
+	const char *text = ngtk_component_get_text (label);
+
+	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+	draw_aligned_text (disp, wnd, gc, rect, TRUE, 0, 2, 0.5f, 2, text);
+
+	XFreeGC (disp, gc);
+}
+
+static void draw_button (NGtkComponent *but)
+{
+	Display* disp = ngtk_xlib_get_display ();
+	Window wnd = ngtk_xlib_base_get_window (but);
+	GC gc = XCreateGC (disp, wnd, 0, 0);
+	
+	const NGtkRectangle *rect = ngtk_xlib_base_get_relative_rect (but);
+	const char *text = ngtk_component_get_text (but);
+
+	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+	draw_aligned_text (disp, wnd, gc, rect, TRUE, 0.5f, 2, 0.5f, 2, text);
+	XDrawRectangle (disp, wnd, gc, 0, 0, rect->w - 1, rect->h - 1);
+
+	XFreeGC (disp, gc);
+}
+
+static NGtkObject* create_basic_widget (int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area)
+{
+	Window wnd = XCreateSimpleWindow (
 		ngtk_xlib_get_display (),     /* Connection to the X server */
-		ngtk_xlib_get_root_window (), /* Parent window */
-		50, 50,                       /* (X,Y) of Top Left Corner */
-		200, 200,                     /* Width, Height of the window */
+		parent == NULL ? ngtk_xlib_get_root_window () : ngtk_xlib_base_get_window (parent), /* Parent window */
+		area->x, area->y,                       /* (X,Y) of Top Left Corner */
+		area->w, area->h,                     /* Width, Height of the window */
 		0,                            /* Border width of the window */
 		ngtk_xlib_get_color (NGTK_XLIB_BLACK), /* Border color */
 		ngtk_xlib_get_color (NGTK_XLIB_WHITE) /* Background color */
 		);
-		
-	NGtkRectangle entire_screen;
+
 	NGtkObject *obj = ngtk_object_new ();
-
-	NGtkInterface *in_base = ngtk_xlib_base_create_interface (xlib_wnd);
-	NGtkInterface *in_comp = ngtk_xlib_component_create_interface (TRUE, NULL, title, visible);
-	NGtkInterface *in_cont = ngtk_xlib_container_create_interface ();
-	NGtkInterface *in_evgn = ngtk_xlib_event_generator_create_interface ();
-
+	NGtkInterface *in_base, *in_comp, *in_evgn;
+	
+	in_base = ngtk_xlib_base_create_interface (wnd);
 	ngtk_object_implement (obj, in_base);
+	
+	in_comp = ngtk_xlib_component_create_interface (enabled, parent, text, visible);
 	ngtk_object_implement (obj, in_comp);
-	ngtk_object_implement (obj, in_cont);
+	
+	in_evgn = ngtk_xlib_event_generator_create_interface ();
 	ngtk_object_implement (obj, in_evgn);
 
-	entire_screen.x = 50;
-	entire_screen.y = 50;
-	entire_screen.w = 200;
-	entire_screen.h = 200;
+	/* Now, do the parts of the construction that depend on the
+	 * existance of a whole object and therefore couldn't be done while
+	 * constructing the interface imps */
+	if (parent != NULL)
+		ngtk_container_add_child (parent, obj);
+	ngtk_component_set_visible (obj, visible);
+	ngtk_xlib_base_put_to (obj, area, TRUE);
 
-	ngtk_xlib_base_put_to (obj, &entire_screen, FALSE);
-	NGTK_CONTAINER_O2F (obj)->pack = pack_main_window;
+	XSelectInput (ngtk_xlib_get_display (), wnd, NGTK_XLIB_EVENT_MASK);
+	
+	return obj;
+}
 
-	XSelectInput (ngtk_xlib_get_display (), xlib_wnd, NGTK_XLIB_EVENT_MASK);
+NGtkObject* ngtk_xlib_create_window_imp (const char* title, int visible)
+{
+	NGtkRectangle area = { 50, 50, 200, 200 };
+	NGtkObject *obj = create_basic_widget (TRUE, NULL, title, visible, &area);
 
-	NGTK_COMPONENT_O2F (obj) -> redraw = checkers_draw;
+	NGtkInterface *in_cont = ngtk_xlib_container_create_interface ();
+	ngtk_object_implement (obj, in_cont);
+
+	NGTK_COMPONENT_O2F (obj) -> redraw = draw_window;
+	NGTK_CONTAINER_O2F (obj) -> pack = pack_main_window;
+	
+	return obj;
+}
+
+NGtkObject* ngtk_xlib_create_label_imp (const char* text, int visible, NGtkContainer *parent)
+{
+	NGtkRectangle area = { 50, 50, 200, 200 };
+	NGtkObject *obj = create_basic_widget (TRUE, parent, text, visible, &area);
+
+	NGTK_COMPONENT_O2F (obj) -> redraw = draw_label;
+	
+	return obj;
+}
+
+NGtkObject* ngtk_xlib_create_button_imp (const char* text, int visible, NGtkContainer *parent)
+{
+	NGtkRectangle area = { 50, 50, 200, 200 };
+	NGtkObject *obj = create_basic_widget (TRUE, parent, text, visible, &area);
+
+	NGTK_COMPONENT_O2F (obj) -> redraw = draw_button;
 	
 	return obj;
 }

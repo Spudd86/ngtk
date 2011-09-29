@@ -54,6 +54,7 @@ void                ngtk_xlib_set_focus_holder (NGtkEventGenerator* eg);
 NGtkEventGenerator* ngtk_xlib_get_focus_holder ();
 
 Display*            ngtk_xlib_get_display ();
+int                 ngtk_xlib_get_screen ();
 Window              ngtk_xlib_get_root_window ();
 unsigned long       ngtk_xlib_get_color (NGtkXlibColorName cn);
 #endif
