@@ -1,3 +1,23 @@
+/*
+ * ngtk-nc-component.c
+ * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
+ *
+ * This file is part of NGtk.
+ *
+ * NGtk is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * NGtk is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "ngtk-nc-base.h"
 #include "ngtk-nc-component.h"
 #include "../basic/ngtk-basic.h"
@@ -55,7 +75,7 @@ void ngtk_nc_component_redraw (NGtkComponent *self)
 	const NGtkRectangle *area = ngtk_nc_base_get_abs_rect (self);
 
 	int max_x, max_y, min_x, min_y;
-	
+
 	if (wnd == NULL || ! dReal->visible)
 		return;
 
@@ -78,7 +98,7 @@ void ngtk_nc_component_redraw (NGtkComponent *self)
 		wattroff (wnd, A_DIM);
 
 	ngtk_nc_base_publish_window (self);
-	
+
 	/* Base will redraw the children if needed */
 	ngtk_basic_component_redraw (self);
 }

@@ -1,3 +1,23 @@
+/*
+ * ngtk-xlib-defs.c
+ * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
+ *
+ * This file is part of NGtk.
+ *
+ * NGtk is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * NGtk is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h> /* For XLookupString */
 
@@ -46,7 +66,7 @@ void ngtk_xlib_init ()
 
 	display_name = getenv ("DISPLAY");
 //	if (display_name == NULL) display_name = ":0";
-	
+
 	/* Open a connection to the X server */
 	xlib_display = XOpenDisplay (display_name);
 
@@ -80,7 +100,7 @@ void ngtk_xlib_init ()
 		ngtk_assert (XAllocColor (xlib_display, xlib_colormap, col));
 		fprintf (stderr, "Result is %lu\n", col->pixel);
 	}
-	
+
 	/* Initialize a connection property with the window manager,
 	 * associated with a window close event */
 	xlib_window_close_atom = XInternAtom (xlib_display, "WM_DELETE_WINDOW", FALSE);
@@ -107,7 +127,7 @@ static void handle_mouse_button_event (XButtonEvent evnt)
 
 	/* The mouse button that triggered the event */
 	unsigned int event_button = evnt.button;
-	
+
 	/* The evnt.type is either ButtonPress or ButtonRelease */
 	int is_release = (evnt.type == ButtonRelease);
 
@@ -117,7 +137,7 @@ static void handle_mouse_button_event (XButtonEvent evnt)
 
 	/* An index between 1-3 of the mouse button that is clicked. */
 	int mouse_but_index = 0;
-	
+
 	/* If this is a mouse button release event that also completes a
 	 * click, then we should fire a click event after firing a release
 	 * event. This variable is an indicator for that */
@@ -126,13 +146,13 @@ static void handle_mouse_button_event (XButtonEvent evnt)
 	NGtkXlibBase *widget = ngtk_xlib_base_get_for_window (wnd);
 
 	/* An event should be ignored in any of the following cases:
-	 * 
+	 *
 	 * 1. The Widget matching the Xlib Window where the event happened
 	 *    is not an event generator.
 	 * 2. The Widget matching the Xlib Window where the event happened
 	 *    is a component that has it's "enabled" state as FALSE.
 	 * 3. No NGtk widget matches this Xlib window (should not happen!)
-	 * 
+	 *
 	 * However, since mouse events do require some handling which isn't
 	 * specific to one widget (i.e. it has some global effects), then we
 	 * will finish handling the event properly (instead of just
@@ -160,7 +180,7 @@ static void handle_mouse_button_event (XButtonEvent evnt)
 		ignore_event = FALSE;
 		break;
 	}
-	
+
 	if (! is_release)
 	{
 		nevent.type = NGTK_MET_DOWN;
@@ -219,13 +239,13 @@ void ngtk_xlib_start_main_loop ()
 		{
 		/* Friendly reminder: We need curly braces to define variables
 		 * inside case statements */
-		 
+
 		case Expose: /* This is the case were we need to redraw */
 		{
 			/* The window that was exposed */
 			Window wnd = event.xexpose.window;
 			NGtkXlibBase *base = ngtk_xlib_base_get_for_window (wnd);
-			
+
 			/* If we have several pending expose events, to avoid
 			 * flickering we will handle just the last one. */
 			if (event.xexpose.count > 0) break;
@@ -242,12 +262,12 @@ void ngtk_xlib_start_main_loop ()
 			handle_mouse_button_event (event.xbutton);
 			break;
 		}
-		
+
 		case MotionNotify:
 		{
-			 
+
 			 /* TODO: handle the event here */
-			 
+
 			break;
 		}
 
@@ -278,9 +298,9 @@ void ngtk_xlib_start_main_loop ()
 			else
 			{
 			}
-			
+
 			 /* TODO: handle the event here */
-			 
+
 			break;
 		}
 
@@ -297,7 +317,7 @@ void ngtk_xlib_start_main_loop ()
 			 * accept resize requests is the root window */
 			NGtkXlibBase *widget = ngtk_xlib_base_get_for_window (event.xconfigure.window);
 			const NGtkRectangle *rect = ngtk_xlib_base_get_relative_rect (widget);
-			
+
 			if (ngtk_object_is_a (widget, NGTK_CONTAINER_TYPE) && (rect->w != event.xconfigure.width || rect->h != event.xconfigure.height))
 				ngtk_container_pack (widget);
 			break;

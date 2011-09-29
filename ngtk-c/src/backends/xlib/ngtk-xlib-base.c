@@ -1,3 +1,23 @@
+/*
+ * ngtk-xlib-base.c
+ * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
+ *
+ * This file is part of NGtk.
+ *
+ * NGtk is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * NGtk is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "ngtk-xlib-defs.h"
 #include "ngtk-xlib-base.h"
 
@@ -13,7 +33,7 @@ static NGtkList window2base = NGTK_EMPTY_LIST_CONST;
 static void register_window (Window xlib_wnd, NGtkXlibBaseI* baseI)
 {
 	WindowAndBase *wb = ngtk_new (WindowAndBase);
-	
+
 	wb->wnd   = xlib_wnd;
 	wb->baseI = baseI;
 
@@ -41,7 +61,7 @@ NGtkXlibBaseI* ngtk_xlib_base_create_interface  (Window xlib_wnd)
 {
 	NGtkInterface *in = ngtk_interface_new (NGTK_XLIBBASE_TYPE);
 	NGtkXlibBaseD *xbd;
-	
+
 	in->d[0] = xbd = ngtk_new (NGtkXlibBaseD);
 	xbd->area.x = 0;
 	xbd->area.y = 0;
@@ -69,7 +89,7 @@ void ngtk_xlib_base_d_free (void *d)
 		wnb = find_window (dReal->_wnd);
 		ngtk_assert (wnb != NULL);
 		unregister_window_and_base (wnb);
-		
+
 		XDestroyWindow (ngtk_xlib_get_display (), dReal->_wnd);
 	}
 
@@ -117,7 +137,7 @@ NGtkXlibBase* ngtk_xlib_base_call_on_window_destroyed (Window xlib_wnd)
 {
 	NGtkListNode  *wnb = find_window (xlib_wnd);
 	NGtkXlibBaseI *xb;
-	
+
 	if (wnb == NULL)
 		return NULL;
 

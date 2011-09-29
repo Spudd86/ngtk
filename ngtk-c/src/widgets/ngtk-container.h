@@ -1,3 +1,23 @@
+/*
+ * ngtk-container.h
+ * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
+ *
+ * This file is part of NGtk.
+ *
+ * NGtk is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * NGtk is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef __NGtk_container_h__
 #define __NGtk_container_h__
 
@@ -41,7 +61,7 @@ NGtkComponentList* ngtk_container_get_children  (NGtkContainer *self);
  * @warning Undefined behaviour will occur if the rectangle will be
  *          partially outside of the parent area or if one or more of
  *          it's dimensions will be zero
- * 
+ *
  * @since 0.9
  */
 void               ngtk_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
@@ -51,7 +71,7 @@ void               ngtk_container_place_child   (NGtkContainer *self, NGtkCompon
  *
  * @param self The container
  * @param layout The layout object
- * 
+ *
  * @since 0.9
  */
 void               ngtk_container_set_layout    (NGtkContainer *self, NGtkLayout *layout);
@@ -61,7 +81,7 @@ void               ngtk_container_set_layout    (NGtkContainer *self, NGtkLayout
  * it's layout object
  *
  * @param self The container
- * 
+ *
  * @since 0.9
  */
 void               ngtk_container_pack          (NGtkContainer *self);
@@ -73,7 +93,7 @@ void               ngtk_container_pack          (NGtkContainer *self);
  * @param child The child to register
  *
  * @warning This method should not be called outside of NGtk!
- * 
+ *
  * @since 0.9
  */
 void               ngtk_container_add_child     (NGtkContainer *self, NGtkComponent* child);
@@ -85,7 +105,7 @@ void               ngtk_container_add_child     (NGtkContainer *self, NGtkCompon
  * @param child The child to unregister
  *
  * @warning This method should not be called outside of NGtk!
- * 
+ *
  * @since 0.9
  */
 void               ngtk_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
