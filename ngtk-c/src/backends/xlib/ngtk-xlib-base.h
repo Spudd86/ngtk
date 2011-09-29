@@ -28,7 +28,7 @@ void                  ngtk_xlib_base_d_free            (void *d);
 Window                ngtk_xlib_base_get_window        (NGtkXlibBase *self);
 const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self);
 
-void                  ngtk_xlib_base_put_to            (NGtkXlibBase *self, const NGtkRectangle *area);
+void                  ngtk_xlib_base_put_to            (NGtkXlibBase *self, const NGtkRectangle *area, int already_put);
 
 NGtkXlibBase*         ngtk_xlib_base_get_for_window    (Window xlib_wnd);
 NGtkXlibBase*         ngtk_xlib_base_call_on_window_destroyed (Window xlib_wnd);

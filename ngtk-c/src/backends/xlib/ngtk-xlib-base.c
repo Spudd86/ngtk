@@ -33,6 +33,7 @@ static NGtkListNode* find_window (Window xlib_wnd)
 
 static void unregister_window_and_base (NGtkListNode *n)
 {
+	ngtk_free ((WindowAndBase*) n->data);
 	ngtk_list_remove_node (&window2base, n);
 }
 
@@ -81,7 +82,7 @@ Window ngtk_xlib_base_get_window (NGtkXlibBase *self)
 	return NGTK_XLIBBASE_O2D (self) -> _wnd;
 }
 
-void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area)
+void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area, int already_put)
 {
 	NGtkRectangle *rect = &(NGTK_XLIBBASE_O2D (self) -> area);
 	Window         wnd  = ngtk_xlib_base_get_window (self);
@@ -91,8 +92,11 @@ void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area)
 	rect->w = area->w;
 	rect->h = area->h;
 
-	XMoveWindow (ngtk_xlib_get_display (), wnd, area->x, area->y);
-	XResizeWindow (ngtk_xlib_get_display (), wnd, area->w, area->h);
+	if (! already_put)
+	{
+		XMoveWindow (ngtk_xlib_get_display (), wnd, area->x, area->y);
+		XResizeWindow (ngtk_xlib_get_display (), wnd, area->w, area->h);
+	}
 }
 
 const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self)

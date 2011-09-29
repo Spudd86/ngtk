@@ -28,6 +28,6 @@ void ngtk_xlib_container_remove_child (NGtkContainer *self, NGtkComponent* child
 void ngtk_xlib_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)
 {
 	/* TODO: since we allow only one window in the NCurses backend */
-	ngtk_xlib_base_put_to (child, rect);
+	ngtk_xlib_base_put_to (child, rect, FALSE);
 	ngtk_basic_container_place_child (self, child, rect);
 }

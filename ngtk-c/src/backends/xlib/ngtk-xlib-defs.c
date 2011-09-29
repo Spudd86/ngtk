@@ -29,10 +29,10 @@ static Window              xlib_root_window;
 static Atom                xlib_window_close_atom;
 
 static Colormap      xlib_colormap;
-static unsigned char xlib_color_vals[NGTK_XLIB_COLOR_MAX][3] = {
-	{255, 255, 255}, /* NGTK_XLIB_WHITE */
-	{0, 0, 0},       /* NGTK_XLIB_BLACK */
-	{167, 157, 120}  /* NGTK_XLIB_GRAY  */
+static float xlib_color_vals[NGTK_XLIB_COLOR_MAX][3] = {
+	{1, 1, 1},          /* NGTK_XLIB_WHITE */
+	{0, 0, 0},          /* NGTK_XLIB_BLACK */
+	{0.6f, 0.5f, 0.4f}  /* NGTK_XLIB_GRAY  */
 	};
 static XColor        xlib_colors[NGTK_XLIB_COLOR_MAX];
 
@@ -69,14 +69,16 @@ void ngtk_xlib_init ()
 	for (i = 0; i < NGTK_XLIB_COLOR_MAX; i++)
 	{
 		XColor *col = &xlib_colors[i];
-		col->red = xlib_color_vals[i][0];
-		col->green = xlib_color_vals[i][1];
-		col->blue = xlib_color_vals[i][2];
+		col->red = (unsigned long) (xlib_color_vals[i][0] * 65535);
+		col->green = (unsigned long) (xlib_color_vals[i][1] * 65535);
+		col->blue = (unsigned long) (xlib_color_vals[i][2] * 65535);
 		/* TODO: the following line is used in some guides and in some
 		 * not. Check way and maybe remove */
 		col->flags = DoRed | DoGreen | DoBlue;
-		
+
+		fprintf (stderr, "Allocating color #%02x%02x%02x\n",col->red, col->green, col->blue);
 		ngtk_assert (XAllocColor (xlib_display, xlib_colormap, col));
+		fprintf (stderr, "Result is %lu\n", col->pixel);
 	}
 	
 	/* Initialize a connection property with the window manager,
@@ -205,6 +207,7 @@ void ngtk_xlib_start_main_loop ()
 	/* Assert initialization */
 	ngtk_assert (ngtk_xlib_initialized);
 
+	printf ("Resize Request event is %d\n", ResizeRequest);
 	while (! ngtk_xlib_should_quit)
 	{
 		XEvent event;
@@ -278,6 +281,16 @@ void ngtk_xlib_start_main_loop ()
 			
 			 /* TODO: handle the event here */
 			 
+			break;
+		}
+
+		case ResizeRequest:
+		{
+			/* The only component who has the bit on to signal it should
+			 * accept resize requests is the root window */
+			NGtkXlibBase *widget = ngtk_xlib_base_get_for_window (event.xresizerequest.window);
+			if (widget == ngtk_xlib_root_window)
+				ngtk_container_pack (widget);
 			break;
 		}
 
