@@ -18,12 +18,15 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include "ngtk-basic-backend.h"
 
 static void on_root_window_creation (NGtkBackendI *self, const char* signame, NGtkValue *val);
 static void on_label_creation       (NGtkBackendI *self, const char* signame, NGtkValue *val);
 static void on_button_creation      (NGtkBackendI *self, const char* signame, NGtkValue *val);
 static void on_text_entry_creation  (NGtkBackendI *self, const char* signame, NGtkValue *val);
+
+static int  can_focus_on            (NGtkBasicBackend *self, NGtkComponent *new_focus);
 
 NGtkBackendI* ngtk_basic_backend_create_interface ()
 {
@@ -34,21 +37,31 @@ NGtkBackendI* ngtk_basic_backend_create_interface ()
 	bbd->root_window = NULL;
 	bbd->focus_holder = NULL;
 	bbd->should_quit = FALSE;
+	bbd->initialized = FALSE;
 	ngtk_list_init (&bbd->all_components);
 
 	in->d[0] = bbd;
 	in->d_free[0] = ngtk_basic_backend_d_free;
 	
 	in->f = ngtk_new (NGtkBackendF);
+	NGTK_BACKEND_I2F (in) -> init = NULL;
 	NGTK_BACKEND_I2F (in) -> start_main_loop = NULL;
 	NGTK_BACKEND_I2F (in) -> quit_main_loop = ngtk_basic_backend_quit_main_loop;
+	NGTK_BACKEND_I2F (in) -> quit = NULL;
+	
 	NGTK_BACKEND_I2F (in) -> create_root_window = NULL;
 	NGTK_BACKEND_I2F (in) -> create_button = NULL;
 	NGTK_BACKEND_I2F (in) -> create_label = NULL;
 	NGTK_BACKEND_I2F (in) -> create_text_entry = NULL;
+	
 	NGTK_BACKEND_I2F (in) -> get_focus_holder = ngtk_basic_backend_get_focus_holder;
 	NGTK_BACKEND_I2F (in) -> set_focus_holder = ngtk_basic_backend_set_focus_holder;
 	NGTK_BACKEND_I2F (in) -> focus_to_next = ngtk_basic_backend_focus_to_next;
+	
+	NGTK_BACKEND_I2F (in) -> print = ngtk_basic_backend_print;
+	NGTK_BACKEND_I2F (in) -> debug = ngtk_basic_backend_debug;
+	NGTK_BACKEND_I2F (in) -> error = ngtk_basic_backend_error;
+
 	in->f_free = ngtk_free;
 
 	ngtk_interface_connect_to (in, "backend::create-but", (NGtkListener) on_button_creation);
@@ -66,9 +79,19 @@ void ngtk_basic_backend_d_free (void *d)
 	ngtk_free (d_real);
 }
 
+void ngtk_basic_backend_call_after_init (NGtkBasicBackend *self)
+{
+	ngtk_assert (! NGTK_BASIC_BACKEND_O2D (self) -> initialized);
+	NGTK_BASIC_BACKEND_O2D (self) -> initialized = TRUE;
+}
+
 void ngtk_basic_backend_call_before_start_main_loop (NGtkBasicBackend *self)
 {
-	NGtkContainer *root_window = NGTK_BASIC_BACKEND_O2D (self) -> root_window;
+	NGtkContainer *root_window;
+
+	ngtk_assert (NGTK_BASIC_BACKEND_O2D (self) -> initialized);
+	
+	root_window = NGTK_BASIC_BACKEND_O2D (self) -> root_window;
 	ngtk_component_set_visible (root_window, TRUE);
 	ngtk_component_set_enabled (root_window, TRUE);
 	
@@ -78,11 +101,13 @@ void ngtk_basic_backend_call_before_start_main_loop (NGtkBasicBackend *self)
 
 int ngtk_basic_backend_should_quit (NGtkBasicBackend *self)
 {
+	ngtk_assert (NGTK_BASIC_BACKEND_O2D (self) -> initialized);
 	return NGTK_BASIC_BACKEND_O2D (self) -> should_quit;
 }
 
 void ngtk_basic_backend_quit_main_loop (NGtkBasicBackend *self)
 {
+	ngtk_assert (NGTK_BASIC_BACKEND_O2D (self) -> initialized);
 	NGTK_BASIC_BACKEND_O2D (self) -> should_quit = TRUE;
 }
 
@@ -123,6 +148,7 @@ static int can_focus_on (NGtkBasicBackend *self, NGtkComponent *new_focus)
 
 int ngtk_basic_backend_set_focus_holder (NGtkBasicBackend *self, NGtkComponent* new_focus)
 {
+	
 	if (can_focus_on (self, new_focus))
 	{
 		NGTK_BASIC_BACKEND_O2D (self) -> focus_holder = new_focus;
@@ -200,4 +226,24 @@ NGtkEventGenerator* ngtk_basic_backend_focus_to_next (NGtkBasicBackend *self)
 	 * focus loop by focusing at the root window */
 	ngtk_backend_set_focus_holder (self, NGTK_BASIC_BACKEND_O2D (self) -> root_window);
 	return NGTK_BASIC_BACKEND_O2D (self) -> root_window;
+}
+
+void ngtk_basic_backend_print (NGtkBasicBackend *self, const char *format, va_list args)
+{
+	vprintf (format, args);
+}
+
+void ngtk_basic_backend_debug (NGtkBasicBackend *self, const char *format, va_list args);
+{
+	fprintf (stderr, "== ngtk::backend::debug == ");
+	vfprintf (stderr, format, args);
+	fprintf (stderr, "\n");
+}
+
+void ngtk_basic_backend_error (NGtkBasicBackend *self, const char *format, va_list args);
+{
+	fprintf (stderr, "== ngtk::backend::error == ");
+	vfprintf (stderr, format, args);
+	fprintf (stderr, "\n");
+	exit (EXIT_FAILURE);
 }

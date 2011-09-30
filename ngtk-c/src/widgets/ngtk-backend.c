@@ -20,14 +20,24 @@
 
 #include "ngtk-backend.h"
 
+void ngtk_backend_init (NGtkBackend *self)
+{
+	NGTK_BACKEND_O2F (self) -> init (self);
+}
+
 void ngtk_backend_start_main_loop (NGtkBackend *self)
 {
-	NGTK_BACKEND_O2F(self) -> start_main_loop (self);
+	NGTK_BACKEND_O2F (self) -> start_main_loop (self);
 }
 
 void ngtk_backend_quit_main_loop (NGtkBackend *self)
 {
-	NGTK_BACKEND_O2F(self) -> quit_main_loop (self);
+	NGTK_BACKEND_O2F (self) -> quit_main_loop (self);
+}
+
+void ngtk_backend_quit (NGtkBackend *self)
+{
+	NGTK_BACKEND_O2F (self) -> quit (self);
 }
 
 NGtkContainer* ngtk_backend_create_root_window (NGtkBackend *self, const char *title)
@@ -63,4 +73,28 @@ int ngtk_backend_set_focus_holder (NGtkBackend *self, NGtkComponent* new_focus)
 NGtkEventGenerator* ngtk_backend_focus_to_next (NGtkBackend *self)
 {
 	return NGTK_BACKEND_O2F(self) -> focus_to_next (self);
+}
+
+void ngtk_backend_print (NGtkBackend *self, const char *format, ...)
+{
+	va_list args;
+	va_start (args, format);
+	NGTK_BACKEND_O2F (self) -> print (self, format, args);
+	va_end (args);
+}
+
+void ngtk_backend_debug (NGtkBackend *self, const char *format, ...)
+{
+	va_list args;
+	va_start (args, format);
+	NGTK_BACKEND_O2F (self) -> debug (self, format, args);
+	va_end (args);
+}
+
+void ngtk_backend_error (NGtkBackend *self, const char *format, ...)
+{
+	va_list args;
+	va_start (args, format);
+	NGTK_BACKEND_O2F (self) -> error (self, format, args);
+	va_end (args);
 }

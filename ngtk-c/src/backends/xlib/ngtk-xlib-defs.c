@@ -29,66 +29,43 @@
 
 #include "ngtk-xlib-window.h"
 
-static int                 ngtk_xlib_should_quit  = FALSE;
-/* The root window that NGtk created. Not to be confused with the root
- * window of the given sreen (in XLib, see below). */
-static NGtkContainer*      ngtk_xlib_root_window  = NULL;
-static int                 ngtk_xlib_initialized  = FALSE;
-static NGtkEventGenerator* ngtk_xlib_focus_holder = NULL;
-
-/* The current connection to the X server */
-static Display*            xlib_display           = NULL;
-/* The screen on which we operate */
-static int                 xlib_screen;
-/* The root window of the xlib screen. This is not to be confused with
- * the root application window created by NGtk (see above). */
-static Window              xlib_root_window;
-
-/* A property/event that we communicate with the window manager. We will
- * use it to store the property of closing a window */
-static Atom                xlib_window_close_atom;
-
-static Colormap      xlib_colormap;
 static float xlib_color_vals[NGTK_XLIB_COLOR_MAX][3] = {
 	{1, 1, 1},          /* NGTK_XLIB_WHITE */
 	{0, 0, 0},          /* NGTK_XLIB_BLACK */
 	{0.6f, 0.5f, 0.4f}  /* NGTK_XLIB_GRAY  */
 	};
-static XColor        xlib_colors[NGTK_XLIB_COLOR_MAX];
 
-void ngtk_xlib_init ()
+void ngtk_xlib_init (NGtkXlibBackend *self)
 {
+	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
+	
 	const char* display_name;
 	int i;
-
-	/* Prevent double initialization */
-	ngtk_assert (! ngtk_xlib_initialized);
 
 	display_name = getenv ("DISPLAY");
 //	if (display_name == NULL) display_name = ":0";
 
 	/* Open a connection to the X server */
-	xlib_display = XOpenDisplay (display_name);
+	xbd->display = XOpenDisplay (display_name);
 
-	if (xlib_display == NULL)
-	{
-		fprintf (stderr, "Can not connect to the X server at %s\n", display_name);
-		exit (EXIT_FAILURE);
-	}
+	if (xbd->display == NULL)
+		ngtk_error (self, "Can not connect to the X server at %s\n", display_name);
 
 	/* Find the default screen on which we should operate */
-	xlib_screen = DefaultScreen (xlib_display);
+	xbd->screen = DefaultScreen (xbd->display);
+	
 	/* Each screen has a root window - a window that covers the entire
 	 * screen. We need it in order to create the children windows */
-	xlib_root_window = RootWindow (xlib_display, xlib_screen);
+	xbd->root_window = RootWindow (xbd->display, xbd->screen);
+	
 	/* Each screen has a colormap - an object that given an RGB color
 	 * will return an identifier of the closest displayable color to
 	 * the given color */
-	xlib_colormap = DefaultColormap (xlib_display, xlib_screen);
+	xbd->colormap = DefaultColormap (xbd->display, xbd->screen);
 
 	for (i = 0; i < NGTK_XLIB_COLOR_MAX; i++)
 	{
-		XColor *col = &xlib_colors[i];
+		XColor *col = &xbd->colors[i];
 		col->red = (unsigned long) (xlib_color_vals[i][0] * 65535);
 		col->green = (unsigned long) (xlib_color_vals[i][1] * 65535);
 		col->blue = (unsigned long) (xlib_color_vals[i][2] * 65535);
@@ -96,17 +73,14 @@ void ngtk_xlib_init ()
 		 * not. Check way and maybe remove */
 		col->flags = DoRed | DoGreen | DoBlue;
 
-		fprintf (stderr, "Allocating color #%02x%02x%02x\n",col->red, col->green, col->blue);
-		ngtk_assert (XAllocColor (xlib_display, xlib_colormap, col));
-		fprintf (stderr, "Result is %lu\n", col->pixel);
+		ngtk_debug (self, "Allocating color #%02x%02x%02x\n",col->red, col->green, col->blue);
+		ngtk_assert (XAllocColor (xbd->display, xbd->colormap, col));
+		ngtk_debug (self, "Result is %lu\n", col->pixel);
 	}
 
 	/* Initialize a connection property with the window manager,
 	 * associated with a window close event */
-	xlib_window_close_atom = XInternAtom (xlib_display, "WM_DELETE_WINDOW", FALSE);
-
-	/* Finally, marked as initialized */
-	ngtk_xlib_initialized = TRUE;
+	xbd->window_close_atom = XInternAtom (xbd->display, "WM_DELETE_WINDOW", FALSE);
 }
 
 /* You want to read the man page for XButtonEvent in order to understand
@@ -222,18 +196,18 @@ static void component_keyed (NGtkComponent* comp, XKeyEvent evnt)
 }
 #endif
 
-void ngtk_xlib_start_main_loop ()
-{
-	/* Assert initialization */
-	ngtk_assert (ngtk_xlib_initialized);
 
-	printf ("Resize Request event is %d\n", ResizeRequest);
-	while (! ngtk_xlib_should_quit)
+void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
+{
+	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
+	ngtk_debug (self, "Resize Request event is %d\n", ResizeRequest);
+	
+	while (! ngtk_xlib_backend_should_quit (self))
 	{
 		XEvent event;
-		XNextEvent (xlib_display, &event);
+		XNextEvent (xbd->display, &event);
 
-		printf ("%d\n", event.type);
+		ngtk_debug (self, "%d\n", event.type);
 		/* See NGTK_XLIB_EVENT_MASK in ngtk-xlib-defs.h */
 		switch (event.type)
 		{

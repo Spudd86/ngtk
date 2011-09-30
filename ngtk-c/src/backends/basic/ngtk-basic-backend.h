@@ -30,6 +30,7 @@ typedef struct _ngtk_basic_backend_d {
 	NGtkComponent     *focus_holder;
 	NGtkComponentList  all_components;
 	int                should_quit;
+	int                initialized;
 } NGtkBasicBackendD;
 
 #define NGTK_BASIC_BACKEND_O2D(comp) NGTK_O2D_CAST(comp,NGTK_BACKEND_TYPE,NGtkBasicBackendD,0)
@@ -38,17 +39,29 @@ typedef struct _ngtk_basic_backend_d {
 NGtkBackendI*       ngtk_basic_backend_create_interface   ();
 void                ngtk_basic_backend_d_free             (void *d);
 
-void                ngtk_basic_backend_start_main_loop    (NGtkBasicBackend *self);
+//void                ngtk_basic_backend_init               (NGtkBasicBackend *self);
+//void                ngtk_basic_backend_start_main_loop    (NGtkBasicBackend *self);
 void                ngtk_basic_backend_quit_main_loop     (NGtkBasicBackend *self);
+//void                ngtk_basic_backend_quit               (NGtkBasicBackend *self);
 
-NGtkContainer*      ngtk_basic_backend_create_root_window (NGtkBasicBackend *self, const char *title);
-NGtkComponent*      ngtk_basic_backend_create_button      (NGtkBasicBackend *self, NGtkContainer* parent, const char *text);
-NGtkComponent*      ngtk_basic_backend_create_label       (NGtkBasicBackend *self, NGtkContainer* parent, const char *text);
-NGtkComponent*      ngtk_basic_backend_create_text_entry  (NGtkBasicBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
+//NGtkContainer*      ngtk_basic_backend_create_root_window (NGtkBasicBackend *self, const char *title);
+//NGtkComponent*      ngtk_basic_backend_create_button      (NGtkBasicBackend *self, NGtkContainer* parent, const char *text);
+//NGtkComponent*      ngtk_basic_backend_create_label       (NGtkBasicBackend *self, NGtkContainer* parent, const char *text);
+//NGtkComponent*      ngtk_basic_backend_create_text_entry  (NGtkBasicBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
 
 NGtkEventGenerator* ngtk_basic_backend_get_focus_holder   (NGtkBasicBackend *self);
 int                 ngtk_basic_backend_set_focus_holder   (NGtkBasicBackend *self, NGtkComponent* new_focus);
 NGtkEventGenerator* ngtk_basic_backend_focus_to_next      (NGtkBasicBackend *self);
 
-int                 ngtk_basic_backend_should_quit        (NGtkBasicBackend *self);
+void                ngtk_basic_backend_print              (NGtkBasicBackend *self, const char *format, va_list args);
+void                ngtk_basic_backend_debug              (NGtkBasicBackend *self, const char *format, va_list args);
+void                ngtk_basic_backend_error              (NGtkBasicBackend *self, const char *format, va_list args);
+
+
+/* Specific function to this implementation: */
+void    ngtk_basic_backend_call_after_init             (NGtkBasicBackend *self);
+void    ngtk_basic_backend_call_before_start_main_loop (NGtkBasicBackend *self);
+
+int     ngtk_basic_backend_should_quit                 (NGtkBasicBackend *self);
+
 #endif

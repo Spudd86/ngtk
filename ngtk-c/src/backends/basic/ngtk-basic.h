@@ -24,5 +24,6 @@
 #include "ngtk-basic-component.h"
 #include "ngtk-basic-container.h"
 #include "ngtk-basic-event-generator.h"
+#include "ngtk-basic-backend.h"
 
 #endif

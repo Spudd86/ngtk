@@ -23,41 +23,7 @@
 
 #include <stdio.h>
 
-typedef struct {
-	Window         wnd;
-	NGtkXlibBaseI *baseI;
-} WindowAndBase;
-
-static NGtkList window2base = NGTK_EMPTY_LIST_CONST;
-
-static void register_window (Window xlib_wnd, NGtkXlibBaseI* baseI)
-{
-	WindowAndBase *wb = ngtk_new (WindowAndBase);
-
-	wb->wnd   = xlib_wnd;
-	wb->baseI = baseI;
-
-	ngtk_list_append (&window2base, wb);
-}
-
-static NGtkListNode* find_window (Window xlib_wnd)
-{
-	NGtkListNode *iter;
-	ngtk_list_foreach (iter, &window2base)
-	{
-		if (((WindowAndBase*)iter->data)->wnd == xlib_wnd)
-			return iter;
-	}
-	return NULL;
-}
-
-static void unregister_window_and_base (NGtkListNode *n)
-{
-	ngtk_free ((WindowAndBase*) n->data);
-	ngtk_list_remove_node (&window2base, n);
-}
-
-NGtkXlibBaseI* ngtk_xlib_base_create_interface  (Window xlib_wnd)
+NGtkXlibBaseI* ngtk_xlib_base_create_interface  (NGtkXlibBackend *backend, Window xlib_wnd)
 {
 	NGtkInterface *in = ngtk_interface_new (NGTK_XLIBBASE_TYPE);
 	NGtkXlibBaseD *xbd;
@@ -68,14 +34,11 @@ NGtkXlibBaseI* ngtk_xlib_base_create_interface  (Window xlib_wnd)
 	xbd->area.w = 0;
 	xbd->area.h = 0;
 	xbd->_wnd = xlib_wnd;
+	xbd->backend = backend;
 	in->d_free[0] = ngtk_xlib_base_d_free;
 
-	register_window (xlib_wnd, in);
-	/* TODO: remove this block */
-#if TRUE
-	ngtk_assert (((WindowAndBase*) (find_window (xlib_wnd) -> data))->baseI == in);
-	fprintf (stderr, "Created a new NGtkXlibBase %p with window %d\n", in, (int) xlib_wnd);
-#endif
+	ngtk_xlib_backend_register_window (backend, xlib_wnd);
+
 	return in;
 }
 
@@ -124,26 +87,13 @@ const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self)
 	return &(NGTK_XLIBBASE_O2D (self) -> area);
 }
 
-NGtkXlibBase* ngtk_xlib_base_get_for_window (Window xlib_wnd)
+NGtkXlibBackend* ngtk_xlib_base_get_backend (NGtkXlibBase *self)
 {
-	NGtkXlibBaseI *baseI = ((WindowAndBase*) find_window (xlib_wnd) -> data) -> baseI;
-	if (baseI == NULL)
-		return NULL;
-	else
-		return ngtk_interface_get_object (baseI);
+	return NGTK_XLIBBASE_O2D (self) -> backend;
 }
 
 NGtkXlibBase* ngtk_xlib_base_call_on_window_destroyed (Window xlib_wnd)
 {
-	NGtkListNode  *wnb = find_window (xlib_wnd);
-	NGtkXlibBaseI *xb;
-
-	if (wnb == NULL)
-		return NULL;
-
-	xb = ((WindowAndBase*)(wnb->data))->baseI;
-	NGTK_XLIBBASE_I2D (xb)->_wnd = BadWindow;
-	unregister_window_and_base (wnb);
-
+	NGtkXlibBaseI *xb = ngtk_xlib_backend_unregister_window (backend, xlib_wnd);
 	return ngtk_interface_get_object (xb);
 }

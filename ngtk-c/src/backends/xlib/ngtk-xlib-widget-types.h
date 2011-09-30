@@ -31,4 +31,6 @@ enum {
 typedef NGtkInterface                NGtkXlibBaseI;
 typedef NGtkObject                   NGtkXlibBase;
 
+typedef NGtkObject                   NGtkXlibBase;
+
 #endif
