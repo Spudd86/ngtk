@@ -25,7 +25,7 @@
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
-NGtkInterface* ngtk_xlib_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible);
+NGtkInterface* ngtk_xlib_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable);
 
 #define  ngtk_xlib_component_get_parent   ngtk_basic_component_get_parent
 

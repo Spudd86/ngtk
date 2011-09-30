@@ -20,7 +20,7 @@
 
 #include "ngtk-basic-component.h"
 
-NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible)
+NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable)
 {
 	NGtkInterface *in = ngtk_interface_new (NGTK_COMPONENT_TYPE);
 	NGtkBasicComponentD *bcd;
@@ -29,20 +29,22 @@ NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer
 	bcd->enabled = enabled;
 	bcd->parent = parent;
 	bcd->text = text;
+	bcd->focusable = focusable;
 	bcd->visible = visible;
 
 	in->d[0] = bcd;
 	in->d_free[0] = ngtk_basic_component_d_free;
 
 	in->f = ngtk_new (NGtkComponentF);
-	NGTK_COMPONENT_I2F (in) -> get_enabled = ngtk_basic_component_get_enabled;
-	NGTK_COMPONENT_I2F (in) -> get_parent  = ngtk_basic_component_get_parent;
-	NGTK_COMPONENT_I2F (in) -> get_text    = ngtk_basic_component_get_text;
-	NGTK_COMPONENT_I2F (in) -> get_visible = ngtk_basic_component_get_visible;
-	NGTK_COMPONENT_I2F (in) -> redraw      = ngtk_basic_component_redraw;
-	NGTK_COMPONENT_I2F (in) -> set_enabled = ngtk_basic_component_set_enabled;
-	NGTK_COMPONENT_I2F (in) -> set_text    = ngtk_basic_component_set_text;
-	NGTK_COMPONENT_I2F (in) -> set_visible = ngtk_basic_component_set_visible;
+	NGTK_COMPONENT_I2F (in) -> get_enabled   = ngtk_basic_component_get_enabled;
+	NGTK_COMPONENT_I2F (in) -> get_focusable = ngtk_basic_component_get_focusable;
+	NGTK_COMPONENT_I2F (in) -> get_parent    = ngtk_basic_component_get_parent;
+	NGTK_COMPONENT_I2F (in) -> get_text      = ngtk_basic_component_get_text;
+	NGTK_COMPONENT_I2F (in) -> get_visible   = ngtk_basic_component_get_visible;
+	NGTK_COMPONENT_I2F (in) -> redraw        = ngtk_basic_component_redraw;
+	NGTK_COMPONENT_I2F (in) -> set_enabled   = ngtk_basic_component_set_enabled;
+	NGTK_COMPONENT_I2F (in) -> set_text      = ngtk_basic_component_set_text;
+	NGTK_COMPONENT_I2F (in) -> set_visible   = ngtk_basic_component_set_visible;
 	in->f_free = ngtk_free;
 
 	return in;
@@ -83,6 +85,11 @@ void ngtk_basic_component_set_visible (NGtkComponent *self, int visible)
 	temp.type = NGTK_VALUE_INT;
 	temp.val.v_int = visible;
 	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::visible", &temp, TRUE);
+}
+
+int ngtk_basic_component_get_focusable (NGtkComponent *self)
+{
+	return NGTK_BASIC_COMPONENT_O2D (self) -> focusable;
 }
 
 const char* ngtk_basic_component_get_text (NGtkComponent *self)

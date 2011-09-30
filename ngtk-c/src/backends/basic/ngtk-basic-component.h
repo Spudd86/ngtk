@@ -27,13 +27,14 @@ typedef struct _ngtk_basic_component_d {
 	NGtkContainer* parent;
 	int            enabled;
 	int            visible;
+	int            focusable;
 	const char*    text;
 } NGtkBasicComponentD;
 
 #define NGTK_BASIC_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkBasicComponentD,0)
 #define NGTK_BASIC_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkBasicComponentD,0)
 
-NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible);
+NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable);
 void           ngtk_basic_component_d_free           (void *d);
 
 NGtkContainer* ngtk_basic_component_get_parent  (NGtkComponent *self);
@@ -43,6 +44,8 @@ void           ngtk_basic_component_set_enabled (NGtkComponent *self, int enable
 
 int            ngtk_basic_component_get_visible (NGtkComponent *self);
 void           ngtk_basic_component_set_visible (NGtkComponent *self, int visible);
+
+int            ngtk_basic_component_get_focusable (NGtkComponent *self);
 
 const char*    ngtk_basic_component_get_text    (NGtkComponent *self);
 void           ngtk_basic_component_set_text    (NGtkComponent *self, const char *text);

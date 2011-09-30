@@ -200,7 +200,7 @@ static void draw_button (NGtkComponent *but)
 	ngtk_basic_component_redraw (but);
 }
 
-static NGtkObject* create_basic_widget (int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area)
+static NGtkObject* create_basic_widget (int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area, int focusable)
 {
 	Window wnd = XCreateSimpleWindow (
 		ngtk_xlib_get_display (),     /* Connection to the X server */
@@ -218,7 +218,7 @@ static NGtkObject* create_basic_widget (int enabled, NGtkContainer *parent, cons
 	in_base = ngtk_xlib_base_create_interface (wnd);
 	ngtk_object_implement (obj, in_base);
 
-	in_comp = ngtk_xlib_component_create_interface (enabled, parent, text, visible);
+	in_comp = ngtk_xlib_component_create_interface (enabled, parent, text, visible, focusable);
 	ngtk_object_implement (obj, in_comp);
 
 	in_evgn = ngtk_xlib_event_generator_create_interface ();
@@ -240,7 +240,7 @@ static NGtkObject* create_basic_widget (int enabled, NGtkContainer *parent, cons
 NGtkObject* ngtk_xlib_create_window_imp (const char* title, int visible)
 {
 	NGtkRectangle area = { 50, 50, 200, 200 };
-	NGtkObject *obj = create_basic_widget (TRUE, NULL, title, visible, &area);
+	NGtkObject *obj = create_basic_widget (TRUE, NULL, title, visible, &area, TRUE);
 
 	NGtkInterface *in_cont = ngtk_xlib_container_create_interface ();
 	ngtk_object_implement (obj, in_cont);
@@ -254,7 +254,7 @@ NGtkObject* ngtk_xlib_create_window_imp (const char* title, int visible)
 NGtkObject* ngtk_xlib_create_label_imp (const char* text, int visible, NGtkContainer *parent)
 {
 	NGtkRectangle area = { 50, 50, 200, 200 };
-	NGtkObject *obj = create_basic_widget (TRUE, parent, text, visible, &area);
+	NGtkObject *obj = create_basic_widget (TRUE, parent, text, visible, &area, FALSE);
 
 	NGTK_COMPONENT_O2F (obj) -> redraw = draw_label;
 
@@ -264,7 +264,7 @@ NGtkObject* ngtk_xlib_create_label_imp (const char* text, int visible, NGtkConta
 NGtkObject* ngtk_xlib_create_button_imp (const char* text, int visible, NGtkContainer *parent)
 {
 	NGtkRectangle area = { 50, 50, 200, 200 };
-	NGtkObject *obj = create_basic_widget (TRUE, parent, text, visible, &area);
+	NGtkObject *obj = create_basic_widget (TRUE, parent, text, visible, &area, TRUE);
 
 	NGTK_COMPONENT_O2F (obj) -> redraw = draw_button;
 

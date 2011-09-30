@@ -45,6 +45,11 @@ void ngtk_component_set_visible (NGtkComponent *self, int visible)
 	NGTK_COMPONENT_O2F (self)->set_visible (self, visible);
 }
 
+int ngtk_component_get_focusable (NGtkComponent *self)
+{
+	return NGTK_COMPONENT_O2F (self)->get_focusable (self);
+}
+
 const char* ngtk_component_get_text (NGtkComponent *self)
 {
 	return NGTK_COMPONENT_O2F (self)->get_text (self);

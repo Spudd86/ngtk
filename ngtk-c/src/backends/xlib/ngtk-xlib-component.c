@@ -23,9 +23,9 @@
 #include "ngtk-xlib-component.h"
 #include "../basic/ngtk-basic.h"
 
-NGtkInterface* ngtk_xlib_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible)
+NGtkInterface* ngtk_xlib_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable)
 {
-	NGtkInterface *in = ngtk_basic_component_create_interface (enabled, parent, text, visible);
+	NGtkInterface *in = ngtk_basic_component_create_interface (enabled, parent, text, visible, focusable);
 
 	NGTK_COMPONENT_I2F (in) -> set_enabled = ngtk_xlib_component_set_enabled;
 	NGTK_COMPONENT_I2F (in) -> set_text    = ngtk_xlib_component_set_text;

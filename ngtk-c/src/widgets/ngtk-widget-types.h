@@ -29,6 +29,7 @@ enum {
 	NGTK_CONTAINER_TYPE       = 2,
 	NGTK_EVENT_GENERATOR_TYPE = 3,
 	NGTK_LAYOUT_TYPE          = 4,
+	NGTK_BACKEND_TYPE         = 5,
 
 	NGTK_BACKEND_BASE_TYPE    = (NGTK_MAX_INTERFACES / 2)
 };
@@ -44,5 +45,8 @@ typedef  NGtkObject     NGtkEventGenerator;
 
 typedef  NGtkInterface  NGtkLayoutI;
 typedef  NGtkObject     NGtkLayout;
+
+typedef  NGtkInterface  NGtkBackendI;
+typedef  NGtkObject     NGtkBackend;
 
 #endif

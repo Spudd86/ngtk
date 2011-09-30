@@ -11,7 +11,7 @@ clean: .SUBDIRS-CLEAN
 	cd object-system; $(MAKE) $(MFLAGS)
 	cd utils;         $(MAKE) $(MFLAGS)
 	cd widgets;       $(MAKE) $(MFLAGS)
-	cd backends;      $(MAKE) $(MFLAGS) backend-nc
+#	cd backends;      $(MAKE) $(MFLAGS) backend-nc
 	cd backends;      $(MAKE) $(MFLAGS) backend-xlib
 
 .SUBDIRS-CLEAN: .PHONY

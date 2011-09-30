@@ -341,6 +341,7 @@ void ngtk_xlib_start_main_loop ()
 				&& event.xclient.window == ngtk_xlib_base_get_window (ngtk_xlib_root_window))
 			{
 				printf ("Received destroy message from WM!\n");
+				ngtk_object_send_signal (ngtk_xlib_root_window, "event::close", NULL);
 				XDestroyWindow (xlib_display, ngtk_xlib_base_get_window (ngtk_xlib_root_window));
 			}
 			else

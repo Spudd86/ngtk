@@ -24,18 +24,20 @@
 #include "ngtk-widget-types.h"
 
 typedef struct _NGtkComponentF {
-	NGtkContainer* (*get_parent)  (NGtkComponent *self);
+	NGtkContainer* (*get_parent)    (NGtkComponent *self);
 
-	int            (*get_enabled) (NGtkComponent *self);
-	void           (*set_enabled) (NGtkComponent *self, int enabled);
+	int            (*get_enabled)   (NGtkComponent *self);
+	void           (*set_enabled)   (NGtkComponent *self, int enabled);
 
-	int            (*get_visible) (NGtkComponent *self);
-	void           (*set_visible) (NGtkComponent *self, int visible);
+	int            (*get_visible)   (NGtkComponent *self);
+	void           (*set_visible)   (NGtkComponent *self, int visible);
+	
+	int            (*get_focusable) (NGtkComponent *self);
 
-	const char*    (*get_text)    (NGtkComponent *self);
-	void           (*set_text)    (NGtkComponent *self, const char *text);
+	const char*    (*get_text)      (NGtkComponent *self);
+	void           (*set_text)      (NGtkComponent *self, const char *text);
 
-	void           (*redraw)      (NGtkComponent *self);
+	void           (*redraw)        (NGtkComponent *self);
 } NGtkComponentF;
 
 #define NGTK_COMPONENT_O2F(comp) NGTK_O2F_CAST(comp,NGTK_COMPONENT_TYPE,NGtkComponentF)
@@ -101,6 +103,17 @@ int            ngtk_component_get_visible (NGtkComponent *self);
  */
 void           ngtk_component_set_visible (NGtkComponent *self, int visible);
 
+/**
+ * Check whether a component is focusable. THis is only the focusable
+ * property, not the entire conclusion of whether a component can
+ * receive the focus.
+ *
+ * @param self The component
+ * @return Whether this component is focusable
+ *
+ * @since 0.9
+ */
+int            ngtk_component_get_focusable (NGtkComponent *self);
 /**
  * Get the text content of the component. This is component dependant
  * (for example, for windows the text is the title, for labels this is

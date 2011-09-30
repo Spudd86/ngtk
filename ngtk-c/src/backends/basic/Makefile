@@ -1,4 +1,5 @@
 OBJS = \
+	ngtk-basic-backend.o \
 	ngtk-basic-component.o \
 	ngtk-basic-container.o \
 	ngtk-basic-event-generator.o
