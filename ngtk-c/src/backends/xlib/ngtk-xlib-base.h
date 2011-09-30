@@ -52,6 +52,7 @@ const NGtkRectangle*  ngtk_xlib_base_get_relative_rect (NGtkXlibBase *self);
 void                  ngtk_xlib_base_put_to            (NGtkXlibBase *self, const NGtkRectangle *area, int already_put);
 
 NGtkXlibBackend*      ngtk_xlib_base_get_backend       (NGtkXlibBase *self);
-NGtkXlibBase*         ngtk_xlib_base_get_for_window    (Window xlib_wnd);
-NGtkXlibBase*         ngtk_xlib_base_call_on_window_destroyed (Window xlib_wnd);
+NGtkXlibBackend*      ngtk_xlib_base_get_backend2      (NGtkXlibBaseI *self);
+
+NGtkXlibBase*         ngtk_xlib_base_call_on_window_destroyed (NGtkXlibBackend *backend, Window xlib_wnd);
 #endif

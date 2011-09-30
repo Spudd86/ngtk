@@ -18,9 +18,7 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-xlib-base.h"
-#include "ngtk-xlib-event-generator.h"
-#include "ngtk-xlib-defs.h"
+#include "ngtk-xlib.h"
 
 NGtkInterface* ngtk_xlib_event_generator_create_interface ()
 {
@@ -41,6 +39,6 @@ NGtkInterface* ngtk_xlib_event_generator_create_interface ()
 
 void ngtk_xlib_event_generator_grab_keyboard_focus (NGtkEventGenerator *self)
 {
-	ngtk_xlib_set_focus_holder (self);
+	ngtk_xlib_backend_set_focus_holder (ngtk_xlib_base_get_backend (self), self);
 	ngtk_basic_event_generator_grab_keyboard_focus (self);
 }

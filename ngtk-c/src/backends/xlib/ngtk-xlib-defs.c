@@ -24,10 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "ngtk-xlib-defs.h"
-#include "ngtk-xlib-base.h"
-
-#include "ngtk-xlib-window.h"
+#include "ngtk-xlib.h"
 
 static float xlib_color_vals[NGTK_XLIB_COLOR_MAX][3] = {
 	{1, 1, 1},          /* NGTK_XLIB_WHITE */
@@ -38,7 +35,7 @@ static float xlib_color_vals[NGTK_XLIB_COLOR_MAX][3] = {
 void ngtk_xlib_init (NGtkXlibBackend *self)
 {
 	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
-	
+
 	const char* display_name;
 	int i;
 
@@ -53,11 +50,11 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 
 	/* Find the default screen on which we should operate */
 	xbd->screen = DefaultScreen (xbd->display);
-	
+
 	/* Each screen has a root window - a window that covers the entire
 	 * screen. We need it in order to create the children windows */
 	xbd->root_window = RootWindow (xbd->display, xbd->screen);
-	
+
 	/* Each screen has a colormap - an object that given an RGB color
 	 * will return an identifier of the closest displayable color to
 	 * the given color */
@@ -85,7 +82,7 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 
 /* You want to read the man page for XButtonEvent in order to understand
  * the following function. */
-static void handle_mouse_button_event (XButtonEvent evnt)
+static void handle_mouse_button_event (NGtkXlibBackend *self, XButtonEvent evnt)
 {
 	/* In order to determine where a mouse press and release together
 	 * from a click, we must check that the press and release of the
@@ -117,7 +114,7 @@ static void handle_mouse_button_event (XButtonEvent evnt)
 	 * event. This variable is an indicator for that */
 	int also_fire_click = FALSE;
 
-	NGtkXlibBase *widget = ngtk_xlib_base_get_for_window (wnd);
+	NGtkXlibBase *widget = ngtk_xlib_backend_get_for_window2 (self, wnd);
 
 	/* An event should be ignored in any of the following cases:
 	 *
@@ -190,18 +187,17 @@ static void handle_mouse_button_event (XButtonEvent evnt)
 	}
 }
 
-#if FALSE
-static void component_keyed (NGtkComponent* comp, XKeyEvent evnt)
-{
-}
-#endif
-
-
-void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
+void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 {
 	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
+	NGtkBasicBackendD *bbd = NGTK_BASIC_BACKEND_O2D (self);
+
+	NGtkContainer    *ngtk_xlib_root_window = bbd->root_window;
+	Display          *xlib_display = xbd->display;
+	Atom              xlib_window_close_atom = xbd->window_close_atom;
+
 	ngtk_debug (self, "Resize Request event is %d\n", ResizeRequest);
-	
+
 	while (! ngtk_xlib_backend_should_quit (self))
 	{
 		XEvent event;
@@ -218,7 +214,7 @@ void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
 		{
 			/* The window that was exposed */
 			Window wnd = event.xexpose.window;
-			NGtkXlibBase *base = ngtk_xlib_base_get_for_window (wnd);
+			NGtkXlibBase *base = ngtk_xlib_backend_get_for_window2 (self, wnd);
 
 			/* If we have several pending expose events, to avoid
 			 * flickering we will handle just the last one. */
@@ -233,7 +229,7 @@ void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
 		case ButtonPress:
 		case ButtonRelease:
 		{
-			handle_mouse_button_event (event.xbutton);
+			handle_mouse_button_event (self, event.xbutton);
 			break;
 		}
 
@@ -289,7 +285,7 @@ void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
 		{
 			/* The only component who has the bit on to signal it should
 			 * accept resize requests is the root window */
-			NGtkXlibBase *widget = ngtk_xlib_base_get_for_window (event.xconfigure.window);
+			NGtkXlibBase *widget = ngtk_xlib_backend_get_for_window2 (self, event.xconfigure.window);
 			const NGtkRectangle *rect = ngtk_xlib_base_get_relative_rect (widget);
 
 			if (ngtk_object_is_a (widget, NGTK_CONTAINER_TYPE) && (rect->w != event.xconfigure.width || rect->h != event.xconfigure.height))
@@ -299,19 +295,19 @@ void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
 
 		case DestroyNotify:
 		{
-			printf ("Received destroy notification!\n");
+			ngtk_debug (self, "Received destroy notification!\n");
 			Window wnd = event.xdestroywindow.window;
-			NGtkXlibBase *xb = ngtk_xlib_base_call_on_window_destroyed (wnd);
+			NGtkXlibBase *xb = ngtk_xlib_base_call_on_window_destroyed (self, wnd);
 			if (xb == ngtk_xlib_root_window)
 			{
-				ngtk_xlib_quit_main_loop ();
-				printf ("Quit main loop!\n");
+				ngtk_backend_quit_main_loop (self);
+				ngtk_debug (self, "Quit main loop!\n");
 			}
 			break;
 		}
 
 		case ClientMessage:
-			if (event.xclient.data.l[0] == xlib_window_close_atom
+			if (event.xclient.data.l[0] == xbd->window_close_atom
 				&& event.xclient.window == ngtk_xlib_base_get_window (ngtk_xlib_root_window))
 			{
 				printf ("Received destroy message from WM!\n");
@@ -331,26 +327,21 @@ void ngtk_xlib_backend_start_main_loop_imp (NGtkXlibBackend *self)
 	}
 }
 
-void ngtk_xlib_quit_main_loop ()
+void ngtk_xlib_quit (NGtkXlibBackend *self)
 {
-	/* Assert initialization */
-	ngtk_assert (ngtk_xlib_initialized);
+	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
+	NGtkBasicBackendD *bbd = NGTK_BASIC_BACKEND_O2D (self);
 
-	ngtk_xlib_should_quit = TRUE;
-}
-
-void ngtk_xlib_quit ()
-{
 	int i;
 
 	/* Assert initialization */
-	ngtk_assert (ngtk_xlib_initialized);
+	ngtk_assert (bbd->initialized);
 
 	/* Free the root window */
-	if (ngtk_xlib_root_window)
+	if (bbd->root_window)
 	{
-		ngtk_object_free (ngtk_xlib_root_window);
-		ngtk_xlib_root_window = NULL;
+		ngtk_object_free (bbd->root_window);
+		bbd->root_window = NULL;
 	}
 
 	/* Free the colors we allocated */
@@ -361,15 +352,16 @@ void ngtk_xlib_quit ()
 		 * the given colormap. We then specify that we are freeing 1
 		 * color, and 0 planes. We don't deal with color planes in NGtk
 		 */
-		XFreeColors (xlib_display, xlib_colormap, &xlib_colors[i].pixel, 1, 0);
+		XFreeColors (xbd->display, xbd->colormap, &xbd->colors[i].pixel, 1, 0);
 	}
 	/* Free the colormap */
-	XFreeColormap (xlib_display, xlib_colormap);
+	XFreeColormap (xbd->display, xbd->colormap);
 
 	/* Close the connection to the X server */
-	XCloseDisplay (xlib_display);
+	XCloseDisplay (xbd->display);
 }
 
+#if FALSE
 NGtkContainer* ngtk_xlib_create_root_window (const char* title)
 {
 	if (ngtk_xlib_root_window == NULL)
@@ -393,35 +385,4 @@ NGtkComponent* ngtk_xlib_create_text_entry (NGtkContainer* parent, const char* t
 {
 	return NULL;
 }
-
-void ngtk_xlib_set_focus_holder (NGtkEventGenerator* eg)
-{
-	XSetInputFocus (xlib_display, ngtk_xlib_base_get_window (eg), RevertToParent, CurrentTime);
-	ngtk_xlib_focus_holder = eg;
-}
-
-NGtkEventGenerator* ngtk_xlib_get_focus_holder ()
-{
-	return ngtk_xlib_focus_holder;
-}
-
-Display* ngtk_xlib_get_display ()
-{
-	return xlib_display;
-}
-
-int ngtk_xlib_get_screen ()
-{
-	return xlib_screen;
-}
-
-Window ngtk_xlib_get_root_window ()
-{
-	return xlib_root_window;
-}
-
-unsigned long ngtk_xlib_get_color (NGtkXlibColorName cn)
-{
-	ngtk_assert (0 <= cn && cn < NGTK_XLIB_COLOR_MAX);
-	return xlib_colors[cn].pixel;
-}
+#endif

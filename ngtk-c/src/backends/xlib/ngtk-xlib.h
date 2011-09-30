@@ -26,11 +26,17 @@
 #include "ngtk-xlib-widget-types.h"
 
 #include "ngtk-xlib-base.h"
+#include "ngtk-xlib-backend.h"
 #include "ngtk-xlib-component.h"
 #include "ngtk-xlib-container.h"
 #include "ngtk-xlib-event-generator.h"
 
 #include "ngtk-xlib-window.h"
+
+#define ngtk_xlib_base_get_display(self) (ngtk_xlib_backend_get_display (ngtk_xlib_base_get_backend (self)))
+#define ngtk_xlib_base_get_screen(self) (ngtk_xlib_backend_get_screen (ngtk_xlib_base_get_backend (self)))
+#define ngtk_xlib_base_get_color(self,col) (ngtk_xlib_backend_get_color (ngtk_xlib_base_get_backend (self), (col)))
+#define ngtk_xlib_base_has_focus(self) (ngtk_xlib_backend_get_focus_holder (ngtk_xlib_base_get_backend (self)) == (self))
 
 #define ngtk_init                ngtk_xlib_init
 #define ngtk_start_main_loop     ngtk_xlib_start_main_loop

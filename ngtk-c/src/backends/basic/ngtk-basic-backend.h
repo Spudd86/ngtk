@@ -61,6 +61,7 @@ void                ngtk_basic_backend_error              (NGtkBasicBackend *sel
 /* Specific function to this implementation: */
 void    ngtk_basic_backend_call_after_init             (NGtkBasicBackend *self);
 void    ngtk_basic_backend_call_before_start_main_loop (NGtkBasicBackend *self);
+int     ngtk_basic_backend_can_focus_on                (NGtkBasicBackend *self, NGtkComponent *new_focus);
 
 int     ngtk_basic_backend_should_quit                 (NGtkBasicBackend *self);
 

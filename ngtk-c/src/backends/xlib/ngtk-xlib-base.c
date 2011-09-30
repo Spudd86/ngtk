@@ -20,6 +20,7 @@
 
 #include "ngtk-xlib-defs.h"
 #include "ngtk-xlib-base.h"
+#include "ngtk-xlib-backend.h"
 
 #include <stdio.h>
 
@@ -37,23 +38,20 @@ NGtkXlibBaseI* ngtk_xlib_base_create_interface  (NGtkXlibBackend *backend, Windo
 	xbd->backend = backend;
 	in->d_free[0] = ngtk_xlib_base_d_free;
 
-	ngtk_xlib_backend_register_window (backend, xlib_wnd);
+	ngtk_xlib_backend_register_window (backend, xlib_wnd, in);
 
 	return in;
 }
 
+
 void ngtk_xlib_base_d_free (void *d)
 {
 	NGtkXlibBaseD *dReal = (NGtkXlibBaseD*) d;
-	NGtkListNode  *wnb;
 
 	if (dReal->_wnd != BadWindow)
 	{
-		wnb = find_window (dReal->_wnd);
-		ngtk_assert (wnb != NULL);
-		unregister_window_and_base (wnb);
-
-		XDestroyWindow (ngtk_xlib_get_display (), dReal->_wnd);
+		ngtk_xlib_backend_unregister_window (dReal->backend, dReal->_wnd);
+		XDestroyWindow (ngtk_xlib_backend_get_display (dReal->backend), dReal->_wnd);
 	}
 
 	ngtk_free (dReal);
@@ -69,6 +67,7 @@ void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area, int a
 {
 	NGtkRectangle *rect = &(NGTK_XLIBBASE_O2D (self) -> area);
 	Window         wnd  = ngtk_xlib_base_get_window (self);
+	NGtkBackend   *xbd  = ngtk_xlib_base_get_backend (self);
 
 	rect->x = area->x;
 	rect->y = area->y;
@@ -77,8 +76,8 @@ void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area, int a
 
 	if (! already_put)
 	{
-		XMoveWindow (ngtk_xlib_get_display (), wnd, area->x, area->y);
-		XResizeWindow (ngtk_xlib_get_display (), wnd, area->w, area->h);
+		XMoveWindow (ngtk_xlib_backend_get_display (xbd), wnd, area->x, area->y);
+		XResizeWindow (ngtk_xlib_backend_get_display (xbd), wnd, area->w, area->h);
 	}
 }
 
@@ -92,7 +91,13 @@ NGtkXlibBackend* ngtk_xlib_base_get_backend (NGtkXlibBase *self)
 	return NGTK_XLIBBASE_O2D (self) -> backend;
 }
 
-NGtkXlibBase* ngtk_xlib_base_call_on_window_destroyed (Window xlib_wnd)
+NGtkXlibBackend* ngtk_xlib_base_get_backend2 (NGtkXlibBaseI *self)
+{
+	return NGTK_XLIBBASE_I2D (self) -> backend;
+}
+
+
+NGtkXlibBase* ngtk_xlib_base_call_on_window_destroyed (NGtkXlibBackend *backend, Window xlib_wnd)
 {
 	NGtkXlibBaseI *xb = ngtk_xlib_backend_unregister_window (backend, xlib_wnd);
 	return ngtk_interface_get_object (xb);

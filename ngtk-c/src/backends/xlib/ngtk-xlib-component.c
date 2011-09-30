@@ -18,10 +18,10 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-xlib-defs.h"
-#include "ngtk-xlib-base.h"
 #include "ngtk-xlib-component.h"
-#include "../basic/ngtk-basic.h"
+#include "ngtk-xlib.h"
+//#include "ngtk-xlib-base.h"
+//#include "../basic/ngtk-basic.h"
 
 NGtkInterface* ngtk_xlib_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable)
 {
@@ -48,9 +48,9 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 	{
 		Window wnd = ngtk_xlib_base_get_window (self);
 		if (visible)
-			XMapWindow (ngtk_xlib_get_display (), wnd);
+			XMapWindow (ngtk_xlib_base_get_display (self), wnd);
 		else
-			XUnmapWindow (ngtk_xlib_get_display (), wnd);
+			XUnmapWindow (ngtk_xlib_base_get_display (self), wnd);
 	}
 	ngtk_basic_component_set_visible (self, visible);
 }

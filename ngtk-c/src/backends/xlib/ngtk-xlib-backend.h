@@ -25,7 +25,14 @@
 #include "ngtk-xlib-widget-types.h"
 #include <X11/Xlib.h>
 
-typedef NGtkBasicBackend NGtkXlibBackend;
+/* Colors used by this backend */
+typedef enum {
+	NGTK_XLIB_WHITE = 0,
+	NGTK_XLIB_BLACK = 1,
+	NGTK_XLIB_GRAY  = 2,
+
+	NGTK_XLIB_COLOR_MAX = 3
+} NGtkXlibColorName;
 
 typedef struct _ngtk_xlib_backend_d {
 	/* The current connection to the X server */
@@ -50,7 +57,7 @@ typedef struct _ngtk_xlib_backend_d {
 
 	/* A list that will contain a mapping between `Window` objects and
 	 * the matching `NGtkObject` objects */
-	NGtkList  window2object
+	NGtkList  window2base;
 } NGtkXlibBackendD;
 
 #define NGTK_XLIB_BACKEND_O2D(comp) NGTK_O2D_CAST(comp,NGTK_BACKEND_TYPE,NGtkXlibBackendD,1)
@@ -59,16 +66,18 @@ typedef struct _ngtk_xlib_backend_d {
 NGtkBackendI*       ngtk_xlib_backend_create_interface   ();
 void                ngtk_xlib_backend_d_free             (void *d);
 
-void                ngtk_xlib_backend_start_main_loop    (NGtkBasicBackend *self);
-void                ngtk_xlib_backend_quit_main_loop     (NGtkBasicBackend *self);
+void                ngtk_xlib_backend_init               (NGtkXlibBackend *self);
+void                ngtk_xlib_backend_start_main_loop    (NGtkXlibBackend *self);
+void                ngtk_xlib_backend_quit_main_loop     (NGtkXlibBackend *self);
+void                ngtk_xlib_backend_quit               (NGtkXlibBackend *self);
 
-NGtkContainer*      ngtk_xlib_backend_create_root_window (NGtkBasicBackend *self, const char *title);
-NGtkComponent*      ngtk_xlib_backend_create_button      (NGtkBasicBackend *self, NGtkContainer* parent, const char *text);
-NGtkComponent*      ngtk_xlib_backend_create_label       (NGtkBasicBackend *self, NGtkContainer* parent, const char *text);
-NGtkComponent*      ngtk_xlib_backend_create_text_entry  (NGtkBasicBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
+NGtkContainer*      ngtk_xlib_backend_create_root_window (NGtkXlibBackend *self, const char *title);
+NGtkComponent*      ngtk_xlib_backend_create_button      (NGtkXlibBackend *self, NGtkContainer* parent, const char *text);
+NGtkComponent*      ngtk_xlib_backend_create_label       (NGtkXlibBackend *self, NGtkContainer* parent, const char *text);
+NGtkComponent*      ngtk_xlib_backend_create_text_entry  (NGtkXlibBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
 
 #define             ngtk_xlib_backend_get_focus_holder   ngtk_basic_backend_get_focus_holder
-int                 ngtk_xlib_backend_set_focus_holder   (NGtkBasicBackend *self, NGtkComponent* new_focus);
+int                 ngtk_xlib_backend_set_focus_holder   (NGtkXlibBackend *self, NGtkComponent* new_focus);
 #define             ngtk_xlib_backend_focus_to_next      ngtk_basic_backend_focus_to_next
 
 #define             ngtk_xlib_backend_print              ngtk_basic_backend_print
@@ -78,7 +87,15 @@ int                 ngtk_xlib_backend_set_focus_holder   (NGtkBasicBackend *self
 #define             ngtk_xlib_backend_should_quit        ngtk_basic_backend_should_quit
 
 /* Non interface functions */
-void            ngtk_xlib_backend_register_window   (NGtkXlibBackend *self, Window xlib_wnd, NGtkXlibBaseI* base);
-NGtkXlibBaseI*  ngtk_xlib_backend_unregister_window (NGtkXlibBackend *self, Window xlib_wnd);
-NGtkXlibBaseI*  ngtk_xlib_backend_get_for_window    (NGtkXlibBackend *self, Window xlib_wnd);
+
+Display*      ngtk_xlib_backend_get_display     (NGtkXlibBackend *self);
+int           ngtk_xlib_backend_get_screen      (NGtkXlibBackend *self);
+Window        ngtk_xlib_backend_get_root_window (NGtkXlibBackend *self);
+unsigned long ngtk_xlib_backend_get_color       (NGtkXlibBackend *self, NGtkXlibColorName cn);
+
+void            ngtk_xlib_backend_register_window    (NGtkXlibBackend *self, Window xlib_wnd, NGtkXlibBaseI* base);
+NGtkXlibBaseI*  ngtk_xlib_backend_unregister_window  (NGtkXlibBackend *self, Window xlib_wnd);
+NGtkXlibBase*   ngtk_xlib_backend_unregister_window2 (NGtkXlibBackend *self, Window xlib_wnd);
+NGtkXlibBaseI*  ngtk_xlib_backend_get_for_window     (NGtkXlibBackend *self, Window xlib_wnd);
+NGtkXlibBase*   ngtk_xlib_backend_get_for_window2    (NGtkXlibBackend *self, Window xlib_wnd);
 #endif

@@ -19,14 +19,13 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "ngtk-basic-backend.h"
 
 static void on_root_window_creation (NGtkBackendI *self, const char* signame, NGtkValue *val);
 static void on_label_creation       (NGtkBackendI *self, const char* signame, NGtkValue *val);
 static void on_button_creation      (NGtkBackendI *self, const char* signame, NGtkValue *val);
 static void on_text_entry_creation  (NGtkBackendI *self, const char* signame, NGtkValue *val);
-
-static int  can_focus_on            (NGtkBasicBackend *self, NGtkComponent *new_focus);
 
 NGtkBackendI* ngtk_basic_backend_create_interface ()
 {
@@ -136,7 +135,7 @@ NGtkEventGenerator* ngtk_basic_backend_get_focus_holder (NGtkBasicBackend *self)
 	return NGTK_BASIC_BACKEND_O2D (self) -> focus_holder;
 }
 
-static int can_focus_on (NGtkBasicBackend *self, NGtkComponent *new_focus)
+int ngtk_basic_backend_can_focus_on (NGtkBasicBackend *self, NGtkComponent *new_focus)
 {
 	ngtk_assert (ngtk_object_is_a (self, NGTK_BACKEND_TYPE));
 	ngtk_assert (ngtk_object_is_a (new_focus, NGTK_COMPONENT_TYPE));
@@ -149,7 +148,7 @@ static int can_focus_on (NGtkBasicBackend *self, NGtkComponent *new_focus)
 int ngtk_basic_backend_set_focus_holder (NGtkBasicBackend *self, NGtkComponent* new_focus)
 {
 	
-	if (can_focus_on (self, new_focus))
+	if (ngtk_basic_backend_can_focus_on (self, new_focus))
 	{
 		NGTK_BASIC_BACKEND_O2D (self) -> focus_holder = new_focus;
 		return TRUE;
@@ -159,7 +158,7 @@ int ngtk_basic_backend_set_focus_holder (NGtkBasicBackend *self, NGtkComponent* 
 
 static NGtkComponent* find_first_focus (NGtkBasicBackend *self, NGtkComponent *comp)
 {	
-	if (can_focus_on (self, comp))
+	if (ngtk_basic_backend_can_focus_on (self, comp))
 		return comp;
 	else if (ngtk_object_is_a (comp, NGTK_COMPONENT_TYPE))
 	{
@@ -233,14 +232,14 @@ void ngtk_basic_backend_print (NGtkBasicBackend *self, const char *format, va_li
 	vprintf (format, args);
 }
 
-void ngtk_basic_backend_debug (NGtkBasicBackend *self, const char *format, va_list args);
+void ngtk_basic_backend_debug (NGtkBasicBackend *self, const char *format, va_list args)
 {
 	fprintf (stderr, "== ngtk::backend::debug == ");
 	vfprintf (stderr, format, args);
 	fprintf (stderr, "\n");
 }
 
-void ngtk_basic_backend_error (NGtkBasicBackend *self, const char *format, va_list args);
+void ngtk_basic_backend_error (NGtkBasicBackend *self, const char *format, va_list args)
 {
 	fprintf (stderr, "== ngtk::backend::error == ");
 	vfprintf (stderr, format, args);

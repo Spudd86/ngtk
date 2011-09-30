@@ -1,4 +1,5 @@
 OBJS = \
+	ngtk-xlib-backend.o \
 	ngtk-xlib-base.o \
 	ngtk-xlib-component.o \
 	ngtk-xlib-container.o \
