@@ -64,7 +64,11 @@ int ngtk_basic_component_get_enabled (NGtkComponent *self)
 }
 void ngtk_basic_component_set_enabled (NGtkComponent *self, int enabled)
 {
+	NGtkValue temp;
 	NGTK_BASIC_COMPONENT_O2D (self) -> enabled = enabled;
+	temp.type = NGTK_VALUE_INT;
+	temp.val.v_int = enabled;
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::enable", &temp, TRUE);
 }
 
 int ngtk_basic_component_get_visible (NGtkComponent *self)
@@ -74,7 +78,11 @@ int ngtk_basic_component_get_visible (NGtkComponent *self)
 
 void ngtk_basic_component_set_visible (NGtkComponent *self, int visible)
 {
+	NGtkValue temp;
 	NGTK_BASIC_COMPONENT_O2D (self) -> visible = visible;
+	temp.type = NGTK_VALUE_INT;
+	temp.val.v_int = visible;
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::visible", &temp, TRUE);
 }
 
 const char* ngtk_basic_component_get_text (NGtkComponent *self)
@@ -84,7 +92,11 @@ const char* ngtk_basic_component_get_text (NGtkComponent *self)
 
 void ngtk_basic_component_set_text (NGtkComponent *self, const char *text)
 {
+	NGtkValue temp;
 	NGTK_BASIC_COMPONENT_O2D (self) -> text = text;
+	temp.type = NGTK_VALUE_CONST_STR;
+	temp.val.v_cstr = text;
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::text", &temp, TRUE);
 }
 
 void ngtk_basic_component_redraw (NGtkComponent *self)
@@ -98,4 +110,5 @@ void ngtk_basic_component_redraw (NGtkComponent *self)
 			ngtk_component_redraw ((NGtkComponent*) iter->data);
 		}
 	}
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::redraw", NULL, TRUE);
 }

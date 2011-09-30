@@ -24,6 +24,7 @@
 
 static void pack_main_window (NGtkContainer *self)
 {
+	NGtkValue tempVal;
 	NGtkRectangle new_area;
 	NGtkListNode  *iter;
 	unsigned int w, h;
@@ -38,6 +39,9 @@ static void pack_main_window (NGtkContainer *self)
 	new_area.h = h;
 
 	ngtk_xlib_base_put_to (self, &new_area, TRUE);
+	tempVal.type = NGTK_VALUE_P_CONST_RECT;
+	tempVal.val.v_cprect = &new_area;
+	ngtk_object_send_signal (self, "event::resize", &tempVal);
 
 	if (NGTK_BASIC_CONTAINER_O2D(self)->layout != NULL)
 		ngtk_layout_pack (NGTK_BASIC_CONTAINER_O2D(self)->layout, self, new_area.w, new_area.h);
@@ -163,6 +167,8 @@ static void draw_label (NGtkComponent *label)
 	draw_aligned_text (disp, wnd, gc, rect, TRUE, 0, 2, 0.5f, 2, text);
 
 	XFreeGC (disp, gc);
+
+	ngtk_basic_component_redraw (label);
 }
 
 static void draw_button (NGtkComponent *but)
@@ -190,6 +196,8 @@ static void draw_button (NGtkComponent *but)
 		XDrawRectangle (disp, wnd, gc, 1, 1, rect->w - 3, rect->h - 3);
 
 	XFreeGC (disp, gc);
+
+	ngtk_basic_component_redraw (but);
 }
 
 static NGtkObject* create_basic_widget (int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area)

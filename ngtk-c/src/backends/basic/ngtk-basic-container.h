@@ -24,7 +24,7 @@
 #include "../../widgets/ngtk-widgets.h"
 
 typedef struct _ngtk_basic_container_d {
-	NGtkComponentList* children;
+	NGtkComponentList  children;
 	NGtkLayout*        layout;
 } NGtkBasicContainerD;
 

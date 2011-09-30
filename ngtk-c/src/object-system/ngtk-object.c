@@ -107,10 +107,14 @@ NGtkInterface* ngtk_interface_cast (NGtkInterface* in, NGtkType iType)
 
 void ngtk_interface_free (NGtkInterface *in)
 {
+	NGtkValue value;
 	int i;
 	ngtk_assert (in != NULL);
 
-	ngtk_interface_send_signal (in, "object::destroy", NULL, FALSE);
+	value.type = NGTK_VALUE_P_VOID;
+	value.val.v_pvoid = in;
+	ngtk_interface_send_signal (in, "object::destroy", &value, TRUE);
+	
 	clear_listeners (& in->listeners);
 
 	if (in->obj != NULL)
@@ -132,12 +136,14 @@ void ngtk_interface_free (NGtkInterface *in)
 
 void ngtk_object_free (NGtkObject* obj)
 {
+	NGtkValue value;
 	int i;
 
 	ngtk_assert (obj != NULL);
 
-	ngtk_object_send_signal (obj, "object::destroy", NULL);
-	clear_listeners (& obj->listeners);
+	value.type = NGTK_VALUE_P_VOID;
+	value.val.v_pvoid = obj;
+	ngtk_object_send_signal (obj, "object::destroy", &value);
 	
 	if (obj->d && obj->d_free)
 		obj->d_free (obj->d);
@@ -145,6 +151,10 @@ void ngtk_object_free (NGtkObject* obj)
 	for (i = 0; i < NGTK_MAX_INTERFACES; i++)
 		if (obj->iImps[i])
 			ngtk_object_detach (obj, obj->iImps[i]);
+
+	/* The interfaces may bug the listeners a bit, so free only when
+	 * done with them */
+	clear_listeners (& obj->listeners);
 
 	ngtk_free (obj);
 }
@@ -182,12 +192,19 @@ void ngtk_object_implement (NGtkObject *obj, NGtkInterface *in)
  * prepared for the day where this can happen externally */
 void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in)
 {
+	NGtkValue value;
 	ngtk_assert (obj);
 	ngtk_assert (in);
 	ngtk_assert (in->iType != NGTK_TYPE_NONE);
 	ngtk_assert (in->obj == obj);
 	ngtk_assert (ngtk_object_is_a (obj, in->iType));
 	ngtk_assert (ngtk_object_cast (obj, in->iType) == in);
+
+	value.type = NGTK_VALUE_P_VOID;
+	value.val.v_pvoid = in;
+	ngtk_object_send_signal (obj, "object::detach", &value);
+	value.val.v_pvoid = obj;
+	ngtk_interface_send_signal (in, "object::detach", &value, FALSE);
 
 	/* To flip a bit, XOR with it's bit mask */
 	obj->iBits                ^= NGTK_BIT_MASK (in->iType);
@@ -253,7 +270,7 @@ static void emit_signal (void *src, NGtkList *listeners, const char *signal, NGt
 	ngtk_list_foreach (iter, listeners)
 	{
 		NGtkListenerInfo *li = (NGtkListenerInfo*) iter->data;
-		if (strcmp (li->signame, signal) == 0)
+		if (li->signame == NGTK_ALL_SIGNALS || strcmp (li->signame, signal) == 0)
 			li->func (src, signal, value);
 	}
 }
@@ -276,6 +293,6 @@ void ngtk_interface_connect_to (NGtkInterface *in, const char* signal, NGtkListe
 void ngtk_interface_send_signal (NGtkInterface* in, const char* signal, NGtkValue *data, int also_object)
 {
 	emit_signal (in, &in->listeners, signal, data);
-	if (also_object)
+	if (also_object && in->obj)
 		ngtk_object_send_signal (in->obj, signal, data);
 }
