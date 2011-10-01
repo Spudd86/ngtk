@@ -70,14 +70,15 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 		 * not. Check way and maybe remove */
 		col->flags = DoRed | DoGreen | DoBlue;
 
-		ngtk_debug (self, "Allocating color #%02x%02x%02x\n",col->red, col->green, col->blue);
+//		ngtk_debug (self, "Allocating color #%02x%02x%02x\n",col->red, col->green, col->blue);
 		ngtk_assert (XAllocColor (xbd->display, xbd->colormap, col));
-		ngtk_debug (self, "Result is %lu\n", col->pixel);
+//		ngtk_debug (self, "Result is %lu\n", col->pixel);
 	}
 
 	/* Initialize a connection property with the window manager,
 	 * associated with a window close event */
 	xbd->window_close_atom = XInternAtom (xbd->display, "WM_DELETE_WINDOW", FALSE);
+	ngtk_debug (self, "Finished initializing with display %p",ngtk_xlib_backend_get_display (self));
 }
 
 /* You want to read the man page for XButtonEvent in order to understand
@@ -187,7 +188,7 @@ static void handle_mouse_button_event (NGtkXlibBackend *self, XButtonEvent evnt)
 	}
 }
 
-void ngtk_xlib_backend_start (NGtkXlibBackend *self)
+void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 {
 	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
 	NGtkBasicBackendD *bbd = NGTK_BASIC_BACKEND_O2D (self);
@@ -195,8 +196,6 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 	NGtkContainer    *ngtk_xlib_root_window = bbd->root_window;
 	Display          *xlib_display = xbd->display;
 	Atom              xlib_window_close_atom = xbd->window_close_atom;
-
-	ngtk_debug (self, "Resize Request event is %d\n", ResizeRequest);
 
 	while (! ngtk_xlib_backend_should_quit (self))
 	{
@@ -212,6 +211,8 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 
 		case Expose: /* This is the case were we need to redraw */
 		{
+			ngtk_debug (self, "Expose or ButtonRelease Received");
+
 			/* The window that was exposed */
 			Window wnd = event.xexpose.window;
 			NGtkXlibBase *base = ngtk_xlib_backend_get_for_window2 (self, wnd);
@@ -228,12 +229,14 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 
 		case ButtonPress:
 		case ButtonRelease:
+			ngtk_debug (self, "ButtonPress or ButtonRelease Received");
 		{
 			handle_mouse_button_event (self, event.xbutton);
 			break;
 		}
 
 		case MotionNotify:
+			ngtk_debug (self, "MotionNotify Received");
 		{
 
 			 /* TODO: handle the event here */
@@ -242,6 +245,7 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 		}
 
 		case KeyPress:
+			ngtk_debug (self, "KeyPress Received");
 		{
 //			Window wnd = event.xbutton.window;
 			KeySym keysym;
@@ -259,7 +263,9 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 			has_ascii = XLookupString (&event.xkey, &key_ascii, 1, &keysym, NULL);
 			has_keysym = keysym != NoSymbol;
 
-			if (has_ascii)
+			if (has_ascii && key_ascii == '\t')
+				ngtk_backend_focus_to_next (self);
+			else if (has_ascii)
 			{
 			}
 			else if (has_keysym)
@@ -282,6 +288,7 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 		 * resize of the right component.
 		 * Based on the example on http://www.lemoda.net/c/xlib-resize/ */
 		case ConfigureNotify:
+			ngtk_debug (self, "ConfigureNotify Received");
 		{
 			/* The only component who has the bit on to signal it should
 			 * accept resize requests is the root window */
@@ -294,8 +301,8 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 		}
 
 		case DestroyNotify:
+			ngtk_debug (self, "DestroyNotify Received");
 		{
-			ngtk_debug (self, "Received destroy notification!\n");
 			Window wnd = event.xdestroywindow.window;
 			NGtkXlibBase *xb = ngtk_xlib_base_call_on_window_destroyed (self, wnd);
 			if (xb == ngtk_xlib_root_window)
@@ -307,17 +314,18 @@ void ngtk_xlib_backend_start (NGtkXlibBackend *self)
 		}
 
 		case ClientMessage:
+			ngtk_debug (self, "ClientMessage Received");
 			if (event.xclient.data.l[0] == xbd->window_close_atom
 				&& event.xclient.window == ngtk_xlib_base_get_window (ngtk_xlib_root_window))
 			{
-				printf ("Received destroy message from WM!\n");
+				ngtk_debug (self, "Received destroy message from WM!\n");
 				ngtk_object_send_signal (ngtk_xlib_root_window, "event::close", NULL);
 				XDestroyWindow (xlib_display, ngtk_xlib_base_get_window (ngtk_xlib_root_window));
 			}
 			else
 			{
-				printf ("Client data is %ld ", event.xclient.data.l[0]);
-				printf ("while our atom is %ld\n", (unsigned long) xlib_window_close_atom);
+				ngtk_debug (self, "Client data is %ld ", event.xclient.data.l[0]);
+				ngtk_debug (self, "while our atom is %ld\n", (unsigned long) xlib_window_close_atom);
 			}
 			break;
 

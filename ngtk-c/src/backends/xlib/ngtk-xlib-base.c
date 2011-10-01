@@ -77,7 +77,9 @@ void ngtk_xlib_base_put_to (NGtkXlibBase *self, const NGtkRectangle *area, int a
 	if (! already_put)
 	{
 		XMoveWindow (ngtk_xlib_backend_get_display (xbd), wnd, area->x, area->y);
+		ngtk_debug (xbd, "XMoveWindow (%p, %lu, %d, %d)", ngtk_xlib_backend_get_display (xbd), wnd, area->x, area->y);
 		XResizeWindow (ngtk_xlib_backend_get_display (xbd), wnd, area->w, area->h);
+		ngtk_debug (xbd, "XResizeWindow (%p, %lu, %lu, %lu)", ngtk_xlib_backend_get_display (xbd), wnd, area->w, area->h);
 	}
 }
 
@@ -100,5 +102,6 @@ NGtkXlibBackend* ngtk_xlib_base_get_backend2 (NGtkXlibBaseI *self)
 NGtkXlibBase* ngtk_xlib_base_call_on_window_destroyed (NGtkXlibBackend *backend, Window xlib_wnd)
 {
 	NGtkXlibBaseI *xb = ngtk_xlib_backend_unregister_window (backend, xlib_wnd);
+	NGTK_XLIBBASE_I2D (xb) -> _wnd = BadWindow;
 	return ngtk_interface_get_object (xb);
 }

@@ -68,7 +68,7 @@ void                ngtk_xlib_backend_d_free             (void *d);
 
 void                ngtk_xlib_backend_init               (NGtkXlibBackend *self);
 void                ngtk_xlib_backend_start_main_loop    (NGtkXlibBackend *self);
-void                ngtk_xlib_backend_quit_main_loop     (NGtkXlibBackend *self);
+#define             ngtk_xlib_backend_quit_main_loop     ngtk_basic_backend_quit_main_loop
 void                ngtk_xlib_backend_quit               (NGtkXlibBackend *self);
 
 NGtkContainer*      ngtk_xlib_backend_create_root_window (NGtkXlibBackend *self, const char *title);
@@ -98,4 +98,6 @@ NGtkXlibBaseI*  ngtk_xlib_backend_unregister_window  (NGtkXlibBackend *self, Win
 NGtkXlibBase*   ngtk_xlib_backend_unregister_window2 (NGtkXlibBackend *self, Window xlib_wnd);
 NGtkXlibBaseI*  ngtk_xlib_backend_get_for_window     (NGtkXlibBackend *self, Window xlib_wnd);
 NGtkXlibBase*   ngtk_xlib_backend_get_for_window2    (NGtkXlibBackend *self, Window xlib_wnd);
+
+NGtkXlibBackend* ngtk_xlib_backend_new ();
 #endif

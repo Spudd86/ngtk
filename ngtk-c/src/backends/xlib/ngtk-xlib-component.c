@@ -48,9 +48,15 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 	{
 		Window wnd = ngtk_xlib_base_get_window (self);
 		if (visible)
+		{
+			ngtk_debug (ngtk_xlib_base_get_backend (self), "XMapWindow (%p, %lu)", ngtk_xlib_base_get_display (self), wnd);
 			XMapWindow (ngtk_xlib_base_get_display (self), wnd);
+		}
 		else
+		{
+			ngtk_debug (ngtk_xlib_base_get_backend (self), "XUnmapWindow (%p, %lu)", ngtk_xlib_base_get_display (self), wnd);
 			XUnmapWindow (ngtk_xlib_base_get_display (self), wnd);
+		}
 	}
 	ngtk_basic_component_set_visible (self, visible);
 }

@@ -150,7 +150,10 @@ int ngtk_basic_backend_set_focus_holder (NGtkBasicBackend *self, NGtkComponent* 
 	
 	if (ngtk_basic_backend_can_focus_on (self, new_focus))
 	{
+		NGtkComponent *old_focus = NGTK_BASIC_BACKEND_O2D (self) -> focus_holder;
 		NGTK_BASIC_BACKEND_O2D (self) -> focus_holder = new_focus;
+		if (old_focus != NULL) ngtk_component_redraw (old_focus);
+		ngtk_component_redraw (new_focus);
 		return TRUE;
 	}
 	return FALSE;

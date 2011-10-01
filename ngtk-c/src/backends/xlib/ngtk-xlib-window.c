@@ -181,6 +181,7 @@ static void draw_button (NGtkComponent *but)
 	const char *text = ngtk_component_get_text (but);
 
 	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+	// ngtk_debug (ngtk_xlib_base_get_backend (but), "XClearArea (%p, %lu, %d, %d, %lu, %lu, %d)", disp, wnd, 0, 0, rect->w, rect->h, FALSE);
 
 	/* The color is gray if we are disabled */
 	if (! ngtk_component_get_enabled (but))
@@ -193,7 +194,10 @@ static void draw_button (NGtkComponent *but)
 	/* Draw a border, or a double border if we hold the focus */
 	XDrawRectangle (disp, wnd, gc, 0, 0, rect->w - 1, rect->h - 1);
 	if (ngtk_xlib_base_has_focus (but))
+	{
+		ngtk_debug (ngtk_xlib_base_get_backend (but), "Drawing focused button!");
 		XDrawRectangle (disp, wnd, gc, 1, 1, rect->w - 3, rect->h - 3);
+	}
 
 	XFreeGC (disp, gc);
 
@@ -211,6 +215,16 @@ static NGtkObject* create_basic_widget (NGtkBackend *self, int enabled, NGtkCont
 		ngtk_xlib_backend_get_color (self, NGTK_XLIB_BLACK), /* Border color */
 		ngtk_xlib_backend_get_color (self, NGTK_XLIB_WHITE) /* Background color */
 		);
+		
+	ngtk_debug (self, "%lu = XCreateSimpleWindow (%p, %lu, %d, %d, %u, %u, %d, %lu, %lu)", wnd, ngtk_xlib_backend_get_display (self),     /* Connection to the X server */
+		parent == NULL ? NGTK_XLIB_BACKEND_O2D (self) -> root_window : ngtk_xlib_base_get_window (parent), /* Parent window */
+		area->x, area->y,                       /* (X,Y) of Top Left Corner */
+		area->w, area->h,                     /* Width, Height of the window */
+		0,                            /* Border width of the window */
+		ngtk_xlib_backend_get_color (self, NGTK_XLIB_BLACK), /* Border color */
+		ngtk_xlib_backend_get_color (self, NGTK_XLIB_WHITE) /* Background color */
+		);
+
 
 	NGtkObject *obj = ngtk_object_new ();
 	NGtkInterface *in_base, *in_comp, *in_evgn;
@@ -232,6 +246,7 @@ static NGtkObject* create_basic_widget (NGtkBackend *self, int enabled, NGtkCont
 	ngtk_component_set_visible (obj, visible);
 	ngtk_xlib_base_put_to (obj, area, TRUE);
 
+	ngtk_debug (self, "XSelectInput (%p, %lu, %lu)", ngtk_xlib_backend_get_display (self), wnd, NGTK_XLIB_EVENT_MASK);
 	XSelectInput (ngtk_xlib_backend_get_display (self), wnd, NGTK_XLIB_EVENT_MASK);
 
 	return obj;
@@ -247,6 +262,8 @@ NGtkObject* ngtk_xlib_create_window_imp (NGtkBackend *self, const char* title, i
 
 	NGTK_COMPONENT_O2F (obj) -> redraw = draw_window;
 	NGTK_CONTAINER_O2F (obj) -> pack = pack_main_window;
+
+	XSetWMProtocols (ngtk_xlib_backend_get_display (self), ngtk_xlib_base_get_window (obj), & NGTK_XLIB_BACKEND_O2D (self) -> window_close_atom, 1);
 
 	return obj;
 }

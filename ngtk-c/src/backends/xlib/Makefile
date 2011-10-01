@@ -12,7 +12,7 @@ all: libngtk-backend-xlib.a
 libngtk-backend-xlib.a: $(OBJS)
 	$(NGTK_MKS) libngtk-backend-xlib.a $(OBJS)
 
-%.o: %.c
+%.o: %.c %.h
 	$(CC) -c $<
 
 clean:
