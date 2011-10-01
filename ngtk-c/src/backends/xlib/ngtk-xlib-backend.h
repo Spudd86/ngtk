@@ -37,10 +37,10 @@ typedef enum {
 typedef struct _ngtk_xlib_backend_d {
 	/* The current connection to the X server */
 	Display*  display;
-	
+
 	/* The screen on which we operate */
 	int       screen;
-	
+
 	/* The root window of the xlib screen. This is not to be confused
 	 * with the root application window created by NGtk (see above). */
 	Window    root_window;
@@ -51,19 +51,15 @@ typedef struct _ngtk_xlib_backend_d {
 
 	/* The colormap of the current screen */
 	Colormap  colormap;
-	
+
 	/* Colors that are allocated for usage by widgets of this backend */
 	XColor    colors[NGTK_XLIB_COLOR_MAX];
-
-	/* A list that will contain a mapping between `Window` objects and
-	 * the matching `NGtkObject` objects */
-	NGtkList  window2base;
 } NGtkXlibBackendD;
 
 #define NGTK_XLIB_BACKEND_O2D(comp) NGTK_O2D_CAST(comp,NGTK_BACKEND_TYPE,NGtkXlibBackendD,1)
 #define NGTK_XLIB_BACKEND_I2D(comp) NGTK_I2D_CAST(comp,NGTK_BACKEND_TYPE,NGtkXlibBackendD,1)
 
-NGtkBackendI*       ngtk_xlib_backend_create_interface   ();
+NGtkBackendI*       ngtk_xlib_backend_create_interface   (NGtkObject *obj);
 void                ngtk_xlib_backend_d_free             (void *d);
 
 void                ngtk_xlib_backend_init               (NGtkXlibBackend *self);
@@ -79,6 +75,8 @@ NGtkComponent*      ngtk_xlib_backend_create_text_entry  (NGtkXlibBackend *self,
 #define             ngtk_xlib_backend_get_focus_holder   ngtk_basic_backend_get_focus_holder
 int                 ngtk_xlib_backend_set_focus_holder   (NGtkXlibBackend *self, NGtkComponent* new_focus);
 #define             ngtk_xlib_backend_focus_to_next      ngtk_basic_backend_focus_to_next
+#define             ngtk_xlib_backend_get_root_window    ngtk_basic_backend_get_root_window
+#define             ngtk_xlib_backend_get_all_components ngtk_basic_backend_get_all_components
 
 #define             ngtk_xlib_backend_print              ngtk_basic_backend_print
 #define             ngtk_xlib_backend_debug              ngtk_basic_backend_debug
@@ -88,16 +86,14 @@ int                 ngtk_xlib_backend_set_focus_holder   (NGtkXlibBackend *self,
 
 /* Non interface functions */
 
-Display*      ngtk_xlib_backend_get_display     (NGtkXlibBackend *self);
-int           ngtk_xlib_backend_get_screen      (NGtkXlibBackend *self);
-Window        ngtk_xlib_backend_get_root_window (NGtkXlibBackend *self);
-unsigned long ngtk_xlib_backend_get_color       (NGtkXlibBackend *self, NGtkXlibColorName cn);
+Display*      ngtk_xlib_backend_get_X_display     (NGtkXlibBackend *self);
+int           ngtk_xlib_backend_get_X_screen      (NGtkXlibBackend *self);
+Window        ngtk_xlib_backend_get_X_root_window (NGtkXlibBackend *self);
+unsigned long ngtk_xlib_backend_get_X_color       (NGtkXlibBackend *self, NGtkXlibColorName cn);
 
-void            ngtk_xlib_backend_register_window    (NGtkXlibBackend *self, Window xlib_wnd, NGtkXlibBaseI* base);
-NGtkXlibBaseI*  ngtk_xlib_backend_unregister_window  (NGtkXlibBackend *self, Window xlib_wnd);
-NGtkXlibBase*   ngtk_xlib_backend_unregister_window2 (NGtkXlibBackend *self, Window xlib_wnd);
-NGtkXlibBaseI*  ngtk_xlib_backend_get_for_window     (NGtkXlibBackend *self, Window xlib_wnd);
-NGtkXlibBase*   ngtk_xlib_backend_get_for_window2    (NGtkXlibBackend *self, Window xlib_wnd);
+void            ngtk_xlib_backend_register_window    (NGtkXlibBackend *self, Window xlib_wnd, NGtkComponent *comp);
+NGtkComponent*  ngtk_xlib_backend_unregister_window  (NGtkXlibBackend *self, Window xlib_wnd);
+NGtkComponent*  ngtk_xlib_backend_get_for_window     (NGtkXlibBackend *self, Window xlib_wnd);
 
 NGtkXlibBackend* ngtk_xlib_backend_new ();
 #endif

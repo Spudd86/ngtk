@@ -1,5 +1,5 @@
 /*
- * ngtk-xlib-container.h
+ * ngtk-base.h
  * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
  *
  * This file is part of NGtk.
@@ -18,17 +18,27 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NGtk_xlib_container__
-#define __NGtk_xlib_container__
+#ifndef __NGtk_base__
+#define __NGtk_base__
 
-#include "../../widgets/ngtk-widgets.h"
-#include "../basic/ngtk-basic.h"
+#include "ngtk-widgets.h"
+#include <stdarg.h>
 
-NGtkInterface* ngtk_xlib_container_create_interface (NGtkObject *obj);
+typedef struct _ngtk_base_f {
+	NGtkBackend* (*get_backend) (NGtkBase *self);
+} NGtkBaseF;
 
-void     ngtk_xlib_container_add_child     (NGtkContainer *self, NGtkComponent* child);
-#define  ngtk_xlib_container_get_children  ngtk_basic_container_get_children
-void     ngtk_xlib_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
-void     ngtk_xlib_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
+#define NGTK_BASE_O2F(comp) NGTK_O2F_CAST(comp,NGTK_BASE_TYPE,NGtkBaseF)
+#define NGTK_BASE_I2F(comp) NGTK_I2F_CAST(comp,NGTK_BASE_TYPE,NGtkBaseF)
+
+/**
+ * Get the backend associated with this object
+ * 
+ * @param self The object whose backend should be returned
+ * @return The backend
+ *
+ * @since 0.9
+ */
+NGtkBackend* ngtk_base_get_backend (NGtkBase *self);
 
 #endif

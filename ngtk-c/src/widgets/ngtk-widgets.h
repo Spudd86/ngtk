@@ -23,9 +23,11 @@
 
 #include "ngtk-widget-types.h"
 
-#include "ngtk-component.h"
-#include "ngtk-layout.h"
+#include "ngtk-base.h"
+#include "ngtk-backend.h"
 #include "ngtk-container.h"
-#include "ngtk-event-generator.h"
+#include "ngtk-component.h"
+#include "ngtk-event-codes.h"
+#include "ngtk-layout.h"
 
 #endif

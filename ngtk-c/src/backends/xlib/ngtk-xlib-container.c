@@ -18,14 +18,11 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-xlib-base.h"
-#include "ngtk-xlib-container.h"
-#include "../basic/ngtk-basic.h"
-#include "ngtk-xlib-widget-types.h"
+#include "ngtk-xlib.h"
 
-NGtkInterface* ngtk_xlib_container_create_interface ()
+NGtkInterface* ngtk_xlib_container_create_interface (NGtkObject *obj)
 {
-	NGtkInterface *in = ngtk_basic_container_create_interface ();
+	NGtkInterface *in = ngtk_basic_container_create_interface (obj);
 
 	NGTK_CONTAINER_I2F (in) -> add_child    = ngtk_xlib_container_add_child;
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_xlib_container_get_children;
@@ -48,6 +45,6 @@ void ngtk_xlib_container_remove_child (NGtkContainer *self, NGtkComponent* child
 void ngtk_xlib_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)
 {
 	/* TODO: since we allow only one window in the NCurses backend */
-	ngtk_xlib_base_put_to (child, rect, FALSE);
+	ngtk_xlib_component_put_to (child, rect, FALSE);
 	ngtk_basic_container_place_child (self, child, rect);
 }

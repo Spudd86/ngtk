@@ -25,23 +25,26 @@
 #include <stdarg.h>
 
 typedef struct _ngtk_backend_f {
-	void                (*init)               (NGtkBackend *self);
-	void                (*start_main_loop)    (NGtkBackend *self);
-	void                (*quit_main_loop)     (NGtkBackend *self);
-	void                (*quit)               (NGtkBackend *self);
+	void            (*init)               (NGtkBackend *self);
+	void            (*start_main_loop)    (NGtkBackend *self);
+	void            (*quit_main_loop)     (NGtkBackend *self);
+	void            (*quit)               (NGtkBackend *self);
 
-	NGtkContainer*      (*create_root_window) (NGtkBackend *self, const char *title);
-	NGtkComponent*      (*create_button)      (NGtkBackend *self, NGtkContainer* parent, const char *text);
-	NGtkComponent*      (*create_label)       (NGtkBackend *self, NGtkContainer* parent, const char *text);
-	NGtkComponent*      (*create_text_entry)  (NGtkBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
+	NGtkContainer*  (*create_root_window) (NGtkBackend *self, const char *title);
+	NGtkComponent*  (*create_button)      (NGtkBackend *self, NGtkContainer* parent, const char *text);
+	NGtkComponent*  (*create_label)       (NGtkBackend *self, NGtkContainer* parent, const char *text);
+	NGtkComponent*  (*create_text_entry)  (NGtkBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
 
-	NGtkEventGenerator* (*get_focus_holder)   (NGtkBackend *self);
-	int                 (*set_focus_holder)   (NGtkBackend *self, NGtkComponent* new_focus);
-	NGtkEventGenerator* (*focus_to_next)      (NGtkBackend *self);
+	NGtkComponent*  (*get_focus_holder)   (NGtkBackend *self);
+	int             (*set_focus_holder)   (NGtkBackend *self, NGtkComponent* new_focus);
+	NGtkComponent*  (*focus_to_next)      (NGtkBackend *self);
+	
+	NGtkContainer*  (*get_root_window)    (NGtkBackend *self);
+	const NGtkList* (*get_all_components) (NGtkBackend *self);
 
-	void                (*print)              (NGtkBackend *self, const char *format, va_list args);
-	void                (*debug)              (NGtkBackend *self, const char *format, va_list args);
-	void                (*error)              (NGtkBackend *self, const char *format, va_list args);
+	void            (*print)              (NGtkBackend *self, const char *format, va_list args);
+	void            (*debug)              (NGtkBackend *self, const char *format, va_list args);
+	void            (*error)              (NGtkBackend *self, const char *format, va_list args);
 } NGtkBackendF;
 
 #define NGTK_BACKEND_O2F(comp) NGTK_O2F_CAST(comp,NGTK_BACKEND_TYPE,NGtkBackendF)
@@ -149,7 +152,7 @@ NGtkComponent* ngtk_backend_create_text_entry (NGtkBackend *self, NGtkContainer*
  *
  * @since 0.9
  */
-NGtkEventGenerator* ngtk_backend_get_focus_holder (NGtkBackend *self);
+NGtkComponent* ngtk_backend_get_focus_holder (NGtkBackend *self);
 
 /**
  * Change the current component which owns the focus to a specified
@@ -175,7 +178,37 @@ int ngtk_backend_set_focus_holder (NGtkBackend *self, NGtkComponent* new_focus);
  *
  * @since 0.9
  */
-NGtkEventGenerator* ngtk_backend_focus_to_next (NGtkBackend *self);
+NGtkComponent* ngtk_backend_focus_to_next (NGtkBackend *self);
+
+/**
+ * Get the root window of this backend
+ *
+ * @param self The backend to use
+ * @return The root window of this backend if already created, or NULL
+ *         if no window was created yet
+ *
+ * @since 0.9
+ */
+NGtkContainer* ngtk_backend_get_root_window (NGtkBackend *self);
+
+/**
+ * Get a read-only list of the components that are currently allocated
+ * in this backend. The read-only means that you may not modify the list
+ * directly. However, you may trigger other functions of the backend and
+ * it's widgets that will modify the list, and in these cases the list
+ * you have will be updated.
+ * 
+ * Because of the ability to indirectly modify the list, you must be
+ * extremly careful when iterating over it (and it's recommended that
+ * you don't do so!).
+ *
+ * @param self The backend to use
+ * @return An updating read-only list of the components allocated in
+ *         this backend. This list includes the root window!
+ *
+ * @since 0.9
+ */
+const NGtkList* ngtk_backend_get_all_components (NGtkBackend *self);
 
 /**
  * Print a message to the user in a backend specific way

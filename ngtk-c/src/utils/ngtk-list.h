@@ -71,7 +71,9 @@ void          ngtk_list_clear_with_free_func  (NGtkList *list, NGtkFreeFunc func
 
 void          ngtk_list_clear                 (NGtkList *list);
 
-int           ngtk_list_is_empty              (NGtkList *list);
+int           ngtk_list_is_empty              (const NGtkList *list);
+
+NGtkList*     ngtk_list_duplicate             (const NGtkList *list);
 
 /**
  * A read-only iterator on the list. This means you may not modify the

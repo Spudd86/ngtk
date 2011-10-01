@@ -178,7 +178,18 @@ void ngtk_list_free (NGtkList *list)
 	ngtk_free (list);
 }
 
-int ngtk_list_is_empty (NGtkList *list)
+int ngtk_list_is_empty (const NGtkList *list)
 {
 	return list->first == NULL;
+}
+
+NGtkList* ngtk_list_duplicate (const NGtkList *list)
+{
+	NGtkListNode *iter;
+	NGtkList     *copy = ngtk_list_new ();
+
+	ngtk_list_foreach (iter, list)
+		ngtk_list_append (copy, iter->data);
+
+	return copy;
 }

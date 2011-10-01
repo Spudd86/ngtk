@@ -20,55 +20,46 @@
 
 #include "ngtk-basic-container.h"
 
-static void remove_children (void *src_interface, const char *signame, NGtkValue *temp);
+static void simple_destroy_container_interface (NGtkObject *obj);
 
-NGtkInterface* ngtk_basic_container_create_interface ()
+NGtkInterface* ngtk_basic_container_create_interface (NGtkObject *obj)
 {
-	NGtkInterface *in = ngtk_interface_new (NGTK_CONTAINER_TYPE);
+	NGtkInterface *in = ngtk_interface_new (obj, NGTK_CONTAINER_TYPE);
 	NGtkBasicContainerD *bcd;
 
-	in->d[0] = bcd = ngtk_new (NGtkBasicContainerD);
+	in->imp_data[0] = bcd = ngtk_new (NGtkBasicContainerD);
 	ngtk_list_init (&bcd->children);
 	bcd->layout    = NULL;
-	in->d_free[0]  = ngtk_basic_container_free_d;
+	in->imp_data_free[0]  = ngtk_free;
 
-	in->f = ngtk_new (NGtkContainerF);
+	in->functions = ngtk_new (NGtkContainerF);
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_basic_container_get_children;
 	NGTK_CONTAINER_I2F (in) -> add_child    = ngtk_basic_container_add_child;
 	NGTK_CONTAINER_I2F (in) -> remove_child = ngtk_basic_container_remove_child;
 	NGTK_CONTAINER_I2F (in) -> place_child  = ngtk_basic_container_place_child;
-	in->f_free = ngtk_free;
+	in->functions_free = ngtk_free;
 
-	/* We need to destroy some stuff while the object is still whole,
-	 * see function documentation below */
-	ngtk_interface_connect_to (in, "object::detach", remove_children);
+	ngtk_object_push_destructor (obj, simple_destroy_container_interface);
 
 	return in;
 }
 
-/* When coming here to destroy the last part of the interface, we
- * can't count on having a connection to a fully working object.
- * Therefore, we can't link from a child to ourselves, and so we
- * don't have a pinter to the container object to pass to the
- * remove_child function to generate the signal.
- * So, we will remove the children while the object is still whole */
-static void remove_children (void *src_interface, const char *signame, NGtkValue *temp)
+static void simple_destroy_container_interface (NGtkObject *obj)
 {
-	NGtkListNode *iter;
-	NGtkContainer *real = ngtk_interface_get_object ((NGtkContainerI*)src_interface);
-	
-	ngtk_list_foreach (iter, ngtk_container_get_children (real))
+	/* The original child list of this container */
+	NGtkList     *children = ngtk_container_get_children (obj);
+
+	/* Warning! We can't iterate over the original children list while
+	 * destroying children, because these children will remove
+	 * themselves from the list upon their destruction. So, instead
+	 * always free the first child */
+	while (! ngtk_list_is_empty (children))
 	{
-		NGtkComponent *child = (NGtkComponent*)iter->data;
-		ngtk_container_remove_child (real, child);
+		NGtkComponent *child = (NGtkComponent*) children->first;
 		ngtk_object_free (child);
 	}
-}
 
-void ngtk_basic_container_free_d (void *d)
-{
-	ngtk_list_clear (& ((NGtkBasicContainerD*)d)->children);
-	ngtk_free (d);
+	ngtk_interface_detach_and_free (ngtk_object_cast (obj, NGTK_CONTAINER_TYPE));
 }
 
 NGtkComponentList* ngtk_basic_container_get_children (NGtkContainer *self)
@@ -78,20 +69,14 @@ NGtkComponentList* ngtk_basic_container_get_children (NGtkContainer *self)
 
 void ngtk_basic_container_add_child (NGtkContainer *self, NGtkComponent* child)
 {
-	NGtkValue temp;
 	ngtk_list_append (& NGTK_BASIC_CONTAINER_O2D (self) -> children, child);
-	temp.type = NGTK_VALUE_P_VOID;
-	temp.val.v_pvoid = child;
-	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_CONTAINER_TYPE), "structure::child-add", &temp, TRUE);
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_CONTAINER_TYPE), "structure::child-add", child, TRUE);
 }
 
 void ngtk_basic_container_remove_child (NGtkContainer *self, NGtkComponent* child)
 {
-	NGtkValue temp;
 	ngtk_list_remove (& NGTK_BASIC_CONTAINER_O2D (self) -> children, child);
-	temp.type = NGTK_VALUE_P_VOID;
-	temp.val.v_pvoid = child;
-	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_CONTAINER_TYPE), "structure::child-rem", &temp, TRUE);
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_CONTAINER_TYPE), "structure::child-rem", child, TRUE);
 }
 
 void ngtk_basic_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)

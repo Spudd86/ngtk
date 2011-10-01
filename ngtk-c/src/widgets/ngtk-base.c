@@ -1,5 +1,5 @@
 /*
- * ngtk-xlib-container.h
+ * ngtk-base.c
  * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
  *
  * This file is part of NGtk.
@@ -18,17 +18,9 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NGtk_xlib_container__
-#define __NGtk_xlib_container__
+#include "ngtk-base.h"
 
-#include "../../widgets/ngtk-widgets.h"
-#include "../basic/ngtk-basic.h"
-
-NGtkInterface* ngtk_xlib_container_create_interface (NGtkObject *obj);
-
-void     ngtk_xlib_container_add_child     (NGtkContainer *self, NGtkComponent* child);
-#define  ngtk_xlib_container_get_children  ngtk_basic_container_get_children
-void     ngtk_xlib_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
-void     ngtk_xlib_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
-
-#endif
+NGtkBackend* ngtk_base_get_backend (NGtkBase *self)
+{
+	return NGTK_BASE_O2F (self) -> get_backend (self);
+}

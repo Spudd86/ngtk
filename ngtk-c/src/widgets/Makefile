@@ -1,8 +1,8 @@
 OBJS = \
+	ngtk-base.o \
 	ngtk-backend.o \
 	ngtk-component.o \
 	ngtk-container.o \
-	ngtk-event-generator.o \
 	ngtk-layout.o
 
 all: libngtk-widgets.a
@@ -10,7 +10,7 @@ all: libngtk-widgets.a
 libngtk-widgets.a: $(OBJS)
 	$(NGTK_MKS) libngtk-widgets.a $(OBJS)
 
-%.o: %.c
+%.o: %.c %.h ngtk-widget-types.h
 	$(CC) -c $<
 
 clean:

@@ -26,7 +26,7 @@
 typedef struct _ngtk_object   NGtkObject;
 typedef struct _ngtk_inteface NGtkInterface;
 
-typedef unsigned long      NGtkObjectTypeMask;
+typedef unsigned long long NGtkObjectTypeMask;
 typedef unsigned short     NGtkType;
 
 #define NGTK_MAX_INTERFACES           (sizeof(NGtkObjectTypeMask) * 8)
@@ -34,69 +34,89 @@ typedef unsigned short     NGtkType;
 
 #define NGTK_TYPE_NONE 0
 
-typedef void (*NGtkListener) (void *signal_src, const char *signame, NGtkValue *data);
+typedef void (*NGtkListener) (void *sigsrc, const char *signame, void *sigdata, void *lisdata);
 
 #define NGTK_ALL_SIGNALS NULL
+
 typedef struct _ngtk_listener_info {
 	NGtkListener  func;
 	const char   *signame;
+	void         *lisdata;
 } NGtkListenerInfo;
 
+
+typedef void (*NGtkDestructor)  (NGtkObject *obj);
+
 struct _ngtk_object {
-	NGtkObjectTypeMask  iBits;
-	NGtkInterface      *iImps[NGTK_MAX_INTERFACES];
-	void               *d;
-	NGtkFreeFunc        d_free;
+	/* A bitmask of the implemented interfaces */
+	NGtkObjectTypeMask  interface_mask;
+
+	/* An array containing pointers to the implemented interfaces */
+	NGtkInterface      *interfaces[NGTK_MAX_INTERFACES];
 
 	/* Amount of references directly to this object */
 	int                 direct_ref_count;
-	/* Amount of references to the interfaces (not including by the
-	 * object itself */
-	int                 interfaces_ref_count;
 
+	/* Signal listeners */
 	NGtkList            listeners;
+
+	/* The object's destructor list. Destructors are called from
+	 * first to last */
+	NGtkList            destructors;
+
+	/* Warn from multiple attempts to free the object that occure
+	 * because of a free-ing recursion */
+	int                 double_free_lock;
 };
+
 
 struct _ngtk_inteface {
-	NGtkObject         *obj;
-	NGtkType            iType;
-	void               *d[NGTK_MAX_INTERFACE_IMP_LEVELS];
-	NGtkFreeFunc        d_free[NGTK_MAX_INTERFACE_IMP_LEVELS];
-	void               *f;
-	NGtkFreeFunc        f_free;
+	/* The object containing this interface */
+	NGtkObject         *object;
 
-	/* Amount of references to the interface directly, INCLUDING the
-	 * one from the object itself */
-	int                 ref_count;
+	/* The type of this interface */
+	NGtkType            type;
 
+	/* Custom data for different implementation levels, with the free
+	 * functions and destructors */
+	void               *imp_data[NGTK_MAX_INTERFACE_IMP_LEVELS];
+	NGtkFreeFunc        imp_data_free[NGTK_MAX_INTERFACE_IMP_LEVELS];
+	NGtkDestructor      imp_destruct[NGTK_MAX_INTERFACE_IMP_LEVELS];
+
+	void               *functions;
+	NGtkFreeFunc        functions_free;
+
+	/* Signal listeners */
 	NGtkList            listeners;
 };
 
-NGtkObject*    ngtk_object_new           ();
-void           ngtk_object_free          (NGtkObject* obj);
-NGtkInterface* ngtk_object_cast          (NGtkObject* obj, NGtkType iType);
-int            ngtk_object_is_a          (NGtkObject* obj, NGtkType iType);
-void           ngtk_object_ref           (NGtkObject* obj);
-void           ngtk_object_unref         (NGtkObject* obj);
-void           ngtk_object_connect_to    (NGtkObject *obj, const char* signal, NGtkListener listener);
-void           ngtk_object_send_signal   (NGtkObject* obj, const char* signal, NGtkValue *data);
+NGtkObject*    ngtk_object_new             ();
+void           ngtk_object_free            (NGtkObject *obj);
+NGtkInterface* ngtk_object_cast            (NGtkObject *obj, NGtkType type);
+int            ngtk_object_is_a            (NGtkObject *obj, NGtkType type);
+void           ngtk_object_ref             (NGtkObject *obj);
+void           ngtk_object_unref           (NGtkObject *obj);
+void           ngtk_object_connect_to      (NGtkObject *obj, const char* signal, NGtkListener listener, void *user_data);
+void           ngtk_object_send_signal     (NGtkObject *obj, const char* signal, void *sigdata);
+void           ngtk_object_push_destructor (NGtkObject *obj, NGtkDestructor dest);
 
-NGtkInterface* ngtk_interface_new        (NGtkType iType);
-void           ngtk_interface_free       (NGtkInterface *in);
-NGtkInterface* ngtk_interface_cast       (NGtkInterface* in, NGtkType iType);
-int            ngtk_interface_is_a       (NGtkInterface* in, NGtkType iType);
-NGtkObject*    ngtk_interface_get_object (NGtkInterface *in);
-void           ngtk_interface_ref        (NGtkInterface *in);
-void           ngtk_interface_unref      (NGtkInterface *in);
-void           ngtk_interface_connect_to (NGtkInterface *in, const char* signal, NGtkListener listener);
-void           ngtk_interface_send_signal(NGtkInterface *in, const char* signal, NGtkValue *data, int also_object);
+NGtkInterface* ngtk_interface_new          (NGtkObject *obj, NGtkType type);
+NGtkInterface* ngtk_interface_cast         (NGtkInterface *in, NGtkType type);
+int            ngtk_interface_is_a         (NGtkInterface *in, NGtkType type);
+NGtkObject*    ngtk_interface_get_object   (NGtkInterface *in);
+void           ngtk_interface_connect_to   (NGtkInterface *in, const char* signal, NGtkListener listener, void *user_data);
+void           ngtk_interface_send_signal  (NGtkInterface *in, const char* signal, void *sigdata, int also_object);
 
-void           ngtk_object_implement     (NGtkObject *obj, NGtkInterface *in);
+/* To be used by external destructors of the objects. When a destructor
+ * wants to finish a certain interface of an object, this is what he
+ * should call */
+void ngtk_interface_detach_and_free (NGtkInterface *in);
 
-#define NGTK_O2F_CAST(o,bit,type) ((type*)(ngtk_object_cast(o,bit)->f))
-#define NGTK_O2D_CAST(o,bit,type,pos) ((type*)(ngtk_object_cast(o,bit)->d[(pos)]))
 
-#define NGTK_I2F_CAST(i,bit,type) ((type*)(ngtk_interface_cast(i,bit)->f))
-#define NGTK_I2D_CAST(i,bit,type,pos) ((type*)(ngtk_interface_cast(i,bit)->d[(pos)]))
+#define NGTK_O2F_CAST(o,bit,type) ((type*)(ngtk_object_cast(o,bit)->functions))
+#define NGTK_O2D_CAST(o,bit,type,pos) ((type*)(ngtk_object_cast(o,bit)->imp_data[(pos)]))
+
+#define NGTK_I2F_CAST(i,bit,type) ((type*)(ngtk_interface_cast(i,bit)->functions))
+#define NGTK_I2D_CAST(i,bit,type,pos) ((type*)(ngtk_interface_cast(i,bit)->imp_data[(pos)]))
 
 #endif

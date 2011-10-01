@@ -60,7 +60,7 @@ NGtkComponent* ngtk_backend_create_text_entry (NGtkBackend *self, NGtkContainer*
 	return NGTK_BACKEND_O2F(self) -> create_text_entry (self, parent, initial_text, max_text_len);
 }
 
-NGtkEventGenerator* ngtk_backend_get_focus_holder (NGtkBackend *self)
+NGtkComponent* ngtk_backend_get_focus_holder (NGtkBackend *self)
 {
 	return NGTK_BACKEND_O2F(self) -> get_focus_holder (self);
 }
@@ -70,9 +70,19 @@ int ngtk_backend_set_focus_holder (NGtkBackend *self, NGtkComponent* new_focus)
 	return NGTK_BACKEND_O2F(self) -> set_focus_holder (self, new_focus);
 }
 
-NGtkEventGenerator* ngtk_backend_focus_to_next (NGtkBackend *self)
+NGtkComponent* ngtk_backend_focus_to_next (NGtkBackend *self)
 {
 	return NGTK_BACKEND_O2F(self) -> focus_to_next (self);
+}
+
+NGtkContainer* ngtk_backend_get_root_window (NGtkBackend *self)
+{
+	return NGTK_BACKEND_O2F(self) -> get_root_window (self);
+}
+
+const NGtkList* ngtk_backend_get_all_components (NGtkBackend *self)
+{
+	return NGTK_BACKEND_O2F(self) -> get_all_components (self);
 }
 
 void ngtk_backend_print (NGtkBackend *self, const char *format, ...)

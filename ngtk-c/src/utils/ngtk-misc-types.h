@@ -32,52 +32,6 @@ typedef struct _ngtk_point {
 	int x, y;
 } NGtkPoint;
 
-typedef enum {
-	NGTK_VALUE_P_VOID,
-	NGTK_VALUE_CHAR,
-	NGTK_VALUE_UCHAR,
-	NGTK_VALUE_SHORT,
-	NGTK_VALUE_USHORT,
-	NGTK_VALUE_INT,
-	NGTK_VALUE_UINT,
-	NGTK_VALUE_LONG,
-	NGTK_VALUE_ULONG,
-	NGTK_VALUE_DOUBLE,
-	NGTK_VALUE_FLOAT,
-	NGTK_VALUE_CONST_STR,
-	NGTK_VALUE_STR,
-	NGTK_VALUE_RECT,
-	NGTK_VALUE_P_CONST_RECT
-} NGtkValueType;
-
-typedef struct {
-	NGtkValueType  type;
-	union {
-		void                *v_pvoid;
-
-		char                 v_char;
-		unsigned char        v_uchar;
-		
-		short                v_short;
-		unsigned short       v_ushort;
-		
-		int                  v_int;
-		unsigned int         v_uint;
-		
-		long                 v_long;
-		unsigned long        v_ulong;
-		
-		double               v_double;
-		float                v_float;
-
-		const char          *v_cstr;
-		char                *v_str;
-		
-		NGtkRectangle        v_rect;
-		const NGtkRectangle *v_cprect;
-	} val;
-} NGtkValue;
-
 #define ngtk_rect_contains(prect,x0,y0) \
 	(  NGTK_IN_RANGE (x0, (prect)->x, (prect)->x + (prect)->w - 1) \
 	&& NGTK_IN_RANGE (y0, (prect)->y, (prect)->y + (prect)->h - 1) )

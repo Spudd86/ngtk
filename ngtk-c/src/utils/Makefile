@@ -3,7 +3,7 @@ all: libngtk-utils.a
 libngtk-utils.a: ngtk-list.o
 	$(NGTK_MKS) libngtk-utils.a  ngtk-list.o
 
-%.o: %.c
+%.o: %.c %.h
 	$(CC) -c $<
 
 clean:

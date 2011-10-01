@@ -21,11 +21,19 @@
 #ifndef __NGtk_xlib_component__
 #define __NGtk_xlib_component__
 
-#include <ncurses.h>
+#include <X11/Xlib.h>
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
-NGtkInterface* ngtk_xlib_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable);
+typedef struct _ngtk_xlib_component_d {
+	NGtkRectangle  area;
+	Window         wnd;
+} NGtkXlibComponentD;
+
+#define NGTK_XLIB_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkXlibComponentD,1)
+#define NGTK_XLIB_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkXlibComponentD,1)
+
+NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible);
 
 #define  ngtk_xlib_component_get_parent   ngtk_basic_component_get_parent
 
@@ -39,5 +47,12 @@ void     ngtk_xlib_component_set_visible  (NGtkComponent *self, int visible);
 void     ngtk_xlib_component_set_text     (NGtkComponent *self, const char *text);
 
 #define  ngtk_xlib_component_redraw       ngtk_basic_component_redraw
+
+/* Non interface functions */
+void                 ngtk_xlib_component_put_to     (NGtkComponent *self, const NGtkRectangle *new_area, int already_there);
+Window               ngtk_xlib_component_get_window (NGtkComponent *self);
+const NGtkRectangle* ngtk_xlib_component_get_rect   (NGtkComponent *self);
+
+void ngtk_xlib_component_call_on_window_destroyed (NGtkComponent *self);
 
 #endif

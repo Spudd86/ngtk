@@ -1,5 +1,5 @@
 /*
- * ngtk-xlib-container.h
+ * ngtk-basic-base.h
  * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
  *
  * This file is part of NGtk.
@@ -18,17 +18,21 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NGtk_xlib_container__
-#define __NGtk_xlib_container__
+#ifndef __NGtk_basic_base__
+#define __NGtk_basic_base__
 
-#include "../../widgets/ngtk-widgets.h"
-#include "../basic/ngtk-basic.h"
+#include "../../widgets/ngtk-base.h"
 
-NGtkInterface* ngtk_xlib_container_create_interface (NGtkObject *obj);
+typedef NGtkBase NGtkBasicBase;
 
-void     ngtk_xlib_container_add_child     (NGtkContainer *self, NGtkComponent* child);
-#define  ngtk_xlib_container_get_children  ngtk_basic_container_get_children
-void     ngtk_xlib_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
-void     ngtk_xlib_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
+typedef struct _ngtk_basic_base_d {
+	NGtkBackend *backend;
+} NGtkBasicBaseD;
+
+#define NGTK_BASIC_BASE_O2D(comp) NGTK_O2D_CAST(comp,NGTK_BASE_TYPE,NGtkBasicBaseD,0)
+#define NGTK_BASIC_BASE_I2D(comp) NGTK_I2D_CAST(comp,NGTK_BASE_TYPE,NGtkBasicBaseD,0)
+
+NGtkBaseI*    ngtk_basic_base_create_interface  (NGtkObject *obj, NGtkBackend *backend);
+NGtkBackend*  ngtk_basic_base_get_backend       (NGtkBase *self);
 
 #endif

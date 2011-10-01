@@ -36,8 +36,8 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 {
 	NGtkXlibBackendD *xbd = NGTK_XLIB_BACKEND_O2D (self);
 
-	const char* display_name;
-	int i;
+	const char* display_name = NULL;
+	int i = 0;
 
 	display_name = getenv ("DISPLAY");
 //	if (display_name == NULL) display_name = ":0";
@@ -48,12 +48,16 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 	if (xbd->display == NULL)
 		ngtk_error (self, "Can not connect to the X server at %s\n", display_name);
 
+	ngtk_debug (self, "Made a connection with the display %p", xbd->display);
+
 	/* Find the default screen on which we should operate */
 	xbd->screen = DefaultScreen (xbd->display);
+	ngtk_debug (self, "The screen we'll use is %d", xbd->screen);
 
 	/* Each screen has a root window - a window that covers the entire
 	 * screen. We need it in order to create the children windows */
 	xbd->root_window = RootWindow (xbd->display, xbd->screen);
+	ngtk_debug (self, "The screen root window is %lu", xbd->root_window);
 
 	/* Each screen has a colormap - an object that given an RGB color
 	 * will return an identifier of the closest displayable color to
@@ -78,7 +82,7 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 	/* Initialize a connection property with the window manager,
 	 * associated with a window close event */
 	xbd->window_close_atom = XInternAtom (xbd->display, "WM_DELETE_WINDOW", FALSE);
-	ngtk_debug (self, "Finished initializing with display %p",ngtk_xlib_backend_get_display (self));
+	ngtk_debug (self, "Finished initializing with display %p",ngtk_xlib_backend_get_X_display (self));
 }
 
 /* You want to read the man page for XButtonEvent in order to understand
@@ -115,7 +119,7 @@ static void handle_mouse_button_event (NGtkXlibBackend *self, XButtonEvent evnt)
 	 * event. This variable is an indicator for that */
 	int also_fire_click = FALSE;
 
-	NGtkXlibBase *widget = ngtk_xlib_backend_get_for_window2 (self, wnd);
+	NGtkComponent *widget = ngtk_xlib_backend_get_for_window (self, wnd);
 
 	/* An event should be ignored in any of the following cases:
 	 *
@@ -158,13 +162,13 @@ static void handle_mouse_button_event (NGtkXlibBackend *self, XButtonEvent evnt)
 		nevent.type = NGTK_MET_DOWN;
 		last_but_press_here[mouse_but_index] = evnt.window;
 
-		/* A clicked object should receive the keyboard focus, iff it's
-		 * an event-generator.
-		 * TODO: Fix focus handling in the Xlib backend. Specifically,
-		 * do we need to manually keep track of focus for widgets inside
-		 * a window? */
-		if (widget != NULL && ngtk_object_is_a (widget, NGTK_EVENT_GENERATOR_TYPE))
-			ngtk_event_generator_grab_keyboard_focus (widget);
+//		/* A clicked object should receive the keyboard focus, iff it's
+//		 * an event-generator.
+//		 * TODO: Fix focus handling in the Xlib backend. Specifically,
+//		 * do we need to manually keep track of focus for widgets inside
+//		 * a window? */
+//		if (widget != NULL && ngtk_object_is_a (widget, NGTK_EVENT_GENERATOR_TYPE))
+//			ngtk_event_generator_grab_keyboard_focus (widget);
 	}
 	else /* if (type == ButtonRelease) */
 	{
@@ -175,15 +179,14 @@ static void handle_mouse_button_event (NGtkXlibBackend *self, XButtonEvent evnt)
 		last_but_press_here[mouse_but_index] = BadWindow;
 	}
 
-	/* Now, if th ecomponent is an event generator, fire the mouse
-	 * event(s). */
-	if (! ignore_event && ngtk_object_is_a (widget, NGTK_EVENT_GENERATOR_TYPE))
+	if (! ignore_event)
 	{
-		ngtk_event_generator_fire_mouse_event (widget, &nevent);
+		NGtkComponentI *compi = ngtk_object_cast (widget, NGTK_COMPONENT_TYPE);
+		ngtk_interface_send_signal (compi, "event::mouse", &nevent, TRUE);
 		if (also_fire_click)
 		{
 			nevent.type = NGTK_MET_CLICK;
-			ngtk_event_generator_fire_mouse_event (widget, &nevent);
+			ngtk_interface_send_signal (compi, "event::mouse", &nevent, TRUE);
 		}
 	}
 }
@@ -215,14 +218,14 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 
 			/* The window that was exposed */
 			Window wnd = event.xexpose.window;
-			NGtkXlibBase *base = ngtk_xlib_backend_get_for_window2 (self, wnd);
+			NGtkComponent *comp = ngtk_xlib_backend_get_for_window (self, wnd);
 
 			/* If we have several pending expose events, to avoid
 			 * flickering we will handle just the last one. */
 			if (event.xexpose.count > 0) break;
 
-			if (base != NULL && ngtk_object_is_a (base, NGTK_COMPONENT_TYPE))
-				ngtk_component_redraw (base);
+			if (comp != NULL && ngtk_object_is_a (comp, NGTK_COMPONENT_TYPE))
+				ngtk_component_redraw (comp);
 
 			break;
 		}
@@ -292,8 +295,8 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 		{
 			/* The only component who has the bit on to signal it should
 			 * accept resize requests is the root window */
-			NGtkXlibBase *widget = ngtk_xlib_backend_get_for_window2 (self, event.xconfigure.window);
-			const NGtkRectangle *rect = ngtk_xlib_base_get_relative_rect (widget);
+			NGtkComponent *widget = ngtk_xlib_backend_get_for_window (self, event.xconfigure.window);
+			const NGtkRectangle *rect = ngtk_xlib_component_get_rect (widget);
 
 			if (ngtk_object_is_a (widget, NGTK_CONTAINER_TYPE) && (rect->w != event.xconfigure.width || rect->h != event.xconfigure.height))
 				ngtk_container_pack (widget);
@@ -304,7 +307,10 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 			ngtk_debug (self, "DestroyNotify Received");
 		{
 			Window wnd = event.xdestroywindow.window;
-			NGtkXlibBase *xb = ngtk_xlib_base_call_on_window_destroyed (self, wnd);
+			NGtkComponent *xb = ngtk_xlib_backend_get_for_window (self, wnd);
+
+			ngtk_xlib_component_call_on_window_destroyed (xb);
+
 			if (xb == ngtk_xlib_root_window)
 			{
 				ngtk_backend_quit_main_loop (self);
@@ -316,11 +322,11 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 		case ClientMessage:
 			ngtk_debug (self, "ClientMessage Received");
 			if (event.xclient.data.l[0] == xbd->window_close_atom
-				&& event.xclient.window == ngtk_xlib_base_get_window (ngtk_xlib_root_window))
+				&& event.xclient.window == ngtk_xlib_component_get_window (ngtk_xlib_root_window))
 			{
 				ngtk_debug (self, "Received destroy message from WM!\n");
 				ngtk_object_send_signal (ngtk_xlib_root_window, "event::close", NULL);
-				XDestroyWindow (xlib_display, ngtk_xlib_base_get_window (ngtk_xlib_root_window));
+				XDestroyWindow (xlib_display, ngtk_xlib_component_get_window (ngtk_xlib_root_window));
 			}
 			else
 			{

@@ -19,23 +19,24 @@
  */
 
 #include "ngtk-basic-component.h"
+#include <string.h>
 
-NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible, int focusable)
+static void simple_destroy_component_interface (NGtkObject *obj);
+
+NGtkInterface* ngtk_basic_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
 {
-	NGtkInterface *in = ngtk_interface_new (NGTK_COMPONENT_TYPE);
+	NGtkInterface *in = ngtk_interface_new (obj, NGTK_COMPONENT_TYPE);
 	NGtkBasicComponentD *bcd;
 
-	bcd = ngtk_new (NGtkBasicComponentD);
+	in->imp_data[0] = bcd = ngtk_new (NGtkBasicComponentD);
 	bcd->enabled = enabled;
 	bcd->parent = parent;
 	bcd->text = text;
 	bcd->focusable = focusable;
 	bcd->visible = visible;
+	in->imp_data_free[0] = ngtk_free;
 
-	in->d[0] = bcd;
-	in->d_free[0] = ngtk_basic_component_d_free;
-
-	in->f = ngtk_new (NGtkComponentF);
+	in->functions = ngtk_new (NGtkComponentF);
 	NGTK_COMPONENT_I2F (in) -> get_enabled   = ngtk_basic_component_get_enabled;
 	NGTK_COMPONENT_I2F (in) -> get_focusable = ngtk_basic_component_get_focusable;
 	NGTK_COMPONENT_I2F (in) -> get_parent    = ngtk_basic_component_get_parent;
@@ -45,16 +46,30 @@ NGtkInterface* ngtk_basic_component_create_interface (int enabled, NGtkContainer
 	NGTK_COMPONENT_I2F (in) -> set_enabled   = ngtk_basic_component_set_enabled;
 	NGTK_COMPONENT_I2F (in) -> set_text      = ngtk_basic_component_set_text;
 	NGTK_COMPONENT_I2F (in) -> set_visible   = ngtk_basic_component_set_visible;
-	in->f_free = ngtk_free;
+	in->functions_free = ngtk_free;
+
+	if (parent != NULL)
+	{
+		ngtk_container_add_child (parent, obj);
+	}
+
+	ngtk_object_push_destructor (obj, simple_destroy_component_interface);
 
 	return in;
 }
 
-void ngtk_basic_component_d_free (void *d)
+static void simple_destroy_component_interface (NGtkObject *obj)
 {
-	NGtkBasicComponentD *d_real = (NGtkBasicComponentD*) d;
-	ngtk_free (d_real);
+	NGtkContainer *parent = ngtk_component_get_parent (obj);
+
+	if (parent != NULL)
+	{
+		ngtk_container_remove_child (parent, obj);
+	}
+
+	ngtk_interface_detach_and_free (ngtk_object_cast (obj, NGTK_COMPONENT_TYPE));
 }
+
 NGtkContainer* ngtk_basic_component_get_parent  (NGtkComponent *self)
 {
 	return NGTK_BASIC_COMPONENT_O2D (self) -> parent;
@@ -64,13 +79,11 @@ int ngtk_basic_component_get_enabled (NGtkComponent *self)
 {
 	return NGTK_BASIC_COMPONENT_O2D (self) -> enabled;
 }
+
 void ngtk_basic_component_set_enabled (NGtkComponent *self, int enabled)
 {
-	NGtkValue temp;
 	NGTK_BASIC_COMPONENT_O2D (self) -> enabled = enabled;
-	temp.type = NGTK_VALUE_INT;
-	temp.val.v_int = enabled;
-	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::enable", &temp, TRUE);
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::enable", &enabled, TRUE);
 }
 
 int ngtk_basic_component_get_visible (NGtkComponent *self)
@@ -80,11 +93,8 @@ int ngtk_basic_component_get_visible (NGtkComponent *self)
 
 void ngtk_basic_component_set_visible (NGtkComponent *self, int visible)
 {
-	NGtkValue temp;
 	NGTK_BASIC_COMPONENT_O2D (self) -> visible = visible;
-	temp.type = NGTK_VALUE_INT;
-	temp.val.v_int = visible;
-	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::visible", &temp, TRUE);
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::visible", &visible, TRUE);
 }
 
 int ngtk_basic_component_get_focusable (NGtkComponent *self)
@@ -99,11 +109,10 @@ const char* ngtk_basic_component_get_text (NGtkComponent *self)
 
 void ngtk_basic_component_set_text (NGtkComponent *self, const char *text)
 {
-	NGtkValue temp;
+	char *str = strdup (text);
 	NGTK_BASIC_COMPONENT_O2D (self) -> text = text;
-	temp.type = NGTK_VALUE_CONST_STR;
-	temp.val.v_cstr = text;
-	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::text", &temp, TRUE);
+	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::text", str, TRUE);
+	ngtk_free (str);
 }
 
 void ngtk_basic_component_redraw (NGtkComponent *self)

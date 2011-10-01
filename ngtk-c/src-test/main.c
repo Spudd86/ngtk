@@ -23,84 +23,40 @@
 #include <stdio.h>
 #include <ncurses.h>
 
-void MyFunc(NGtkEventGenerator *comp, const NGtkMouseEvent *evnt, void* data)
+void HideOnClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
 {
-	if (evnt->type == NGTK_MET_CLICK || evnt->type == NGTK_MET_DOWN)
+	NGtkMouseEvent *evnt = (NGtkMouseEvent*) sigdata;
+	if (evnt->type == NGTK_MET_CLICK)
 		ngtk_component_set_visible (comp, ! ngtk_component_get_visible (comp));
 }
 
-void MyFunc2(NGtkEventGenerator *comp, const NGtkMouseEvent *evnt, void* data)
+void QuitOnPress (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
 {
-	ngtk_quit_main_loop ();
+	ngtk_debug (ngtk_base_get_backend (comp), "Received mouse event signal!");
+	NGtkMouseEvent *evnt = (NGtkMouseEvent*) sigdata;
+	if (evnt->type == NGTK_MET_CLICK)
+		ngtk_backend_quit_main_loop (ngtk_base_get_backend (comp));
 }
 
-#ifdef NGTK_USE_NC
 int main (int argc, char **argv)
 {
+	NGtkBackend *X = ngtk_xlib_backend_new ();
+
 	NGtkContainer *wnd;
 	NGtkComponent *lab, *lab2;
 	NGtkRectangle  rect;
 
-	ngtk_init ();
+	ngtk_backend_init (X);
 
-	wnd = ngtk_create_root_window ("oh yeah!");
-    lab = ngtk_create_label ("Quit here!");
-    lab2 = ngtk_create_label ("Hide me!");
-
-    ngtk_container_add_child (wnd, lab);
-    rect.x = rect.y = 2;
-    rect.w = 13;
-    rect.h = 6;
-    ngtk_container_place_child (wnd, lab, &rect);
-
-    ngtk_container_add_child (wnd, lab2);
-    rect.x += rect.w;
-    ngtk_container_place_child (wnd, lab2, &rect);
-
-    ngtk_container_pack (wnd);
-
-	ngtk_component_set_visible (lab, TRUE);
-	ngtk_component_set_enabled (lab, TRUE);
-
-	ngtk_component_set_visible (lab2, TRUE);
-	ngtk_component_set_enabled (lab2, TRUE);
-
+	wnd = ngtk_backend_create_root_window (X, "oh yeah!");
+	ngtk_object_connect_to (wnd, "event::mouse", QuitOnPress, NULL);
 	ngtk_component_set_visible (wnd, TRUE);
 
-	ngtk_event_generator_add_mouse_listener (lab, MyFunc2, NULL, NULL);
-	ngtk_event_generator_add_mouse_listener (lab2, MyFunc, NULL, NULL);
+	ngtk_backend_start_main_loop (X);
 
-	ngtk_start_main_loop ();
+	ngtk_backend_quit (X);
 
-/*	ngtk_object_free (wnd); */
+	ngtk_object_free (X);
 
-	ngtk_quit ();
+	return EXIT_SUCCESS;
 }
-#endif
-
-#ifdef NGTK_USE_XLIB
-int main (int argc, char **argv)
-{
-	NGtkContainer *wnd;
-	NGtkComponent *lab, *lab2;
-	NGtkRectangle  rect;
-
-	ngtk_init ();
-
-	wnd = ngtk_create_root_window ("oh yeah!");
-	lab = ngtk_create_button (wnd, "yesl!");
-
-	ngtk_component_set_visible (lab, TRUE);
-	rect.x = rect.y = 5;
-	rect.w = rect.h = 55;
-	ngtk_container_place_child (wnd, lab, &rect);
-	ngtk_event_generator_add_mouse_listener (lab, MyFunc2, NULL, NULL);
-	ngtk_component_set_visible (wnd, TRUE);
-
-	ngtk_start_main_loop ();
-
-/*	ngtk_object_free (wnd); */
-
-	ngtk_quit ();
-}
-#endif

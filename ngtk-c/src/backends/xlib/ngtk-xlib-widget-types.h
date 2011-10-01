@@ -24,13 +24,6 @@
 #include "../../widgets/ngtk-widget-types.h"
 #include "../../object-system/ngtk-object.h"
 
-enum {
-	NGTK_XLIBBASE_TYPE = NGTK_BACKEND_BASE_TYPE
-};
-
-typedef NGtkInterface                NGtkXlibBaseI;
-typedef NGtkObject                   NGtkXlibBase;
-
 typedef NGtkObject                   NGtkXlibBackend;
 
 #endif

@@ -1,10 +1,8 @@
 OBJS = \
 	ngtk-xlib-backend.o \
-	ngtk-xlib-base.o \
 	ngtk-xlib-component.o \
 	ngtk-xlib-container.o \
 	ngtk-xlib-defs.o \
-	ngtk-xlib-event-generator.o \
 	ngtk-xlib-window.o
 
 all: libngtk-backend-xlib.a

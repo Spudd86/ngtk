@@ -23,196 +23,198 @@
 
 #include <string.h>
 
-/* Gluing together an interface and an object is a one way operation,
- * which is not reversible for now to make things a bit more sane */
-static void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in);
-
-static void append_listener (NGtkList *listeners, const char *signal, NGtkListener listener);
+static void append_listener (NGtkList *listeners, const char *signal, NGtkListener listener, void *user_data);
 static void clear_listeners (NGtkList *listeners);
-static void emit_signal     (void *src, NGtkList *listeners, const char *signal, NGtkValue *value);
+static void emit_signal     (void *src, NGtkList *listeners, const char *signal, void *sigdata);
+
+static void attach (NGtkObject *obj, NGtkInterface *in);
+static void detach (NGtkObject *obj, NGtkInterface *in);
+
+static void object_free_real (NGtkObject *obj);
+
+#define LOCKED   TRUE
+#define UNLOCKED FALSE
 
 NGtkObject* ngtk_object_new ()
 {
 	int i;
 	NGtkObject *obj = ngtk_new (NGtkObject);
+	ngtk_assert (obj);
 
-	obj->iBits = NGTK_TYPE_NONE;
+	obj->interface_mask = 0;
 
 	for (i = 0; i < NGTK_MAX_INTERFACES; i++)
-		obj->iImps[i] = NULL;
+		obj->interfaces[i] = NULL;
 
-	obj->d = NULL;
-	obj->d_free = NULL;
+	obj->direct_ref_count = 1;    /* We will return one ref */
 
-	obj->direct_ref_count = 1; /* We will return one ref */
-	obj->interfaces_ref_count = 0; /* No interfaces, so no references to
-	                                * them */
 	ngtk_list_init (&obj->listeners);
-	
+
+	ngtk_list_init (&obj->destructors);
+
+	obj->double_free_lock = UNLOCKED;
+
 	return obj;
 }
 
-NGtkInterface* ngtk_interface_new (NGtkType iType)
+NGtkInterface* ngtk_interface_new (NGtkObject *obj, NGtkType type)
 {
 	int i;
 	NGtkInterface *in = ngtk_new (NGtkInterface);
 
-	in->obj = NULL;
-
-	in->iType = iType;
+	in->type = type;
 
 	for (i = 0; i < NGTK_MAX_INTERFACE_IMP_LEVELS; i++)
 	{
-		in->d[i] = NULL;
-		in->d_free[i] = NULL;
+		in->imp_data[i] = NULL;
+		in->imp_data_free[i] = NULL;
+		in->imp_destruct[i] = NULL;
 	}
 
-	in->f = NULL;
-	in->f_free = NULL;
+	in->functions = NULL;
+	in->functions_free = NULL;
 
-	in->ref_count = 0;
 	ngtk_list_init (&in->listeners);
-	
+
+	/* The attach function wants to know the object is NULL. So if we
+	 * don't want to depend on uninitialized memory, we must set the
+	 * object first */
+	in->object = NULL;
+	attach (obj, in);
+
 	return in;
 }
 
-int ngtk_object_is_a (NGtkObject* obj, NGtkType iType)
+static void attach (NGtkObject *obj, NGtkInterface *in)
 {
-	/* Sanity check */
-	ngtk_assert (obj != NULL);
-	return ((obj->iBits) & NGTK_BIT_MASK(iType)) != 0;
+	ngtk_assert (obj);
+	ngtk_assert (in);
+
+	ngtk_assert (! ngtk_object_is_a (obj, in->type));
+	ngtk_assert (in->object == NULL);
+
+	obj->interface_mask       |= NGTK_BIT_MASK (in->type);
+	obj->interfaces[in->type]  = in;
+
+	in->object                 = obj;
 }
 
-int ngtk_interface_is_a (NGtkInterface* in, NGtkType iType)
+static void detach (NGtkObject *obj, NGtkInterface *in)
 {
-	if (in->iType == iType) return TRUE;
-	/* Sanity check */
-	ngtk_assert (in->obj != NULL);
-	return ngtk_object_is_a (in->obj, iType);
+	ngtk_assert (obj);
+	ngtk_assert (in);
+
+	ngtk_assert (ngtk_object_cast (obj, in->type) == in);
+	ngtk_assert (in->object == obj);
+
+	obj->interface_mask       ^= NGTK_BIT_MASK (in->type);
+	obj->interfaces[in->type]  = NULL;
+
+	in->object                 = NULL;
 }
 
-NGtkInterface* ngtk_object_cast (NGtkObject* obj, NGtkType iType)
+/* To be used by external destructors of the objects. When a destructor
+ * wants to finish a certain interface of an object, this is what he
+ * should call */
+void ngtk_interface_detach_and_free (NGtkInterface *in)
 {
-	ngtk_assert (ngtk_object_is_a (obj, iType));
-	return obj->iImps[iType];
-}
-
-NGtkInterface* ngtk_interface_cast (NGtkInterface* in, NGtkType iType)
-{
-	if (in->iType == iType) return in;
-	/* Sanity check */
-	ngtk_assert (in->obj != NULL);
-	return ngtk_object_cast (in->obj, iType);
-}
-
-void ngtk_interface_free (NGtkInterface *in)
-{
-	NGtkValue value;
 	int i;
 	ngtk_assert (in != NULL);
+	ngtk_assert (in->object != NULL);
 
-	value.type = NGTK_VALUE_P_VOID;
-	value.val.v_pvoid = in;
-	ngtk_interface_send_signal (in, "object::destroy", &value, TRUE);
-	
+	for (i = NGTK_MAX_INTERFACE_IMP_LEVELS - 1; i >= 0 ; i--)
+	{
+		if (in->imp_destruct[i] != NULL)
+		{
+			in->imp_destruct[i] (in->object);
+			in->imp_destruct[i] = NULL;
+		}
+		if (in->imp_data[i] && in->imp_data_free[i])
+		{
+			in->imp_data_free[i] (in->imp_data[i]);
+			in->imp_data_free[i] = NULL;
+			in->imp_data[i] = NULL;
+		}
+	}
+
+	if (in->functions && in->functions_free)
+		in->functions_free (in->functions);
+
 	clear_listeners (& in->listeners);
 
-	if (in->obj != NULL)
-	{
-		ngtk_object_detach (in->obj, in);
-	}
-
-	for (i = 0; i < NGTK_MAX_INTERFACE_IMP_LEVELS; i++)
-	{
-		if (in->d[i] && in->d_free[i])
-			in->d_free[i] (in->d[i]);
-	}
-
-	if (in->f && in->f_free)
-		in->f_free (in->f);
+	detach (in->object, in);
 
 	ngtk_free (in);
 }
 
-void ngtk_object_free (NGtkObject* obj)
+static void object_free_real (NGtkObject *obj)
 {
-	NGtkValue value;
+	NGtkListNode *iter;
 	int i;
 
 	ngtk_assert (obj != NULL);
 
-	value.type = NGTK_VALUE_P_VOID;
-	value.val.v_pvoid = obj;
-	ngtk_object_send_signal (obj, "object::destroy", &value);
-	
-	if (obj->d && obj->d_free)
-		obj->d_free (obj->d);
+	ngtk_list_foreach (iter, &obj->destructors)
+		((NGtkDestructor) iter->data) (obj);
 
+	/* Now make sure the object was cleaned succesfully */
 	for (i = 0; i < NGTK_MAX_INTERFACES; i++)
-		if (obj->iImps[i])
-			ngtk_object_detach (obj, obj->iImps[i]);
+		ngtk_assert (obj->interfaces[i] == NULL);
 
-	/* The interfaces may bug the listeners a bit, so free only when
-	 * done with them */
+	ngtk_assert (obj->interface_mask == 0);
+
+	/* Now, clean the remaining stuff */
 	clear_listeners (& obj->listeners);
-
+	ngtk_list_clear (& obj->destructors);
 	ngtk_free (obj);
+}
+
+void ngtk_object_free (NGtkObject *obj)
+{
+	if (obj->double_free_lock == UNLOCKED)
+	{
+		obj->double_free_lock = LOCKED;
+		object_free_real (obj);
+	}
+}
+
+int ngtk_object_is_a (NGtkObject* obj, NGtkType type)
+{
+	/* Sanity check */
+	ngtk_assert (obj != NULL);
+	return ((obj->interface_mask) & NGTK_BIT_MASK(type)) != 0;
+}
+
+int ngtk_interface_is_a (NGtkInterface* in, NGtkType type)
+{
+	ngtk_assert (in != NULL);
+	if (in->type == type) return TRUE;
+
+	/* Sanity check */
+	ngtk_assert (in->object != NULL);
+	return ngtk_object_is_a (in->object, type);
+}
+
+NGtkInterface* ngtk_object_cast (NGtkObject* obj, NGtkType type)
+{
+	ngtk_assert (ngtk_object_is_a (obj, type));
+	return obj->interfaces[type];
+}
+
+NGtkInterface* ngtk_interface_cast (NGtkInterface* in, NGtkType type)
+{
+	ngtk_assert (in != NULL);
+	if (in->type == type) return in;
+
+	/* Sanity check */
+	ngtk_assert (in->object!= NULL);
+	return ngtk_object_cast (in->object, type);
 }
 
 NGtkObject* ngtk_interface_get_object (NGtkInterface *in)
 {
 	ngtk_assert (in);
-	return in->obj;
-}
-
-void ngtk_object_implement (NGtkObject *obj, NGtkInterface *in)
-{
-	NGtkValue temp;
-	ngtk_assert (obj);
-	ngtk_assert (in);
-	ngtk_assert (in->iType != NGTK_TYPE_NONE);
-	ngtk_assert (in->obj == NULL);
-
-	obj->iBits                |= NGTK_BIT_MASK (in->iType);
-	obj->iImps[in->iType]      = in;
-	obj->interfaces_ref_count += in->ref_count;
-	in->obj                    = obj;
-
-	ngtk_interface_ref (in);
-
-	temp.type = NGTK_VALUE_P_VOID;
-	temp.val.v_pvoid = in;
-	ngtk_object_send_signal (obj, "object::implement", &temp);
-	temp.val.v_pvoid = obj;
-	ngtk_interface_send_signal (in, "object::implement", &temp, FALSE);
-}
-
-/* For now, detaching interfaces is only an internal operation that
- * happens when freeing an interface. Nevertheless, write code which is
- * prepared for the day where this can happen externally */
-void ngtk_object_detach (NGtkObject *obj, NGtkInterface *in)
-{
-	NGtkValue value;
-	ngtk_assert (obj);
-	ngtk_assert (in);
-	ngtk_assert (in->iType != NGTK_TYPE_NONE);
-	ngtk_assert (in->obj == obj);
-	ngtk_assert (ngtk_object_is_a (obj, in->iType));
-	ngtk_assert (ngtk_object_cast (obj, in->iType) == in);
-
-	value.type = NGTK_VALUE_P_VOID;
-	value.val.v_pvoid = in;
-	ngtk_object_send_signal (obj, "object::detach", &value);
-	value.val.v_pvoid = obj;
-	ngtk_interface_send_signal (in, "object::detach", &value, FALSE);
-
-	/* To flip a bit, XOR with it's bit mask */
-	obj->iBits                ^= NGTK_BIT_MASK (in->iType);
-	obj->iImps[in->iType]      = NULL;
-	obj->interfaces_ref_count -= in->ref_count;
-	in->obj                    = NULL;
-	
-	ngtk_interface_unref (in);
+	return in->object;
 }
 
 void ngtk_object_ref (NGtkObject* obj)
@@ -223,39 +225,24 @@ void ngtk_object_ref (NGtkObject* obj)
 void ngtk_object_unref (NGtkObject* obj)
 {
 	ngtk_assert (-- obj->direct_ref_count >= 0);
-	if (obj->direct_ref_count == 0 && obj->interfaces_ref_count == 0)
+	if (obj->direct_ref_count == 0)
 		ngtk_object_free (obj);
 }
 
-void ngtk_interface_ref (NGtkInterface* in)
+void ngtk_object_push_destructor (NGtkObject *obj, NGtkDestructor dest)
 {
-	++ in->ref_count;
-	if (in->obj != NULL)
-		++ in->obj->interfaces_ref_count;
+	ngtk_assert (obj != NULL);
+	ngtk_assert (dest != NULL);
+
+	ngtk_list_prepend (& obj->destructors, dest);
 }
 
-void ngtk_interface_unref (NGtkInterface* in)
-{
-	ngtk_assert (-- in->ref_count >= 0);
-
-	if (in->obj != NULL)
-		-- in->obj->interfaces_ref_count;
-	
-	/* If no reference, not from an object and not externally then free
-	 * the interface implementation */
-	if (in->ref_count == 0)
-	{
-		ngtk_assert (in->obj == NULL); /* The ref count should include
-		                                * the object ref */
-		ngtk_interface_free (in);
-	}
-}
-
-static void append_listener (NGtkList *listeners, const char *signal, NGtkListener listener)
+static void append_listener (NGtkList *listeners, const char *signal, NGtkListener listener, void *user_data)
 {
 	NGtkListenerInfo *i = ngtk_new (NGtkListenerInfo);
 	i->signame = signal;
 	i->func = listener;
+	i->lisdata = user_data;
 	ngtk_list_append (listeners, i);
 }
 
@@ -264,35 +251,35 @@ static void clear_listeners (NGtkList *listeners)
 	ngtk_list_clear_with_free_func (listeners, ngtk_free);
 }
 
-static void emit_signal (void *src, NGtkList *listeners, const char *signal, NGtkValue *value)
+static void emit_signal (void *src, NGtkList *listeners, const char *signal, void *sigdata)
 {
 	NGtkListNode *iter;
 	ngtk_list_foreach (iter, listeners)
 	{
 		NGtkListenerInfo *li = (NGtkListenerInfo*) iter->data;
 		if (li->signame == NGTK_ALL_SIGNALS || strcmp (li->signame, signal) == 0)
-			li->func (src, signal, value);
+			li->func (src, signal, sigdata, li->lisdata);
 	}
 }
 
-void ngtk_object_connect_to (NGtkObject *obj, const char* signal, NGtkListener listener)
+void ngtk_object_connect_to (NGtkObject *obj, const char* signal, NGtkListener listener, void *user_data)
 {
-	append_listener (&obj->listeners, signal, listener);
+	append_listener (&obj->listeners, signal, listener, user_data);
 }
 
-void ngtk_object_send_signal (NGtkObject* obj, const char* signal, NGtkValue *data)
+void ngtk_object_send_signal (NGtkObject* obj, const char* signal, void *sigdata)
 {
-	emit_signal (obj, &obj->listeners, signal, data);
+	emit_signal (obj, &obj->listeners, signal, sigdata);
 }
 
-void ngtk_interface_connect_to (NGtkInterface *in, const char* signal, NGtkListener listener)
+void ngtk_interface_connect_to (NGtkInterface *in, const char* signal, NGtkListener listener, void *user_data)
 {
-	append_listener (&in->listeners, signal, listener);
+	append_listener (&in->listeners, signal, listener, user_data);
 }
 
-void ngtk_interface_send_signal (NGtkInterface* in, const char* signal, NGtkValue *data, int also_object)
+void ngtk_interface_send_signal (NGtkInterface* in, const char* signal, void *sigdata, int also_object)
 {
-	emit_signal (in, &in->listeners, signal, data);
-	if (also_object && in->obj)
-		ngtk_object_send_signal (in->obj, signal, data);
+	emit_signal (in, &in->listeners, signal, sigdata);
+	if (also_object && in->object)
+		ngtk_object_send_signal (in->object, signal, sigdata);
 }
