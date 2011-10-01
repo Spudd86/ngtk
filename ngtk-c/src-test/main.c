@@ -43,14 +43,19 @@ int main (int argc, char **argv)
 	NGtkBackend *X = ngtk_xlib_backend_new ();
 
 	NGtkContainer *wnd;
-	NGtkComponent *lab, *lab2;
+	NGtkComponent *lab;
 	NGtkRectangle  rect;
 
 	ngtk_backend_init (X);
 
 	wnd = ngtk_backend_create_root_window (X, "oh yeah!");
 	ngtk_object_connect_to (wnd, "event::mouse", QuitOnPress, NULL);
+
+	lab = ngtk_backend_create_label (X, wnd, "oh no!");
+	ngtk_component_set_visible (lab, TRUE);
+
 	ngtk_component_set_visible (wnd, TRUE);
+
 
 	ngtk_backend_start_main_loop (X);
 

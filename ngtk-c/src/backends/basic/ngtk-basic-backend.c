@@ -257,8 +257,8 @@ void ngtk_basic_backend_component_unregister (NGtkComponent *comp)
 	NGtkListNode *n     = ngtk_list_find (comps, comp);
 
 	ngtk_assert (n != NULL);
-
 	ngtk_list_remove_node (comps, n);
+	ngtk_assert (ngtk_list_find (comps, comp) == NULL);
 }
 
 void ngtk_basic_backend_root_window_register (NGtkContainer *root_window)

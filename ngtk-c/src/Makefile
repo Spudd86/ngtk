@@ -1,6 +1,6 @@
 export NGTK_MKS=$(AR) rcs
 export NGTK_MKD=ld --whole-archive -shared -fPIC -o
-CC+=-g -Wall -Werror
+CC+=-g -Wall -Werror $(NGTK_CFLAGS)
 export CC
 all:   dist/libngtk.so
 

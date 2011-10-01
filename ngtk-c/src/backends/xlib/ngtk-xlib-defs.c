@@ -214,7 +214,7 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 
 		case Expose: /* This is the case were we need to redraw */
 		{
-			ngtk_debug (self, "Expose or ButtonRelease Received");
+			ngtk_debug (self, "Expose Received");
 
 			/* The window that was exposed */
 			Window wnd = event.xexpose.window;

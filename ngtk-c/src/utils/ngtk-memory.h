@@ -23,14 +23,28 @@
 
 #include <stdlib.h>
 
-#define ngtk_new(type)         ((type*) ngtk_malloc (sizeof (type)))
-#define ngtk_new_array(type,n) ((type*) ngtk_malloc ((n) * sizeof (type)))
+void* ngtk_debug_malloc (int size, const char *type);
+void ngtk_debug_free (void *where);
+
+#ifdef NGTK_TYPE_DEBUG
+#define ngtk_new(type)         ((type*) (ngtk_debug_malloc (sizeof (type), #type)))
+#define ngtk_new_array(type,n) ((type*) (ngtk_debug_malloc ((n) * sizeof (type), #type "[" #n "]")))
+#else
+#define ngtk_new(type)         ((type*) (ngtk_malloc (sizeof (type))))
+#define ngtk_new_array(type,n) ((type*) (ngtk_malloc ((n) * sizeof (type))))
+#endif
 
 /* May be useful to have all the code use our own malloc/free. Note
  * that these must be valid function pointers to be passed on, so if
  * something custom should be made, it must be wrapped in a real function
  */
+
+#ifdef NGTK_TYPE_DEBUG
+#define ngtk_malloc      malloc
+#define ngtk_free        ngtk_debug_free
+#else
 #define ngtk_malloc      malloc
 #define ngtk_free        free
+#endif
 
 #endif

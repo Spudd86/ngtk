@@ -55,7 +55,8 @@ static void simple_destroy_container_interface (NGtkObject *obj)
 	 * always free the first child */
 	while (! ngtk_list_is_empty (children))
 	{
-		NGtkComponent *child = (NGtkComponent*) children->first;
+		NGtkComponent *child = (NGtkComponent*) children->first->data;
+		ngtk_list_remove (children, child);
 		ngtk_object_free (child);
 	}
 
