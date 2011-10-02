@@ -142,6 +142,7 @@ NGtkComponent* ngtk_xlib_backend_create_text_entry (NGtkBasicBackend *self, NGtk
 
 int ngtk_xlib_backend_set_focus_holder (NGtkXlibBackend *self, NGtkComponent* eg)
 {
+#if FALSE
 	if (ngtk_basic_backend_can_focus_on (self, eg))
 	{
 		int has_parent = ngtk_component_get_parent (eg) != NULL;
@@ -155,6 +156,7 @@ int ngtk_xlib_backend_set_focus_holder (NGtkXlibBackend *self, NGtkComponent* eg
 //		XFlush (ngtk_xlib_backend_get_display (self));
 		XSetInputFocus (ngtk_xlib_backend_get_X_display (self), ngtk_xlib_component_get_window (eg), revert_to, CurrentTime);
 	}
+#endif
 	return ngtk_basic_backend_set_focus_holder (self, eg);
 }
 

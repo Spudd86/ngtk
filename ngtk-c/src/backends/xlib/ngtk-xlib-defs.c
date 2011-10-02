@@ -241,8 +241,23 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 		case MotionNotify:
 			ngtk_debug (self, "MotionNotify Received");
 		{
+			XMotionEvent mevent = event.xmotion;
+			Window wnd = mevent.window;
+			NGtkComponent *comp = ngtk_xlib_backend_get_for_window (self, wnd);
+			NGtkMouseEvent nevent;
 
-			 /* TODO: handle the event here */
+			if (mevent.state & Button1Mask)
+				nevent.button = NGTK_MBUT_L;
+			else if (mevent.state & Button2Mask)
+				nevent.button = NGTK_MBUT_R;
+			if (mevent.state & Button3Mask)
+				nevent.button = NGTK_MBUT_M;
+			else
+				nevent.button = NGTK_MBUT_NONE;
+
+			nevent.type = NGTK_MET_MOVE;
+
+			ngtk_interface_send_signal (ngtk_object_cast (comp, NGTK_COMPONENT_TYPE), "event::mouse", &nevent, TRUE);
 
 			break;
 		}
@@ -250,12 +265,18 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 		case KeyPress:
 			ngtk_debug (self, "KeyPress Received");
 		{
-//			Window wnd = event.xbutton.window;
+			//Window wnd = //event.xbutton.window;
+			//NGtkComponent *comp = ngtk_xlib_backend_get_for_window (self, wnd);
+			NGtkComponent *comp = ngtk_backend_get_focus_holder (self);
 			KeySym keysym;
 			int has_keysym;
 			char key_ascii;
 			int has_ascii;
 
+			NGtkKeyboardEvent kevent;
+			kevent.key = NGTK_KKEY_OTHER;
+
+			if (comp == NULL) break;
 			/* XLookupString will translate a key event into an ascii
 			 * symbol, after interpreting the Shift and other modifiers
 			 * along with actual key pressed. It will return the number
@@ -266,20 +287,46 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 			has_ascii = XLookupString (&event.xkey, &key_ascii, 1, &keysym, NULL);
 			has_keysym = keysym != NoSymbol;
 
-			if (has_ascii && key_ascii == '\t')
+			if ((has_ascii && key_ascii == '\t') || (has_keysym && keysym == XK_Tab))
+			{
 				ngtk_backend_focus_to_next (self);
-			else if (has_ascii)
-			{
-			}
-			else if (has_keysym)
-			{
-			}
-			else
-			{
+				break;
 			}
 
-			 /* TODO: handle the event here */
+			if (has_ascii)
+			{
+				kevent.key = key_ascii;
+			}
+			/* No "else", since we have some collisions */
+			if (has_keysym)
+			{
+				switch (keysym)
+				{
+				case XK_BackSpace:
+					kevent.key = NGTK_KKEY_BACKSPACE;
+					break;
+				case XK_Return:
+					kevent.key = NGTK_KKEY_ENTER;
+					break;
+				case XK_space:
+					kevent.key = NGTK_KKEY_SPACE;
+					break;
+				case XK_Left:
+					kevent.key = NGTK_KKEY_ARROW_LEFT;
+					break;
+				case XK_Up:
+					kevent.key = NGTK_KKEY_ARROW_UP;
+					break;
+				case XK_Right:
+					kevent.key = NGTK_KKEY_ARROW_RIGHT;
+					break;
+				case XK_Down:
+					kevent.key = NGTK_KKEY_ARROW_DOWN;
+					break;
+				}
+			}
 
+			ngtk_interface_send_signal (ngtk_object_cast (comp, NGTK_COMPONENT_TYPE), "event::keyboard", &kevent, TRUE);
 			break;
 		}
 

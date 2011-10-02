@@ -21,8 +21,9 @@
 #include "../src/ngtk.h"
 
 #include <stdio.h>
-#include <ncurses.h>
+#include <string.h>
 
+#define MAX_STR 4096
 void HideOnClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
 {
 	NGtkMouseEvent *evnt = (NGtkMouseEvent*) sigdata;
@@ -38,8 +39,36 @@ void QuitOnPress (NGtkComponent *comp, const char* signame, void *sigdata, void 
 		ngtk_backend_quit_main_loop (ngtk_base_get_backend (comp));
 }
 
+void SimulateLabel (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+{
+	char *textbuf = (char *) lisdata;
+	int curlen = strlen (textbuf);
+
+	NGtkKeyboardEvent *kevent = (NGtkKeyboardEvent*) sigdata;
+	NGtkKeyboardEventKey key = kevent->key;
+
+	printf ("SimulateLabel\n");
+	if (curlen > 0 && key == NGTK_KKEY_BACKSPACE)
+		textbuf[curlen - 1] = '\0';
+	else if (curlen < MAX_STR)
+	{
+		char toAdd = '\0';
+		if (key == NGTK_KKEY_SPACE)
+			toAdd = ' ';
+		else if (NGTK_KKEY_MIN_CHAR < key && key < NGTK_KKEY_MAX_CHAR)
+			toAdd = key;
+
+		textbuf[curlen] = toAdd;
+		textbuf[curlen+1] = '\0';
+	}
+
+	ngtk_component_set_text (comp, textbuf);
+}
+
 int main (int argc, char **argv)
 {
+	char text[MAX_STR+1] = { '\0' };
+
 	NGtkBackend *X = ngtk_xlib_backend_new ();
 
 	NGtkContainer *wnd;
@@ -51,11 +80,13 @@ int main (int argc, char **argv)
 	wnd = ngtk_backend_create_root_window (X, "oh yeah!");
 	ngtk_object_connect_to (wnd, "event::mouse", QuitOnPress, NULL);
 
-	lab = ngtk_backend_create_label (X, wnd, "oh no!");
-	ngtk_component_set_visible (lab, TRUE);
+	lab = ngtk_backend_create_button (X, wnd, "oh no!");
+	ngtk_object_connect_to (lab, "event::keyboard", SimulateLabel, text);
 
+	ngtk_component_set_visible (lab, TRUE);
 	ngtk_component_set_visible (wnd, TRUE);
 
+	ngtk_assert (ngtk_backend_set_focus_holder (X, lab));
 
 	ngtk_backend_start_main_loop (X);
 

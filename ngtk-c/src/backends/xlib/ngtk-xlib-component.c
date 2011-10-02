@@ -23,7 +23,7 @@
 //#include "ngtk-xlib-base.h"
 //#include "../basic/ngtk-basic.h"
 
-static const NGtkRectangle default_position = { 0, 0, 100, 100 };
+static const NGtkRectangle default_position = { 0, 0, 200, 200 };
 
 NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
 {
@@ -41,9 +41,9 @@ NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContai
 	xcd = ngtk_new (NGtkXlibComponentD);
 	in->imp_data[1] = xcd;
 	xcd->area.x = default_position.x;
-	xcd->area.y = default_position.x;
-	xcd->area.w = default_position.x;
-	xcd->area.h = default_position.x;
+	xcd->area.y = default_position.y;
+	xcd->area.w = default_position.w;
+	xcd->area.h = default_position.h;
 	xcd->wnd = XCreateSimpleWindow (
 		/* Connection to X server */
 		disp,
