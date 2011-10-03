@@ -40,7 +40,7 @@
 #endif
 
 #define NGTK_IN_RANGE(val,min,max) ((min) <= (val) && (val) <= (max))
-#define NGTK_BIT_MASK(bit) (1 << ((bit)-1))
+#define NGTK_BIT_MASK(bit) ( ((unsigned long long)1) << ((bit)-1))
 
 #define NGTK_FIELD_OFFSET(field,type) ((int)(&(((type*)NULL)->field)))
 
