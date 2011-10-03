@@ -30,6 +30,7 @@
 #include "ngtk-xlib-container.h"
 
 #include "ngtk-xlib-window.h"
+#include "ngtk-xlib-graphics.h"
 
 #define ngtk_xlib_base_get_display(self) (ngtk_xlib_backend_get_X_display (ngtk_base_get_backend (self)))
 #define ngtk_xlib_base_get_screen(self) (ngtk_xlib_backend_get_X_screen (ngtk_base_get_backend (self)))

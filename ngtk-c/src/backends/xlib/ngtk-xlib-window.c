@@ -19,6 +19,7 @@
  */
 
 #include "ngtk-xlib.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -52,154 +53,56 @@ static void pack_main_window (NGtkContainer *self)
 	}
 }
 
-static void draw_aligned_text (Display *disp, Drawable d, GC gc, int screen,
-	const NGtkRectangle *rect, int ignoreXY,
-	float halign, int hpad,
-	float valign, int vpad,
-	const char* text)
-{
-	XFontStruct *font;
-	int str_w, str_h, len = strlen (text);
-	int xoff, yoff;
-
-	/* In theory, to get the default Font, pass the default GC to
-	 * XQueryFont, instead of passing an actual font ID (as returned from
-	 * XGetGCValues). Created GC's simply do not have a font set to them
-	 * and only the default GC has.
-	 *
-	 * See (merge the link into one line):
-	 *   http://books.google.co.il/books?id=d8tByjvMmIwC&lpg=PA146
-	 *   &ots=mnQJfk48K5&dq=xlib%20get%20default%20font&hl=en&pg=PA146
-	 *   #v=onepage&q=xlib%20get%20default%20font&f=false
-	 */
-
-	font = XQueryFont (disp, XGContextFromGC (DefaultGC (disp, screen)));
-	ngtk_assert (font != NULL);
-	str_w = XTextWidth (font, text, len);
-	/* The Glyphs (shapes) of a font are in coordinates relative to
-	 * some imaginary line called baseline. The ascent is how much above
-	 * the line does the highest glyph go, and the descent is the how
-	 * much below the line do glyphs go. Therefor, their sum is the
-	 * maximal height of the text */
-	str_h = font->ascent + font->descent;
-
-	xoff = (int) (hpad + (rect->w - 2 * hpad - str_w) * halign);
-	yoff = (int) (vpad + (rect->h - 2 * vpad - str_h) * valign);
-	if (! ignoreXY)
-	{
-		xoff += rect->x;
-		yoff += rect->y;
-	}
-
-	/* Since the point we specify is the origin (the y is the baseline),
-	 * we must add the ascent if we wish to specify the top side)
-	 */
-	XDrawString (disp, d, gc, xoff, yoff + font->ascent, text, len);
-	XFreeFontInfo (NULL, font, 1);
-}
-#if FALSE
-static void checkers_draw (NGtkXlibBase *xb)
-{
-	Window wnd = ngtk_xlib_component_get_window (xb);
-	Display* disp = ngtk_xlib_get_display ();
-	GC gc = XCreateGC (disp, wnd, 0, 0);
-
-	int w = ngtk_xlib_base_get_relative_rect (xb)->w;
-	int h = ngtk_xlib_base_get_relative_rect (xb)->h;
-
-	int i, j;
-
-	ngtk_assert (! (gc < 0));
-
-	fprintf (stderr, "Printing checkers on indow %d %dx%d\n", (int)wnd, w, h);
-
-	XSetFillStyle (disp, gc, FillSolid);
-
-	XSetForeground (disp, gc, ngtk_xlib_get_color (NGTK_XLIB_BLACK));
-	XFillRectangle (disp, wnd, gc, 0, 0, w, h);
-
-	XSetForeground (disp, gc, ngtk_xlib_get_color (NGTK_XLIB_WHITE));
-	for (i = 0; i * 20 < h; i++)
-		for (j = 0; j * 20 < w; j++)
-		{
-			if ((i + j) % 2 == 0)
-				XFillRectangle (disp, wnd, gc, j * 20, i * 20, 20, 20);
-		}
-
-	XFreeGC (disp, gc);
-}
-#endif
 static void draw_window (NGtkComponent *window)
 {
-	Display* disp = ngtk_xlib_base_get_display (window);
-	Window wnd = ngtk_xlib_component_get_window (window);
-	GC gc = XCreateGC (disp, wnd, 0, 0);
+	NGtkXlibGraphics *g;
 
-	const NGtkRectangle *rect = ngtk_xlib_component_get_rect (window);
-
-	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
-
-	XFreeGC (disp, gc);
+	g = ngtk_xlib_graphics_create (window);
+	ngtk_graphics_clear (g);
+	ngtk_object_free (g);
 
 	ngtk_basic_component_redraw (window);
 }
 
 static void draw_label (NGtkComponent *label)
 {
-	Display* disp = ngtk_xlib_base_get_display (label);
-	Window wnd = ngtk_xlib_component_get_window (label);
-	GC gc = XCreateGC (disp, wnd, 0, 0);
-
 	const NGtkRectangle *rect = ngtk_xlib_component_get_rect (label);
-	const char *text = ngtk_component_get_text (label);
+	NGtkXlibGraphics    *g    = ngtk_xlib_graphics_create (label);
+	const char          *text = ngtk_component_get_text (label);
 
-	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+	ngtk_graphics_clear (g);
+	ngtk_basic_graphics_draw_aligned_text (g, rect, TRUE, 0, 2, 0.5f, 2, text);
 
-	/* The color is gray if we are disabled */
-	if (! ngtk_component_get_enabled (label))
-		XSetForeground (disp, gc, ngtk_xlib_base_get_color (label, NGTK_XLIB_GRAY));
-	else
-		XSetForeground (disp, gc, ngtk_xlib_base_get_color (label, NGTK_XLIB_BLACK));
-
-	/* Labels are not and can not be focus holders! */
-	draw_aligned_text (disp, wnd, gc, ngtk_xlib_base_get_screen (label), rect, TRUE, 0, 2, 0.5f, 2, text);
-
-	XFreeGC (disp, gc);
-
+	ngtk_object_free (g);
 	ngtk_basic_component_redraw (label);
 }
 
 static void draw_button (NGtkComponent *but)
 {
-	Display* disp = ngtk_xlib_base_get_display (but);
-	Window wnd = ngtk_xlib_component_get_window (but);
-	GC gc = XCreateGC (disp, wnd, 0, 0);
-
 	const NGtkRectangle *rect = ngtk_xlib_component_get_rect (but);
-	const char *text = ngtk_component_get_text (but);
+	NGtkXlibGraphics    *g    = ngtk_xlib_graphics_create (but);
+	const char          *text = ngtk_component_get_text (but);
 
-	XClearArea (disp, wnd, 0, 0, rect->w, rect->h, FALSE);
-	// ngtk_debug (ngtk_xlib_base_get_backend (but), "XClearArea (%p, %lu, %d, %d, %lu, %lu, %d)", disp, wnd, 0, 0, rect->w, rect->h, FALSE);
+	ngtk_graphics_clear (g);
+	ngtk_graphics_draw_frame (g, rect, ngtk_xlib_base_has_focus (but));
+	ngtk_basic_graphics_draw_aligned_text (g, rect, TRUE, 0.5f, 2, 0.5f, 2, text);
 
-	/* The color is gray if we are disabled */
-	if (! ngtk_component_get_enabled (but))
-		XSetForeground (disp, gc, ngtk_xlib_base_get_color (but, NGTK_XLIB_GRAY));
-	else
-		XSetForeground (disp, gc, ngtk_xlib_base_get_color (but, NGTK_XLIB_BLACK));
-
-	draw_aligned_text (disp, wnd, gc, ngtk_xlib_base_get_screen (but), rect, TRUE, 0.5f, 2, 0.5f, 2, text);
-
-	/* Draw a border, or a double border if we hold the focus */
-	XDrawRectangle (disp, wnd, gc, 0, 0, rect->w - 1, rect->h - 1);
-	if (ngtk_xlib_base_has_focus (but))
-	{
-		ngtk_debug (ngtk_base_get_backend (but), "Drawing focused button!");
-		XDrawRectangle (disp, wnd, gc, 1, 1, rect->w - 3, rect->h - 3);
-	}
-
-	XFreeGC (disp, gc);
-
+	ngtk_object_free (g);
 	ngtk_basic_component_redraw (but);
+}
+
+static void draw_text_entry (NGtkComponent *te)
+{
+	const NGtkRectangle *rect = ngtk_xlib_component_get_rect (te);
+	NGtkXlibGraphics    *g    = ngtk_xlib_graphics_create (te);
+	const char          *text = ngtk_component_get_text (te);
+
+	ngtk_graphics_clear (g);
+	ngtk_graphics_draw_frame (g, rect, ngtk_xlib_base_has_focus (te));
+	ngtk_basic_graphics_draw_text_with_cursor (g, rect, TRUE, 0, 2, 0.5f, 2, text, ngtk_text_entry_get_cursor_position (te));
+
+	ngtk_object_free (g);
+	ngtk_basic_component_redraw (te);
 }
 
 static NGtkObject* create_basic_widget (NGtkBackend *self, int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area, int focusable)
@@ -251,6 +154,17 @@ NGtkObject* ngtk_xlib_create_button_imp (NGtkBackend *self, const char* text, in
 	NGtkObject *obj = create_basic_widget (self, TRUE, parent, text, visible, &area, TRUE);
 
 	NGTK_COMPONENT_O2F (obj) -> redraw = draw_button;
+
+	return obj;
+}
+
+NGtkObject* ngtk_xlib_create_text_entry_imp (NGtkBackend *self, NGtkContainer *parent, const char* initial_text, int visible, int max_text_len)
+{
+	NGtkRectangle area = { 0, 0, 100, 100 };
+	NGtkObject *obj = create_basic_widget (self, TRUE, parent, initial_text, visible, &area, TRUE);
+
+	ngtk_basic_text_entry_create_interface (obj, initial_text, max_text_len);
+	NGTK_COMPONENT_O2F (obj) -> redraw = draw_text_entry;
 
 	return obj;
 }

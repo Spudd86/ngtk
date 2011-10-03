@@ -3,6 +3,7 @@ OBJS = \
 	ngtk-xlib-component.o \
 	ngtk-xlib-container.o \
 	ngtk-xlib-defs.o \
+	ngtk-xlib-graphics.o \
 	ngtk-xlib-window.o
 
 all: libngtk-backend-xlib.a

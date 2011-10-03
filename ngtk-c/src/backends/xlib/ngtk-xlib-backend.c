@@ -127,16 +127,12 @@ NGtkComponent* ngtk_xlib_backend_create_label (NGtkBasicBackend *self, NGtkConta
 
 NGtkComponent* ngtk_xlib_backend_create_text_entry (NGtkBasicBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len)
 {
-	ngtk_assert (FALSE);
-//	NGtkComponent *te = NULL;
-//	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
-//	NGtkValue      val;
-//
-//	val.type = NGTK_VALUE_P_VOID;
-//	val.val.v_pvoid = te;
-//	ngtk_interface_send_signal (in, "backend::create-te",  &val, TRUE);
-//
-//	return te;
+	NGtkObject* te = ngtk_xlib_create_text_entry_imp (self, parent, initial_text, FALSE, max_text_len);
+	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
+
+	ngtk_interface_send_signal (in, "backend::create-te",  te, TRUE);
+
+	return te;
 }
 
 

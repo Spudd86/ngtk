@@ -24,6 +24,7 @@
 #include "../../widgets/ngtk-widget-types.h"
 #include "../../object-system/ngtk-object.h"
 
-typedef NGtkObject                   NGtkXlibBackend;
+typedef NGtkObject NGtkXlibBackend;
+typedef NGtkObject NGtkXlibGraphics;
 
 #endif
