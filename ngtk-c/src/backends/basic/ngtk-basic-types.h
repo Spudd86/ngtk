@@ -1,5 +1,5 @@
 /*
- * ngtk-basic.h
+ * ngtk-basic-types.h
  * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
  *
  * This file is part of NGtk.
@@ -18,17 +18,22 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NGtk_basic_h__
-#define __NGtk_basic_h__
+#ifndef __NGtk_basic_types_h__
+#define __NGtk_basic_types_h__
 
-#include "ngtk-basic-types.h"
+#include "../../object-system/ngtk-object.h"
+#include "../../widgets/ngtk-widget-types.h" /* To define the graphics type */
 
-#include "ngtk-basic-base.h"
-#include "ngtk-basic-component.h"
-#include "ngtk-basic-container.h"
-#include "ngtk-basic-backend.h"
+typedef NGtkObject    NGtkGraphics;
+typedef NGtkInterface NGtkGraphicsI;
 
-#include "ngtk-basic-graphics.h"
-#include "ngtk-basic-text-entry.h"
+typedef NGtkObject    NGtkTextEntry;
+typedef NGtkInterface NGtkTextEntryI;
+
+enum {
+	NGTK_GRAPHICS_TYPE = NGTK_BACKEND_BASE_TYPE,
+	NGTK_TEXT_ENTRY_TYPE,
+	NGTK_SUB_BACKEND_BASE_TYPE
+};
 
 #endif
