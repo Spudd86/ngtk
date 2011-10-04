@@ -25,10 +25,10 @@
 
 #include "ngtk-nc-widget-types.h"
 
-#include "ngtk-nc-base.h"
+#include "ngtk-nc-backend.h"
 #include "ngtk-nc-component.h"
 #include "ngtk-nc-container.h"
-#include "ngtk-nc-event-generator.h"
+#include "ngtk-nc-graphics.h"
 
 #include "ngtk-nc-window.h"
 

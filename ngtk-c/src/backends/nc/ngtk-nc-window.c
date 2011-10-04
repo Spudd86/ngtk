@@ -39,6 +39,8 @@ static void pack_main_window (NGtkContainer *self)
 	 * WINDOW and will crate a new one. We will do this for all the
 	 * children since we have no (easy) way to know which one was
 	 * resized by the packing and which one wasn't.
+	 *
+	 * TODO: for future versions, consider using pads instead of windows
 	 */
 	ngtk_list_foreach (iter, ngtk_container_get_children (self))
 	{

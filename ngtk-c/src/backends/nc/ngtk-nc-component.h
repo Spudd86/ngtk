@@ -25,7 +25,15 @@
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
-NGtkInterface* ngtk_nc_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible);
+typedef struct _NGtkNcComponentD {
+	NGtkRectangle  area;
+	WINDOW        *wnd;
+} NGtkNcComponentD;
+
+#define NGTK_NC_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
+#define NGTK_NC_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
+
+NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, int enabled, NGtkContainer *parent, const char* text, int visible);
 
 #define  ngtk_nc_component_get_parent   ngtk_basic_component_get_parent
 
@@ -39,5 +47,15 @@ void     ngtk_nc_component_set_visible  (NGtkComponent *self, int visible);
 void     ngtk_nc_component_set_text     (NGtkComponent *self, const char *text);
 
 void     ngtk_nc_component_redraw       (NGtkComponent *self);
+
+/* Non interface functions */
+WINDOW*  ngtk_nc_component_get_window   (NGtkComponent *self);
+int      ngtk_nc_component_is_mapped    (NGtkComponent *self);
+
+const NGtkRectangle*  ngtk_nc_component_get_abs_rect      (NGtkComponent *self);
+
+void                  ngtk_nc_component_map_to            (NGtkComponent *self, const NGtkRectangle *area);
+void                  ngtk_nc_component_unmap_window      (NGtkComponent *self);
+
 
 #endif

@@ -19,22 +19,10 @@
  */
 
 #include <ncurses.h>
-#include "ngtk-nc-defs.h"
-#include "ngtk-nc-base.h"
+#include "ngtk-nc.h"
 
-#include "ngtk-nc-window.h"
-
-static int                 ngtk_nc_should_quit  = FALSE;
-static NGtkComponentList*  ngtk_nc_components   = NULL;
-static NGtkContainer*      ngtk_nc_root_window  = NULL;
-static int                 ngtk_nc_initialized  = FALSE;
-static NGtkEventGenerator* ngtk_nc_focus_holder = NULL;
-
-void ngtk_nc_init ()
+void ngtk_nc_backend_init (NGtkNcBackend *self)
 {
-	/* Prevent double initialization */
-	ngtk_assert (! ngtk_nc_initialized);
-
 	/* Start CURSES mode */
 	initscr ();
 
@@ -57,12 +45,8 @@ void ngtk_nc_init ()
 	 * will filter out those which are not yet supported */
 	mousemask (ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
 
-	/* A list of all the components that were created during runtime.
-	 * This will allow us to do easy garbage collection later */
-	ngtk_nc_components = ngtk_list_new ();
-
-	/* Finally, marked as initialized */
-	ngtk_nc_initialized = TRUE;
+	/* Mark the finish of the initialization */
+	ngtk_basic_backend_call_after_init (self);
 }
 
 static void component_moused (NGtkComponent* comp, mmask_t bstate)
@@ -104,7 +88,7 @@ NGTK_LONG_MACRO_END
 		/* It's a non supported button, don't report this */
 		return;
 
-	ngtk_event_generator_fire_mouse_event (comp, &evnt);
+	ngtk_interface_send_signal (ngtk_object_cast (comp, NGTK_COMPONENT_TYPE), "event::mouse", &evnt, TRUE);
 }
 
 static void component_keyed (NGtkComponent* comp, int ch)
@@ -112,12 +96,9 @@ static void component_keyed (NGtkComponent* comp, int ch)
 //	NGtkKeyboardEvent event;
 }
 
-void ngtk_nc_start_main_loop ()
+void ngtk_nc_backend_start_main_loop (NGtkNcBackend *self)
 {
-	/* Assert initialization */
-	ngtk_assert (ngtk_nc_initialized);
-
-	while (! ngtk_nc_should_quit)
+	while (! ngtk_basic_backend_should_quit (self))
 	{
 		int ch = getch ();
 
@@ -126,69 +107,45 @@ void ngtk_nc_start_main_loop ()
 			MEVENT         mouse_event;
 			const NGtkRectangle *comp_rect;
 			NGtkListNode  *iter;
+			NGtkContainer *inner_most_comp = ngtk_backend_get_root_window (self);
 
 			if (getmouse (&mouse_event) == OK)
-			ngtk_list_foreach (iter, ngtk_container_get_children (ngtk_nc_root_window))
 			{
-				NGtkComponent *comp = (NGtkComponent*) iter->data;
-				comp_rect = ngtk_nc_base_get_abs_rect (comp);
-				if (ngtk_rect_contains (comp_rect, mouse_event.x, mouse_event.y))
-					component_moused (comp, mouse_event.bstate);
+				do {
+					ngtk_list_foreach (iter, ngtk_container_get_children (inner_most_comp))
+					{
+						NGtkComponent *comp = (NGtkComponent*) iter->data;
+						comp_rect = ngtk_nc_component_get_abs_rect (comp);
+						if (ngtk_rect_contains (comp_rect, mouse_event.x, mouse_event.y))
+						{
+							inner_most_comp = comp;
+							break;
+						}
+					}
+				} while (ngtk_object_is_a (inner_most_comp, NGTK_CONTAINER_TYPE));
+
+				component_moused (inner_most_comp, mouse_event.bstate);
 			}
 		}
 		else if (ch == KEY_RESIZE)
 		{
-//			WINDOW *prev = ngtk_nc_base_get_window (ngtk_nc_root_window);
-
-//			wclear (prev);
-//			wrefresh (prev);
-
-			ngtk_container_pack (ngtk_nc_root_window);
+			ngtk_container_pack (ngtk_backend_get_root_window (self));
 		}
 		else
 		{
-			component_keyed (ngtk_nc_focus_holder, ch);
+			component_keyed (ngtk_backend_get_focus_holder (self), ch);
 		}
 	}
 }
 
-void ngtk_nc_quit_main_loop ()
+void ngtk_nc_backend_quit (NGtkNcBackend *self)
 {
-	/* Assert initialization */
-	ngtk_assert (ngtk_nc_initialized);
-
-	ngtk_nc_should_quit = TRUE;
-}
-
-void ngtk_nc_quit ()
-{
-	NGtkListNode *iter;
-
-	/* Assert initialization */
-	ngtk_assert (ngtk_nc_initialized);
-
-	/* Release the allocated components */
-	if (ngtk_nc_components)
-	{
-		/* If there are any components that were still not freed, free them
-		 * before we quit, to make sure we don't leak memory */
-		ngtk_list_foreach (iter, ngtk_nc_components)
-		{
-			NGtkComponent *comp = (NGtkComponent*) iter->data;
-			ngtk_object_free (comp);
-		}
-
-		/* Now free the component list */
-		ngtk_list_free (ngtk_nc_components);
-
-		ngtk_nc_components = NULL;
-	}
+	NGtkContainer *root_window = ngtk_basic_backend_get_root_window (self);
 
 	/* Free the root window */
-	if (ngtk_nc_root_window)
+	if (root_window)
 	{
-		ngtk_object_free (ngtk_nc_root_window);
-		ngtk_nc_root_window = NULL;
+		ngtk_object_free (root_window);
 	}
 
 	/* Leave curses mode */
@@ -223,12 +180,12 @@ NGtkComponent* ngtk_nc_create_text_entry (const char* text)
 	return NULL;
 }
 
-void ngtk_nc_set_focus_holder (NGtkEventGenerator* eg)
+void ngtk_nc_set_focus_holder (NGtkComponent* eg)
 {
 	ngtk_nc_focus_holder = eg;
 }
 
-NGtkEventGenerator* ngtk_nc_get_focus_holder ()
+NGtkComponent* ngtk_nc_get_focus_holder ()
 {
 	return ngtk_nc_focus_holder;
 }

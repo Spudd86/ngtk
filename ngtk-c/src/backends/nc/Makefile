@@ -1,9 +1,9 @@
 OBJS = \
-	ngtk-nc-base.o \
+	ngtk-nc-backend.o \
 	ngtk-nc-component.o \
 	ngtk-nc-container.o \
 	ngtk-nc-defs.o \
-	ngtk-nc-event-generator.o \
+	ngtk-nc-graphics.o \
 	ngtk-nc-window.o
 
 all: libngtk-backend-nc.a

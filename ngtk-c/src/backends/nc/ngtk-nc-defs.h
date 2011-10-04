@@ -34,7 +34,7 @@ NGtkComponent*  ngtk_nc_create_label        (const char* text);
 NGtkComponent*  ngtk_nc_create_text_entry   (const char* text);
 
 /* Utility functions of this backend */
-void                ngtk_nc_set_focus_holder (NGtkEventGenerator* eg);
-NGtkEventGenerator* ngtk_nc_get_focus_holder ();
+void           ngtk_nc_set_focus_holder (NGtkComponent* eg);
+NGtkComponent* ngtk_nc_get_focus_holder ();
 
 #endif

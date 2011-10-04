@@ -18,14 +18,11 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-nc-base.h"
-#include "ngtk-nc-container.h"
-#include "../basic/ngtk-basic.h"
-#include "ngtk-nc-widget-types.h"
+#include "ngtk-nc.h"
 
-NGtkInterface* ngtk_nc_container_create_interface ()
+NGtkInterface* ngtk_nc_container_create_interface (NGtkObject *obj)
 {
-	NGtkInterface *in = ngtk_basic_container_create_interface ();
+	NGtkInterface *in = ngtk_basic_container_create_interface (obj);
 
 	NGTK_CONTAINER_I2F (in) -> add_child    = ngtk_nc_container_add_child;
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_nc_container_get_children;
@@ -42,13 +39,14 @@ void ngtk_nc_container_add_child (NGtkContainer *self, NGtkComponent* child)
 
 void ngtk_nc_container_remove_child (NGtkContainer *self, NGtkComponent* child)
 {
-	ngtk_nc_base_unmap_window (child);
+	ngtk_nc_component_set_visible (child, FALSE);
+	ngtk_nc_component_unmap_window (child);
 	ngtk_basic_container_remove_child (self, child);
 }
 
 void ngtk_nc_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)
 {
 	/* TODO: since we allow only one window in the NCurses backend */
-	ngtk_nc_base_map_to (child, rect);
+	ngtk_nc_component_map_to (child, rect);
 	ngtk_basic_container_place_child (self, child, rect);
 }
