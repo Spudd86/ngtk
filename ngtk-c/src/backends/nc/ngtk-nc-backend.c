@@ -32,6 +32,8 @@ NGtkBackendI* ngtk_nc_backend_create_interface (NGtkObject *obj)
 	nbd -> has_waiting = FALSE;
 	in->imp_data_free[1] = ngtk_free;
 
+
+	NGTK_BACKEND_I2F (in) -> init            = ngtk_nc_backend_init;
 	NGTK_BACKEND_I2F (in) -> start_main_loop = ngtk_nc_backend_start_main_loop;
 	NGTK_BACKEND_I2F (in) -> quit_main_loop  = ngtk_nc_backend_quit_main_loop;
 	NGTK_BACKEND_I2F (in) -> quit            = ngtk_nc_backend_quit;
@@ -40,8 +42,6 @@ NGtkBackendI* ngtk_nc_backend_create_interface (NGtkObject *obj)
 	NGTK_BACKEND_I2F (in) -> create_button      = ngtk_nc_backend_create_button;
 	NGTK_BACKEND_I2F (in) -> create_label       = ngtk_nc_backend_create_label;
 	NGTK_BACKEND_I2F (in) -> create_text_entry  = ngtk_nc_backend_create_text_entry;
-
-	ngtk_nc_backend_init (obj);
 
 	ngtk_object_push_destructor (obj, ngtk_nc_backend_destructor);
 
@@ -54,9 +54,9 @@ static void ngtk_nc_backend_destructor (NGtkNcBackend *obj)
 	 * so here we shuold only do misc stuff if any */
 }
 
-NGtkContainer* ngtk_xlib_backend_create_root_window (NGtkBasicBackend *self, const char *title)
+NGtkContainer* ngtk_nc_backend_create_root_window (NGtkBasicBackend *self, const char *title)
 {
-	NGtkContainer *wnd = NULL;//ngtk_xlib_create_window_imp (self, title, FALSE);
+	NGtkContainer *wnd = ngtk_nc_create_window_imp (self, title, FALSE);
 	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
 
 	ngtk_basic_backend_root_window_register (wnd);
@@ -66,9 +66,9 @@ NGtkContainer* ngtk_xlib_backend_create_root_window (NGtkBasicBackend *self, con
 	return wnd;
 }
 
-NGtkComponent* ngtk_xlib_backend_create_button (NGtkBasicBackend *self, NGtkContainer* parent, const char *text)
+NGtkComponent* ngtk_nc_backend_create_button (NGtkBasicBackend *self, NGtkContainer* parent, const char *text)
 {
-	NGtkComponent *but = NULL;//ngtk_xlib_create_button_imp (self, text, FALSE, parent);
+	NGtkComponent *but = ngtk_nc_create_button_imp (self, text, FALSE, parent);
 	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
 
 	ngtk_interface_send_signal (in, "backend::create-but",  but, TRUE);
@@ -76,9 +76,9 @@ NGtkComponent* ngtk_xlib_backend_create_button (NGtkBasicBackend *self, NGtkCont
 	return but;
 }
 
-NGtkComponent* ngtk_xlib_backend_create_label (NGtkBasicBackend *self, NGtkContainer* parent, const char *text)
+NGtkComponent* ngtk_nc_backend_create_label (NGtkBasicBackend *self, NGtkContainer* parent, const char *text)
 {
-	NGtkComponent *lab = NULL;//ngtk_xlib_create_label_imp (self, text, FALSE, parent);;
+	NGtkComponent *lab = ngtk_nc_create_label_imp (self, text, FALSE, parent);;
 	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
 
 	ngtk_interface_send_signal (in, "backend::create-lab",  lab, TRUE);
@@ -86,9 +86,9 @@ NGtkComponent* ngtk_xlib_backend_create_label (NGtkBasicBackend *self, NGtkConta
 	return lab;
 }
 
-NGtkComponent* ngtk_xlib_backend_create_text_entry (NGtkBasicBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len)
+NGtkComponent* ngtk_nc_backend_create_text_entry (NGtkBasicBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len)
 {
-	NGtkObject* te = NULL;//ngtk_xlib_create_text_entry_imp (self, parent, initial_text, FALSE, max_text_len);
+	NGtkObject* te = ngtk_nc_create_text_entry_imp (self, parent, initial_text, FALSE, max_text_len);
 	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
 
 	ngtk_interface_send_signal (in, "backend::create-te",  te, TRUE);
@@ -173,4 +173,11 @@ void ngtk_nc_backend_call_on_widget_hide (NGtkNcBackend *self, NGtkComponent *co
 	 * accumulation ends, our requests will be passed */
 	else
 		NGTK_NC_BACKEND_O2D (self) -> has_waiting = TRUE;
+}
+
+NGtkNcBackend* ngtk_nc_backend_new ()
+{
+	NGtkObject *obj = ngtk_object_new ();
+	ngtk_nc_backend_create_interface (obj);
+	return obj;
 }

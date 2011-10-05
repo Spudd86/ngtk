@@ -69,7 +69,13 @@ int main (int argc, char **argv)
 {
 	char text[MAX_STR+1] = { '\0' };
 
+#ifdef NGTK_USE_NC
+	NGtkBackend *X = ngtk_nc_backend_new ();
+#elif defined (NGTK_USE_XLIB)
 	NGtkBackend *X = ngtk_xlib_backend_new ();
+#else
+#error "No backend selected!"
+#endif
 
 	NGtkContainer *wnd;
 	NGtkComponent *lab;

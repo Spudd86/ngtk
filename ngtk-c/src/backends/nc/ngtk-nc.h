@@ -32,6 +32,8 @@
 
 #include "ngtk-nc-window.h"
 
+#define ngtk_nc_component_has_focus(comp) (ngtk_backend_get_focus_holder (ngtk_base_get_backend (comp)) == (comp))
+
 #define ngtk_init                ngtk_nc_init
 #define ngtk_start_main_loop     ngtk_nc_start_main_loop
 #define ngtk_quit_main_loop      ngtk_nc_quit_main_loop

@@ -23,6 +23,7 @@
 
 #include "ngtk-macros.h"
 
+/** A Rectangle defined by a corener point (x,y) and dimensions wxh */
 typedef struct _ngtk_rectangle {
 	int x, y;
 	int w, h;
@@ -36,6 +37,12 @@ typedef struct _ngtk_point {
 	(  NGTK_IN_RANGE (x0, (prect)->x, (prect)->x + (prect)->w - 1) \
 	&& NGTK_IN_RANGE (y0, (prect)->y, (prect)->y + (prect)->h - 1) )
 
+/** A type for functions that free memory */
 typedef void (*NGtkFreeFunc) (void *data);
+/**
+ * /typedef
+ * A type for functions that free memory and receive an additional
+ * pointer that may be needed for freeing the data.
+ * */
 typedef void (*NGtkDFreeFunc) (void *data, void *extra_data);
 #endif

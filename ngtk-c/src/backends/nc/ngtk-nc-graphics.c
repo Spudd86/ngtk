@@ -18,7 +18,7 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-xlib.h"
+#include "ngtk-nc.h"
 
 static void ngtk_nc_graphics_destroy (NGtkGraphics *self);
 
@@ -36,7 +36,7 @@ NGtkNcGraphics* ngtk_nc_graphics_create (NGtkComponent *comp)
 	inG = ngtk_interface_new (obj, NGTK_GRAPHICS_TYPE);
 
 	inG->imp_data[0] = ngd = ngtk_new (NGtkNcGraphicsD);
-	ngd->window = ngtk_nc_component_get_window (comp);
+	ngd->wnd = ngtk_nc_component_get_window (comp);
 	inG->imp_data_free[0] = ngtk_free;
 
 	inG->functions = ngtk_new (NGtkGraphicsF);
@@ -51,6 +51,8 @@ NGtkNcGraphics* ngtk_nc_graphics_create (NGtkComponent *comp)
 
 	ngtk_object_push_destructor (obj, ngtk_nc_graphics_destroy);
 
+	ngtk_assert (ngtk_object_is_a (obj, NGTK_GRAPHICS_TYPE));
+
 	return obj;
 }
 
@@ -59,45 +61,45 @@ static void ngtk_nc_graphics_destroy (NGtkGraphics *self)
 	ngtk_interface_detach_and_free (ngtk_object_cast (self, NGTK_GRAPHICS_TYPE));
 }
 
-void ngtk_xlib_graphics_clear (NGtkGraphics *self)
+void ngtk_nc_graphics_clear (NGtkGraphics *self)
 {
-	NGtkNcGraphicsD *dd = NGTK_NC`_GRAPHICS_O2D (self);
+	NGtkNcGraphicsD *dd = NGTK_NC_GRAPHICS_O2D (self);
 	wclear (dd->wnd);
 }
 
-int  ngtk_xlib_graphics_calc_text_width  (NGtkGraphics *self, const char *text, int start, int length)
+int  ngtk_nc_graphics_calc_text_width  (NGtkGraphics *self, const char *text, int start, int length)
 {
 	return length;
 }
 
-int ngtk_xlib_graphics_calc_text_height (NGtkGraphics *self)
+int ngtk_nc_graphics_calc_text_height (NGtkGraphics *self)
 {
 	return 1;
 }
 
-void ngtk_xlib_graphics_draw_text (NGtkGraphics *self, const char *text, int start, int length, int x, int y)
+void ngtk_nc_graphics_draw_text (NGtkGraphics *self, const char *text, int start, int length, int x, int y)
 {
 	NGtkNcGraphicsD *dd = NGTK_NC_GRAPHICS_O2D (self);
 	mvwaddstr (dd->wnd, y, x, text);
 }
 
-int ngtk_xlib_graphics_calc_text_cursor_end_width (NGtkGraphics *self)
+int ngtk_nc_graphics_calc_text_cursor_end_width (NGtkGraphics *self)
 {
 	return 1;
 }
 
-void ngtk_xlib_graphics_draw_text_cursor (NGtkGraphics *self, int x, int y)
+void ngtk_nc_graphics_draw_text_cursor (NGtkGraphics *self, int x, int y)
 {
 	NGtkNcGraphicsD *dd = NGTK_NC_GRAPHICS_O2D (self);
 	mvwchgat (dd->wnd, y, x, 1, A_REVERSE, 0, NULL);
 }
 
-void ngtk_xlib_graphics_draw_frame (NGtkGraphics *self, const NGtkRectangle *rect, int is_focus_frame)
+void ngtk_nc_graphics_draw_frame (NGtkGraphics *self, const NGtkRectangle *rect, int is_focus_frame)
 {
 	NGtkNcGraphicsD *dd = NGTK_NC_GRAPHICS_O2D (self);
 
 	if (is_focus_frame)
-		wattron (dd->wmd, A_BOLD);
-	box (wnd);
-	wattroff (dd->wmd, A_BOLD);
+		wattron (dd->wnd, A_BOLD);
+	box (dd->wnd, 0, 0);
+	wattroff (dd->wnd, A_BOLD);
 }

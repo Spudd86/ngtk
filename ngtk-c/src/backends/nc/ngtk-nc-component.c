@@ -24,7 +24,7 @@ static const NGtkRectangle default_position = { 0, 0, 4, 4 };
 
 static void ngtk_nc_component_destructor (NGtkComponent *comp);
 
-NGtkInterface* ngtk_basic_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
+NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
 {
 	NGtkInterface *in = ngtk_basic_component_create_interface (obj, parent, enabled, focusable, text, visible);
 	NGtkNcComponentD *ncd;
@@ -35,6 +35,7 @@ NGtkInterface* ngtk_basic_component_create_interface (NGtkObject *obj, NGtkConta
 	ncd->area.w = default_position.w;
 	ncd->area.h = default_position.h;
 	ncd->wnd = NULL;
+	ncd->wnd_resized = FALSE;
 	in->imp_data_free[1] = ngtk_free;
 
 	NGTK_COMPONENT_I2F (in) -> redraw      = ngtk_nc_component_redraw;
@@ -136,7 +137,7 @@ int ngtk_nc_component_is_mapped (NGtkComponent *self)
 	return ngtk_nc_component_get_window (self) != NULL;
 }
 
-void ngtk_nc_base_unmap_window (NGtkComponent *self)
+void ngtk_nc_component_unmap_window (NGtkComponent *self)
 {
 	WINDOW** wnd = &(NGTK_NC_COMPONENT_O2D (self) -> wnd);
 	if (*wnd != NULL)
@@ -151,13 +152,20 @@ void ngtk_nc_component_map_to (NGtkComponent *self, const NGtkRectangle *area)
 	NGtkRectangle *rect = &(NGTK_NC_COMPONENT_O2D (self) -> area);
 	WINDOW       **wnd  = &(NGTK_NC_COMPONENT_O2D (self) -> wnd);
 
+	/**
+	 * @warning Always resize the WINDOW field, even if the new size
+	 * is the current size! This is necessary due to a bug in NCURSES,
+	 * which is detailed in ngtk-nc-window.c inside the pack method, and
+	 * also here below.
+	 */
+
 	rect->x = area->x;
 	rect->y = area->y;
 	rect->w = area->w;
 	rect->h = area->h;
 
 	/* Remove and free the existing window (See below why) */
-	ngtk_nc_base_unmap_window (self);
+	ngtk_nc_component_unmap_window (self);
 
 	/* When we create a child window, one may expect that we'll use the
 	 * subwin/derwin functions. We are not going to do that...
@@ -166,11 +174,24 @@ void ngtk_nc_component_map_to (NGtkComponent *self, const NGtkRectangle *area)
 	 * the window before deleting all the children. Since we do delete
 	 * windows and in the pack method (see the comment in
 	 * ngtk-nc-window.c), it would be unwise to enter this trouble. */
-	if (area->h > 0 && area->w > 0);
+	if (area->h > 0 && area->w > 0)
+	{
 		*wnd = newwin (area->h, area->w, area->y, area->x);
+		NGTK_NC_COMPONENT_O2D (self)-> wnd_resized = TRUE;
+	}
 }
 
-const NGtkRectangle*  ngtk_nc_component_get_abs_rect (NGtkComponent *self)
+const NGtkRectangle* ngtk_nc_component_get_abs_rect (NGtkComponent *self)
 {
 	return &(NGTK_NC_COMPONENT_O2D (self) -> area);
+}
+
+void ngtk_nc_component_reset_resize_bit (NGtkComponent *self)
+{
+	NGTK_NC_COMPONENT_O2D (self)-> wnd_resized = FALSE;
+}
+
+int ngtk_nc_component_was_resized (NGtkComponent *self)
+{
+	return NGTK_NC_COMPONENT_O2D (self)-> wnd_resized;
 }

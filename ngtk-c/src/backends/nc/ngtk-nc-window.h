@@ -20,5 +20,7 @@
 
 #include "ngtk-nc-container.h"
 
-NGtkObject* ngtk_nc_create_label_imp (const char* title, int visible);
-NGtkObject* ngtk_nc_create_window_imp (const char* title, int visible);
+NGtkObject* ngtk_nc_create_button_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent);
+NGtkObject* ngtk_nc_create_label_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent);
+NGtkObject* ngtk_nc_create_window_imp (NGtkBackend *self, const char* title, int visible);
+NGtkObject* ngtk_nc_create_text_entry_imp (NGtkBackend *self, NGtkContainer *parent, const char* initial_text, int visible, int max_text_len);

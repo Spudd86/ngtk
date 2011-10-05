@@ -23,13 +23,21 @@
 
 #include "../utils/ngtk-utils.h"
 
+/**
+  * @defgroup ObjectSystem The object system
+  * @{
+  */
 typedef struct _ngtk_object   NGtkObject;
 typedef struct _ngtk_inteface NGtkInterface;
 
 typedef unsigned long long NGtkObjectTypeMask;
 typedef unsigned short     NGtkType;
 
-#define NGTK_MAX_INTERFACES           (sizeof(NGtkObjectTypeMask) * 8)
+/** /def The maximal amount of unique interface types that may be
+ *       defined using the object system */
+#define NGTK_MAX_INTERFACES           (sizeof(NGtkObjectTypeMask) * 8 - 1)
+/** /def The maximal amount of implementation levels that may be used to
+ *       implement a single interface */
 #define NGTK_MAX_INTERFACE_IMP_LEVELS 5
 
 #define NGTK_TYPE_NONE 0
@@ -119,4 +127,5 @@ void ngtk_interface_detach_and_free (NGtkInterface *in);
 #define NGTK_I2F_CAST(i,bit,type) ((type*)(ngtk_interface_cast(i,bit)->functions))
 #define NGTK_I2D_CAST(i,bit,type,pos) ((type*)(ngtk_interface_cast(i,bit)->imp_data[(pos)]))
 
+/** @} */
 #endif

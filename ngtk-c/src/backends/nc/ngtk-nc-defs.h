@@ -28,9 +28,9 @@ void            ngtk_nc_start_main_loop     ();
 void            ngtk_nc_quit_main_loop      ();
 void            ngtk_nc_quit                ();
 
-NGtkContainer*  ngtk_nc_create_root_window  (const char* title);
-NGtkComponent*  ngtk_nc_create_button       (const char* text);
-NGtkComponent*  ngtk_nc_create_label        (const char* text);
+NGtkContainer*  ngtk_nc_backend_create_root_window  (const char* title);
+NGtkComponent*  ngtk_nc_backend_create_button       (const char* text);
+NGtkComponent*  ngtk_nc_backend_create_label        (const char* text);
 NGtkComponent*  ngtk_nc_create_text_entry   (const char* text);
 
 /* Utility functions of this backend */

@@ -28,12 +28,13 @@
 typedef struct _NGtkNcComponentD {
 	NGtkRectangle  area;
 	WINDOW        *wnd;
+	int            wnd_resized;
 } NGtkNcComponentD;
 
 #define NGTK_NC_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
 #define NGTK_NC_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
 
-NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, int enabled, NGtkContainer *parent, const char* text, int visible);
+NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible);
 
 #define  ngtk_nc_component_get_parent   ngtk_basic_component_get_parent
 
@@ -54,8 +55,10 @@ int      ngtk_nc_component_is_mapped    (NGtkComponent *self);
 
 const NGtkRectangle*  ngtk_nc_component_get_abs_rect      (NGtkComponent *self);
 
-void                  ngtk_nc_component_map_to            (NGtkComponent *self, const NGtkRectangle *area);
-void                  ngtk_nc_component_unmap_window      (NGtkComponent *self);
+void     ngtk_nc_component_map_to       (NGtkComponent *self, const NGtkRectangle *area);
+void     ngtk_nc_component_unmap_window (NGtkComponent *self);
 
+void     ngtk_nc_component_reset_resize_bit (NGtkComponent *self);
+int      ngtk_nc_component_was_resized      (NGtkComponent *self);
 
 #endif

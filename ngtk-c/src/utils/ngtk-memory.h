@@ -23,7 +23,18 @@
 
 #include <stdlib.h>
 
+/**
+ * A malloc function which outputs to the terminal the type and adress
+ * of the allocated memory. Can be useful for debugging pointer types.
+ * This should not be used directly - it should be used by the
+ * \ref ngtk_new macro when type debugging is enabled.
+ */
 void* ngtk_debug_malloc (int size, const char *type);
+/**
+ * A free function which outputs to the terminal the adress of the freed
+ * memory. Together with \ref ngtk_debug_malloc it can be useful for
+ * debugging memory allocations
+ */
 void ngtk_debug_free (void *where);
 
 #ifdef NGTK_TYPE_DEBUG
