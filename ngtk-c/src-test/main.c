@@ -47,7 +47,7 @@ void SimulateLabel (NGtkComponent *comp, const char* signame, void *sigdata, voi
 	NGtkKeyboardEvent *kevent = (NGtkKeyboardEvent*) sigdata;
 	NGtkKeyboardEventKey key = kevent->key;
 
-	printf ("SimulateLabel\n");
+//	printf ("SimulateLabel\n");
 	if (curlen > 0 && key == NGTK_KKEY_BACKSPACE)
 		textbuf[curlen - 1] = '\0';
 	else if (curlen < MAX_STR)
@@ -86,8 +86,8 @@ int main (int argc, char **argv)
 	wnd = ngtk_backend_create_root_window (X, "oh yeah!");
 	ngtk_object_connect_to (wnd, "event::mouse", QuitOnPress, NULL);
 
-	lab = ngtk_backend_create_button (X, wnd, "oh no!");
-	ngtk_object_connect_to (lab, "event::keyboard", SimulateLabel, text);
+	lab = ngtk_backend_create_text_entry (X, wnd, "oh no!", 4096);
+	ngtk_object_connect_to (lab, "event::mouse", HideOnClick, text);
 
 	ngtk_component_set_visible (lab, TRUE);
 	ngtk_component_set_visible (wnd, TRUE);

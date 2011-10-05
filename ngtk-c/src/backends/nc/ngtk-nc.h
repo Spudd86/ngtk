@@ -21,8 +21,6 @@
 #ifndef __NGtk_nc_h__
 #define __NGtk_nc_h__
 
-#include "ngtk-nc-defs.h"
-
 #include "ngtk-nc-widget-types.h"
 
 #include "ngtk-nc-backend.h"

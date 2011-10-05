@@ -63,9 +63,9 @@ NGtkComponent* ngtk_nc_backend_create_text_entry  (NGtkNcBackend *self, NGtkCont
 #define        ngtk_nc_backend_get_root_window    ngtk_basic_backend_get_root_window
 #define        ngtk_nc_backend_get_all_components ngtk_basic_backend_get_all_components
 
-#define        ngtk_nc_backend_print              ngtk_basic_backend_print
-#define        ngtk_nc_backend_debug              ngtk_basic_backend_debug
-#define        ngtk_nc_backend_error              ngtk_basic_backend_error
+void           ngtk_nc_backend_print              (NGtkBasicBackend *self, const char *format, va_list args);
+void           ngtk_nc_backend_debug              (NGtkBasicBackend *self, const char *format, va_list args);
+void           ngtk_nc_backend_error              (NGtkBasicBackend *self, const char *format, va_list args);
 
 #define        ngtk_nc_backend_should_quit        ngtk_basic_backend_should_quit
 

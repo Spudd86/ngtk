@@ -24,7 +24,7 @@ static const NGtkRectangle default_position = { 0, 0, 4, 4 };
 
 static void ngtk_nc_component_destructor (NGtkComponent *comp);
 
-NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
+NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible, NGtkNcDrawingFunc real_draw)
 {
 	NGtkInterface *in = ngtk_basic_component_create_interface (obj, parent, enabled, focusable, text, visible);
 	NGtkNcComponentD *ncd;
@@ -36,6 +36,7 @@ NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContaine
 	ncd->area.h = default_position.h;
 	ncd->wnd = NULL;
 	ncd->wnd_resized = FALSE;
+	ncd->real_draw = real_draw;
 	in->imp_data_free[1] = ngtk_free;
 
 	NGTK_COMPONENT_I2F (in) -> redraw      = ngtk_nc_component_redraw;
@@ -59,8 +60,6 @@ static void ngtk_nc_component_destructor (NGtkComponent *comp)
 		/* Now free the window */
 		ngtk_nc_component_unmap_window (comp);
 	}
-
-	ngtk_interface_detach_and_free (ngtk_object_cast (comp, NGTK_COMPONENT_TYPE));
 }
 
 void ngtk_nc_component_set_enabled (NGtkComponent *self, int enabled)
@@ -73,7 +72,6 @@ void ngtk_nc_component_set_visible (NGtkComponent *self, int visible)
 {
 	int old_val = ngtk_component_get_visible (self);
 	ngtk_basic_component_set_visible (self, visible);
-	ngtk_nc_component_redraw (self);
 
 	/* Clear the widget if it wasn't visible */
 	if (old_val && ! visible)
@@ -94,32 +92,10 @@ void ngtk_nc_component_set_text (NGtkComponent *self, const char *text)
 
 void ngtk_nc_component_redraw (NGtkComponent *self)
 {
-	const NGtkBasicComponentD *dReal = NGTK_BASIC_COMPONENT_O2D (self);
-	WINDOW *wnd = ngtk_nc_component_get_window (self);
-	const NGtkRectangle *area = ngtk_nc_component_get_abs_rect (self);
-
-	int max_x, max_y, min_x, min_y;
-
-	if (! ngtk_nc_component_is_mapped (self) || ! dReal->visible)
+	if (! ngtk_nc_component_is_mapped (self) || ! ngtk_component_get_visible (self))
 		return;
 
-	wclear (wnd);
-	box (wnd, 0, 0);
-
-	if (! dReal->enabled)
-		wattron (wnd, A_DIM);
-
-	/* Don't use the printw version, since then you need "%s" to avoid
-	 * format string attacks, which is just an annoyance */
-	mvwaddstr (wnd, 1, 1, dReal->text);
-
-	getbegyx (wnd, min_y, min_x);
-	getmaxyx (wnd, max_y, max_x);
-
-	mvwprintw (wnd, area->h-1, 1, "W: (%d,%d) %dx%d, A: (%d,%d) %dx%d", min_x, min_y, max_x - min_x, max_y - min_y, area->x, area->y, area->w, area->h);
-
-	if (! dReal->enabled)
-		wattroff (wnd, A_DIM);
+	NGTK_NC_COMPONENT_O2D (self) -> real_draw (self);
 
 	ngtk_nc_backend_drawing_commit (ngtk_base_get_backend (self), self);
 

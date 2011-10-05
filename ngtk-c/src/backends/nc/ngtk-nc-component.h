@@ -25,16 +25,19 @@
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
+typedef void (*NGtkNcDrawingFunc) (NGtkComponent *self);
+
 typedef struct _NGtkNcComponentD {
-	NGtkRectangle  area;
-	WINDOW        *wnd;
-	int            wnd_resized;
+	NGtkRectangle     area;
+	WINDOW           *wnd;
+	int               wnd_resized;
+	NGtkNcDrawingFunc real_draw;
 } NGtkNcComponentD;
 
 #define NGTK_NC_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
 #define NGTK_NC_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkNcComponentD,1)
 
-NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible);
+NGtkInterface* ngtk_nc_component_create_interface (NGtkObject *obj, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible, NGtkNcDrawingFunc real_draw);
 
 #define  ngtk_nc_component_get_parent   ngtk_basic_component_get_parent
 

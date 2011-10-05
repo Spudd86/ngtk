@@ -93,13 +93,47 @@ NGTK_LONG_MACRO_END
 
 static void component_keyed (NGtkComponent* comp, int ch)
 {
-//	NGtkKeyboardEvent event;
+	NGtkKeyboardEvent event;
+
+	switch (ch)
+	{
+	case KEY_ENTER:
+		event.key = NGTK_KKEY_ENTER;
+		break;
+	case KEY_BACKSPACE:
+		event.key = NGTK_KKEY_BACKSPACE;
+		break;
+	case KEY_UP:
+		event.key = NGTK_KKEY_ARROW_UP;
+		break;
+	case KEY_DOWN:
+		event.key = NGTK_KKEY_ARROW_DOWN;
+		break;
+	case KEY_LEFT:
+		event.key = NGTK_KKEY_ARROW_LEFT;
+		break;
+	case KEY_RIGHT:
+		event.key = NGTK_KKEY_ARROW_RIGHT;
+		break;
+	case ' ':
+		event.key = NGTK_KKEY_SPACE;
+		break;
+	default:
+		if (NGTK_KKEY_MIN_CHAR <= ch && ch <= NGTK_KKEY_MAX_CHAR)
+			event.key = ch;
+		else
+			event.key = NGTK_KKEY_OTHER;
+	}
+
+	ngtk_interface_send_signal (ngtk_object_cast (comp, NGTK_COMPONENT_TYPE), "event::keyboard", &event, TRUE);
 }
 
 void ngtk_nc_backend_start_main_loop (NGtkNcBackend *self)
 {
 	while (! ngtk_basic_backend_should_quit (self))
 	{
+//		ngtk_component_redraw (ngtk_backend_get_root_window (self));
+
 		int ch = getch ();
 
 		if (ch == KEY_MOUSE)
@@ -107,22 +141,26 @@ void ngtk_nc_backend_start_main_loop (NGtkNcBackend *self)
 			MEVENT         mouse_event;
 			const NGtkRectangle *comp_rect;
 			NGtkListNode  *iter;
-			NGtkContainer *inner_most_comp = ngtk_backend_get_root_window (self);
+			NGtkComponent *inner_most_comp = ngtk_backend_get_root_window (self);
+			NGtkComponent *old_inner_most_comp;
 
 			if (getmouse (&mouse_event) == OK)
 			{
 				do {
+					old_inner_most_comp = inner_most_comp;
 					ngtk_list_foreach (iter, ngtk_container_get_children (inner_most_comp))
 					{
 						NGtkComponent *comp = (NGtkComponent*) iter->data;
 						comp_rect = ngtk_nc_component_get_abs_rect (comp);
-						if (ngtk_rect_contains (comp_rect, mouse_event.x, mouse_event.y))
+						if (ngtk_component_get_visible (comp) &&
+							ngtk_rect_contains (comp_rect, mouse_event.x, mouse_event.y))
 						{
 							inner_most_comp = comp;
 							break;
 						}
 					}
-				} while (ngtk_object_is_a (inner_most_comp, NGTK_CONTAINER_TYPE));
+				} while (ngtk_object_is_a (inner_most_comp, NGTK_CONTAINER_TYPE)
+						&& inner_most_comp != old_inner_most_comp);
 
 				component_moused (inner_most_comp, mouse_event.bstate);
 			}

@@ -80,7 +80,20 @@ int ngtk_nc_graphics_calc_text_height (NGtkGraphics *self)
 void ngtk_nc_graphics_draw_text (NGtkGraphics *self, const char *text, int start, int length, int x, int y)
 {
 	NGtkNcGraphicsD *dd = NGTK_NC_GRAPHICS_O2D (self);
-	mvwaddstr (dd->wnd, y, x, text);
+	int i;
+	int width, height;
+	int begin_at, short_len;
+
+	getmaxyx (dd->wnd, height, width);
+
+	if (y >= height || y < 0)
+		return;
+
+	begin_at  = start - MIN (0, x);
+	short_len = MIN(width, length - begin_at) - 1;
+
+	for (i = begin_at; i <= begin_at + short_len; i++)
+		mvwaddch (dd->wnd, y, x + i, text[i]);
 }
 
 int ngtk_nc_graphics_calc_text_cursor_end_width (NGtkGraphics *self)

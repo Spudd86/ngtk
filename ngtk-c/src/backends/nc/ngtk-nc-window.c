@@ -18,6 +18,8 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+#include <ncurses.h>
 #include "ngtk-nc.h"
 
 static void pack_main_window (NGtkContainer *self)
@@ -105,19 +107,19 @@ static void draw_text_entry (NGtkComponent *te)
 	const char          *text = ngtk_component_get_text (te);
 
 	ngtk_graphics_clear (g);
-	ngtk_graphics_draw_frame (g, rect, ngtk_nc_component_has_focus (te));
 	ngtk_basic_graphics_draw_text_with_cursor (g, rect, TRUE, 0, 1, 0.5f, 1, text, ngtk_text_entry_get_cursor_position (te));
+	ngtk_graphics_draw_frame (g, rect, ngtk_nc_component_has_focus (te));
 
 	ngtk_object_free (g);
 	ngtk_basic_component_redraw (te);
 }
 
-static NGtkObject* create_basic_widget (NGtkBackend *self, int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area, int focusable)
+static NGtkObject* create_basic_widget (NGtkBackend *self, int enabled, NGtkContainer *parent, const char* text, int visible, const NGtkRectangle *area, int focusable, NGtkNcDrawingFunc real_draw)
 {
 	NGtkObject *obj = ngtk_object_new ();
 
 	ngtk_basic_base_create_interface (obj, self);
-	ngtk_nc_component_create_interface (obj, parent, enabled, focusable, text, visible);
+	ngtk_nc_component_create_interface (obj, parent, enabled, focusable, text, visible, real_draw);
 
 	/* Now, do the parts of the construction that depend on the
 	 * existance of a whole object and therefore couldn't be done while
@@ -133,11 +135,10 @@ static NGtkObject* create_basic_widget (NGtkBackend *self, int enabled, NGtkCont
 NGtkObject* ngtk_nc_create_window_imp (NGtkBackend *self, const char* title, int visible)
 {
 	NGtkRectangle area = { 0, 0, COLS, LINES };
-	NGtkObject *obj = create_basic_widget (self, TRUE, NULL, title, visible, &area, TRUE);
+	NGtkObject *obj = create_basic_widget (self, TRUE, NULL, title, visible, &area, TRUE, draw_window);
 
 	ngtk_nc_container_create_interface (obj);
 
-	NGTK_COMPONENT_O2F (obj) -> redraw = draw_window;
 	NGTK_CONTAINER_O2F (obj) -> pack = pack_main_window;
 
 	return obj;
@@ -145,31 +146,26 @@ NGtkObject* ngtk_nc_create_window_imp (NGtkBackend *self, const char* title, int
 
 NGtkObject* ngtk_nc_create_label_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
 {
-	NGtkRectangle area = { 0, 0, 100, 100 };
-	NGtkObject *obj = create_basic_widget (self, TRUE, parent, text, visible, &area, FALSE);
-
-	NGTK_COMPONENT_O2F (obj) -> redraw = draw_label;
+	NGtkRectangle area = { 0, 0, strlen (text), 1 };
+	NGtkObject *obj = create_basic_widget (self, TRUE, parent, text, visible, &area, FALSE, draw_label);
 
 	return obj;
 }
 
 NGtkObject* ngtk_nc_create_button_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
 {
-	NGtkRectangle area = { 0, 0, 100, 100 };
-	NGtkObject *obj = create_basic_widget (self, TRUE, parent, text, visible, &area, TRUE);
-
-	NGTK_COMPONENT_O2F (obj) -> redraw = draw_button;
+	NGtkRectangle area = { 0, 0, strlen (text) + 2, 3 };
+	NGtkObject *obj = create_basic_widget (self, TRUE, parent, text, visible, &area, TRUE, draw_button);
 
 	return obj;
 }
 
 NGtkObject* ngtk_nc_create_text_entry_imp (NGtkBackend *self, NGtkContainer *parent, const char* initial_text, int visible, int max_text_len)
 {
-	NGtkRectangle area = { 0, 0, 100, 100 };
-	NGtkObject *obj = create_basic_widget (self, TRUE, parent, initial_text, visible, &area, TRUE);
+	NGtkRectangle area = { 3, 3, 2 + MIN (2 * strlen (initial_text), max_text_len), 3 };
+	NGtkObject *obj = create_basic_widget (self, TRUE, parent, initial_text, visible, &area, TRUE, draw_text_entry);
 
 	ngtk_basic_text_entry_create_interface (obj, initial_text, max_text_len);
-	NGTK_COMPONENT_O2F (obj) -> redraw = draw_text_entry;
 
 	return obj;
 }

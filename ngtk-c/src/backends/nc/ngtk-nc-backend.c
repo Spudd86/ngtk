@@ -118,7 +118,7 @@ void ngtk_nc_backend_drawing_release (NGtkNcBackend *self)
 		&& NGTK_NC_BACKEND_O2D (self) -> has_waiting)
 	{
 		/* If so, commit the drawings */
-		doupdate ();
+		wrefresh (stdscr);
 		/* Now, mark that we don't have any pending drawing requests */
 		NGTK_NC_BACKEND_O2D (self) -> has_waiting = FALSE;
 	}
@@ -141,12 +141,12 @@ void ngtk_nc_backend_drawing_commit (NGtkNcBackend *self, NGtkComponent *comp)
 
 	/* Now, actually commit the "touched" window to the accumulation
 	 * buffer */
-	wnoutrefresh (to_out);
+	overwrite (to_out, stdscr);
 
 	/* If we are not currently in accumulation mode, we should send
 	 * graphical updates as soon as we get them. */
 	if (NGTK_NC_BACKEND_O2D (self) -> freeze_count == 0)
-		doupdate ();
+		wrefresh (stdscr);
 	/* Otherwise, we should mark that updates were made, so that when
 	 * accumulation ends, our requests will be passed */
 	else
@@ -163,12 +163,12 @@ void ngtk_nc_backend_call_on_widget_hide (NGtkNcBackend *self, NGtkComponent *co
 	wclear (to_clear);
 
 	/* Now, actually commit to the accumulation buffer */
-	wnoutrefresh (to_clear);
+	overwrite (to_clear, stdscr);
 
 	/* If we are not currently in accumulation mode, we should send
 	 * graphical updates as soon as we get them. */
 	if (NGTK_NC_BACKEND_O2D (self) -> freeze_count == 0)
-		doupdate ();
+		wrefresh (stdscr);
 	/* Otherwise, we should mark that updates were made, so that when
 	 * accumulation ends, our requests will be passed */
 	else
@@ -180,4 +180,14 @@ NGtkNcBackend* ngtk_nc_backend_new ()
 	NGtkObject *obj = ngtk_object_new ();
 	ngtk_nc_backend_create_interface (obj);
 	return obj;
+}
+
+void ngtk_nc_backend_print (NGtkBasicBackend *self, const char *format, va_list args)
+{
+}
+void ngtk_nc_backend_debug (NGtkBasicBackend *self, const char *format, va_list args)
+{
+}
+void ngtk_nc_backend_error (NGtkBasicBackend *self, const char *format, va_list args)
+{
 }
