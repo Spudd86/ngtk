@@ -12,7 +12,7 @@ libngtk-backend-xlib.a: $(OBJS)
 	$(NGTK_MKS) libngtk-backend-xlib.a $(OBJS)
 
 %.o: %.c %.h
-	$(CC) -c $<
+	$(NGTK_MKO) -c $< -o $@
 
 clean:
-	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete
+	-rm *.o *.a

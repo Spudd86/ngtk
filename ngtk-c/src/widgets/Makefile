@@ -11,7 +11,7 @@ libngtk-widgets.a: $(OBJS)
 	$(NGTK_MKS) libngtk-widgets.a $(OBJS)
 
 %.o: %.c %.h ngtk-widget-types.h
-	$(CC) -c $<
+	$(NGTK_MKO) -c $< -o $@
 
 clean:
-	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete
+	-rm *.o *.a

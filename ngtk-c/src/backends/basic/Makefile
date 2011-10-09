@@ -11,8 +11,8 @@ all: libngtk-backend-basic.a
 libngtk-backend-basic.a: $(OBJS)
 	$(NGTK_MKS) libngtk-backend-basic.a $(OBJS)
 
-%.o: %.c
-	$(CC) -c $<
+%.o: %.c %.h
+	$(NGTK_MKO) -c $< -o $@
 
 clean:
-	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete
+	-rm *.o *.a

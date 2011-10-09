@@ -4,7 +4,7 @@ libngtk-utils.a: ngtk-list.o ngtk-memory.o
 	$(NGTK_MKS) libngtk-utils.a  ngtk-list.o ngtk-memory.o
 
 %.o: %.c %.h
-	$(CC) -c $<
+	$(NGTK_MKO) -c $< -o $@
 
 clean:
-	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete
+	-rm *.o *.a

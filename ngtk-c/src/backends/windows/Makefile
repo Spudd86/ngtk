@@ -1,18 +1,18 @@
 OBJS = \
-	ngtk-widget-window.c \
-	ngtk-win-base.c \
-	ngtk-win-component.c \
-	ngtk-win-container.c \
-	ngtk-win-defs.c \
-	ngtk-win-event-generator.c
+	ngtk-widget-window.o \
+	ngtk-win-base.o \
+	ngtk-win-component.o \
+	ngtk-win-container.o \
+	ngtk-win-defs.o \
+	ngtk-win-event-generator.o
 
 all: libngtk-backend-windows.a
 
 libngtk-backend-windows.a: $(OBJS)
 	$(NGTK_MKS) libngtk-backend-windows.a $(OBJS)
 
-%.o: %.c
-	$(CC) -c $<
+%.o: %.c %.h
+	$(NGTK_MKO) -c $< -o $@
 
 clean:
-	find "(" -regex ".*\.o" -or -regex ".*\.a" ")" -delete
+	-rm *.o *.a
