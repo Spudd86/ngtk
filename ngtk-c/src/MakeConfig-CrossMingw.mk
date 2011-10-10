@@ -13,6 +13,8 @@ export RANLIBFLAGS =
 export LD          = i686-pc-mingw32-ld
 export LDFLAGS     = --whole-archive -shared -lmsvcrt -L/usr/i686-pc-mingw32/sys-root/mingw/lib
 
+export CCLDEFLAGS  = -lmsvcrt -L/usr/i686-pc-mingw32/sys-root/mingw/lib
+
 export NGTK_BUILD_XLIB    = FALSE
 export NGTK_BUILD_NCURSES = FALSE
 export NGTK_BUILD_WINAPI  = TRUE

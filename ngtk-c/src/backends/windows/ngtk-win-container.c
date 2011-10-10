@@ -18,14 +18,11 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-win-base.h"
-#include "ngtk-win-container.h"
-#include "../basic/ngtk-basic.h"
-#include "ngtk-win-widget-types.h"
+#include "ngtk-win.h"
 
-NGtkInterface* ngtk_win_container_create_interface ()
+NGtkInterface* ngtk_win_container_create_interface (NGtkObject *obj)
 {
-	NGtkInterface *in = ngtk_basic_container_create_interface ();
+	NGtkInterface *in = ngtk_basic_container_create_interface (obj);
 
 	NGTK_CONTAINER_I2F (in) -> add_child    = ngtk_win_container_add_child;
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_win_container_get_children;
@@ -37,20 +34,16 @@ NGtkInterface* ngtk_win_container_create_interface ()
 
 void ngtk_win_container_add_child (NGtkContainer *self, NGtkComponent* child)
 {
-	HWND p = NGTK_WINBASE_O2D(self)->hwnd;
-	HWND c = NGTK_WINBASE_O2D(child)->hwnd;
-	SetParent (c,p);
 	ngtk_basic_container_add_child (self, child);
 }
 
 void ngtk_win_container_remove_child (NGtkContainer *self, NGtkComponent* child)
 {
-	SetParent (NGTK_WINBASE_O2D(child)->hwnd, NULL);
 	ngtk_basic_container_remove_child (self, child);
 }
 
 void ngtk_win_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)
 {
-	SetWindowPos (NGTK_WINBASE_O2D(child)->hwnd, HWND_TOP, rect->x, rect->y, rect->w, rect->h, SWP_NOZORDER);
+	SetWindowPos (ngtk_win_component_get_hwnd (child), HWND_TOP, rect->x, rect->y, rect->w, rect->h, SWP_NOZORDER);
 	ngtk_basic_container_place_child (self, child, rect);
 }

@@ -13,6 +13,8 @@ export RANLIBFLAGS =
 export LD          = ld
 export LDFLAGS     = --whole-archive -shared
 
+export CCLDEFLAGS  =
+
 export NGTK_BUILD_XLIB    = TRUE
 export NGTK_BUILD_NCURSES = TRUE
 export NGTK_BUILD_WINAPI  = FALSE

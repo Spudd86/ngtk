@@ -1,5 +1,5 @@
 /*
- * ngtk-win-defs.h
+ * ngtk-xlib.h
  * (C) Barak Itkin <lightningismyname at gmail dot com>, 2011
  *
  * This file is part of NGtk.
@@ -18,27 +18,29 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NGtk_win_defs__
-#define __NGtk_win_defs__
+#ifndef __NGtk_win_h__
+#define __NGtk_win_h__
 
+#include <windows.h>
 #include "ngtk-win-widget-types.h"
 
 #include "ngtk-win-backend.h"
 #include "ngtk-win-component.h"
 #include "ngtk-win-container.h"
+#include "ngtk-win-defs.h"
 
-// #include "ngtk-widget-window.h"
+#include "ngtk-win-window.h"
 
-#define NGtk_Win_hInstance     (GetModuleHandle (NULL))
-typedef NGtkObject* NGtk_Win_ExtraDataType;
+#define ngtk_win_base_has_focus(self) (ngtk_backend_get_focus_holder (ngtk_base_get_backend (self)) == (self))
 
-void  ngtk_win_call_after_compononet_creation (NGtkComponent *obj);
-void  ngtk_win_init                           (NGtkBackend *backend);
-void  ngtk_win_start_main_loop                (NGtkBackend *backend);
-void  ngtk_win_quit_main_loop                 (NGtkBackend *backend);
-void  ngtk_win_quit                           (NGtkBackend *backend);
+#define ngtk_init                ngtk_win_init
+#define ngtk_start_main_loop     ngtk_win_start_main_loop
+#define ngtk_quit_main_loop      ngtk_win_quit_main_loop
+#define ngtk_quit                ngtk_win_quit
 
-LRESULT CALLBACK ngtk_win_general_WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-LPCSTR ngtk_win_get_root_window_class_name    (NGtkBackend *backend);
+#define ngtk_create_root_window  ngtk_win_create_root_window
+#define ngtk_create_button       ngtk_win_create_button
+#define ngtk_create_label        ngtk_win_create_label
+#define ngtk_create_text_entry   ngtk_win_create_text_entry
 
 #endif

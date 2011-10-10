@@ -24,7 +24,7 @@
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
-NGtkInterface*     ngtk_win_container_create_interface ();
+NGtkInterface*     ngtk_win_container_create_interface (NGtkObject *obj);
 
 void               ngtk_win_container_add_child     (NGtkContainer *self, NGtkComponent* child);
 #define            ngtk_win_container_get_children  ngtk_basic_container_get_children

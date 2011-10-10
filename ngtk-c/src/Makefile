@@ -2,7 +2,7 @@ include MakeConfig.mk
 
 export NGTK_MKS=$(AR) $(ARFLAGS)
 export NGTK_MKD=$(LD) $(LDFLAGS)
-export NGTK_MKO=$(CC) $(CFLAGS) -g -Wall -Werror $(NGTK_CFLAGS) -c
+export NGTK_MKO=$(CC) $(CFLAGS) -g -Wall -Werror $(NGTK_CFLAGS)
 
 all: ngtk-core ngtk-backend-subdirs
 
@@ -22,17 +22,10 @@ clean: .PHONY
 	cd utils;         $(MAKE) $(MFLAGS) clean
 	cd widgets;       $(MAKE) $(MFLAGS) clean
 
-ifeq ($(NGTK_BUILD_NCURSES), TRUE)
 	cd backends;      $(MAKE) $(MFLAGS) clean-backend-nc
-endif
-
-ifeq ($(NGTK_BUILD_XLIB), TRUE)
 	cd backends;      $(MAKE) $(MFLAGS) clean-backend-xlib
-endif
-
-ifeq ($(NGTK_BUILD_WINAPI), TRUE)
 	cd backends;      $(MAKE) $(MFLAGS) clean-backend-windows
-endif
+
 	-rm -rf dist/
 
 ngtk-backend-subdirs: .PHONY

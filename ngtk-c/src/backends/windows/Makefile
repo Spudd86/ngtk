@@ -1,10 +1,9 @@
 OBJS = \
-	ngtk-widget-window.o \
-	ngtk-win-base.o \
+	ngtk-win-backend.o \
 	ngtk-win-component.o \
 	ngtk-win-container.o \
 	ngtk-win-defs.o \
-	ngtk-win-event-generator.o
+	ngtk-win-window.o
 
 all: libngtk-backend-windows.a
 

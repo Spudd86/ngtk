@@ -24,11 +24,7 @@
 #include "../../widgets/ngtk-widget-types.h"
 #include "../../object-system/ngtk-object.h"
 
-enum {
-	NGTK_WINBASE_TYPE = NGTK_BACKEND_BASE_TYPE
-};
-
-typedef NGtkInterface                NGtkWinBaseI;
-typedef NGtkObject                   NGtkWinBase;
+typedef NGtkInterface                NGtkWinBackendI;
+typedef NGtkObject                   NGtkWinBackend;
 
 #endif

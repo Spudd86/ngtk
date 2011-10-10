@@ -79,15 +79,15 @@ int main (int argc, char **argv)
 
 	NGtkContainer *wnd;
 	NGtkComponent *lab;
-	NGtkRectangle  rect;
+	//NGtkRectangle  rect;
 
 	ngtk_backend_init (X);
 
 	wnd = ngtk_backend_create_root_window (X, "oh yeah!");
-	ngtk_object_connect_to (wnd, "event::mouse", QuitOnPress, NULL);
+	ngtk_object_connect_to (wnd, "event::mouse", (NGtkListener)QuitOnPress, NULL);
 
 	lab = ngtk_backend_create_text_entry (X, wnd, "oh no!", 4096);
-	ngtk_object_connect_to (lab, "event::mouse", HideOnClick, text);
+	ngtk_object_connect_to (lab, "event::mouse", (NGtkListener)HideOnClick, text);
 
 	ngtk_component_set_visible (lab, TRUE);
 	ngtk_component_set_visible (wnd, TRUE);

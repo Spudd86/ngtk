@@ -18,42 +18,58 @@
  * License along with NGtk.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ngtk-win-base.h"
-#include "ngtk-win-component.h"
-#include "../basic/ngtk-basic.h"
-#include "ngtk-win-widget-types.h"
+#include "ngtk-win.h"
 
-NGtkInterface* ngtk_win_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible)
+NGtkInterface* ngtk_win_component_create_interface (NGtkObject *obj, HWND hwnd, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
 {
-	NGtkInterface *in = ngtk_basic_component_create_interface (enabled, parent, text, visible);
+	NGtkInterface *in = ngtk_basic_component_create_interface (obj, parent, enabled, focusable, text, visible);
+	NGtkWinComponentD *wcd = ngtk_new (NGtkWinComponentD);
 
-	NGTK_COMPONENT_I2F (in) -> redraw      = ngtk_win_component_redraw;
+	in->imp_data[1]      = wcd;
+	wcd->hwnd            = hwnd;
+	wcd->base_wndproc    = (WNDPROC) GetWindowLong (hwnd, GWL_WNDPROC);
+	in->imp_data_free[1] = ngtk_free;
+	
 	NGTK_COMPONENT_I2F (in) -> set_enabled = ngtk_win_component_set_enabled;
 	NGTK_COMPONENT_I2F (in) -> set_text    = ngtk_win_component_set_text;
 	NGTK_COMPONENT_I2F (in) -> set_visible = ngtk_win_component_set_visible;
+
+	SetParent (hwnd, ngtk_win_component_get_hwnd (parent));
+	SetWindowLongA (hwnd, GWL_WNDPROC, (LONG) ngtk_win_general_WndProc);
+	ngtk_win_call_after_compononet_creation (obj);
 
 	return in;
 }
 
 void ngtk_win_component_set_enabled (NGtkComponent *self, int enabled)
 {
-	EnableWindow (NGTK_WINBASE_O2D (self)->hwnd, enabled);
+	EnableWindow (NGTK_WIN_COMPONENT_O2D (self)->hwnd, enabled);
 	ngtk_basic_component_set_enabled (self, enabled);
 }
 
 void ngtk_win_component_set_visible (NGtkComponent *self, int visible)
 {
-	ShowWindow (NGTK_WINBASE_O2D (self)->hwnd, visible ? SW_NORMAL : SW_HIDE);
+	ShowWindow (NGTK_WIN_COMPONENT_O2D (self)->hwnd, visible ? SW_NORMAL : SW_HIDE);
 	ngtk_basic_component_set_visible (self, visible);
 }
 
 void ngtk_win_component_set_text (NGtkComponent *self, const char *text)
 {
-	SetWindowTextA (NGTK_WINBASE_O2D (self)->hwnd, text);
+	SetWindowTextA (NGTK_WIN_COMPONENT_O2D (self)->hwnd, text);
 	ngtk_basic_component_set_text (self, text);
 }
 
-void ngtk_win_component_redraw (NGtkComponent *self)
+HWND ngtk_win_component_get_hwnd (NGtkComponent *self)
 {
-	ngtk_basic_component_redraw (self);
+	return NGTK_WIN_COMPONENT_O2D (self)->hwnd;
+}
+
+WNDPROC ngtk_win_component_get_base_wnd_proc (NGtkComponent *self)
+{
+	return NGTK_WIN_COMPONENT_O2D (self)->base_wndproc;
+}
+
+void ngtk_win_component_call_on_wnd_destroy (NGtkComponent *self)
+{
+	NGTK_WIN_COMPONENT_O2D (self)->hwnd = NULL;
 }

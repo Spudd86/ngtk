@@ -21,10 +21,19 @@
 #ifndef __NGtk_win_component__
 #define __NGtk_win_component__
 
+#include <windows.h>
 #include "../../widgets/ngtk-widgets.h"
 #include "../basic/ngtk-basic.h"
 
-NGtkInterface* ngtk_win_component_create_interface (int enabled, NGtkContainer *parent, const char* text, int visible);
+typedef struct _ngtk_win_component_d {
+	HWND    hwnd;
+	WNDPROC base_wndproc;
+} NGtkWinComponentD;
+
+#define NGTK_WIN_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkWinComponentD,1)
+#define NGTK_WIN_COMPONENT_I2D(comp) NGTK_I2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkWinComponentD,1)
+
+NGtkInterface* ngtk_win_component_create_interface (NGtkObject *obj, HWND hwnd, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible);
 
 #define  ngtk_win_component_get_parent   ngtk_basic_component_get_parent
 
@@ -37,6 +46,9 @@ void     ngtk_win_component_set_visible  (NGtkComponent *self, int visible);
 #define  ngtk_win_component_get_text     ngtk_basic_component_get_text
 void     ngtk_win_component_set_text     (NGtkComponent *self, const char *text);
 
-void     ngtk_win_component_redraw       (NGtkComponent *self);
+/* Non interface functions */
+HWND     ngtk_win_component_get_hwnd            (NGtkComponent *self);
+WNDPROC  ngtk_win_component_get_base_wnd_proc   (NGtkComponent *self);
+void     ngtk_win_component_call_on_wnd_destroy (NGtkComponent *self);
 
 #endif
