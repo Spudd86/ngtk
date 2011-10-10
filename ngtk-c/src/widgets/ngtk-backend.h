@@ -57,7 +57,7 @@ typedef struct _ngtk_backend_f {
  *
  * @since 0.9
  */
-void ngtk_backend_init (NGtkBackend *self);
+NGTK_EXPORT void ngtk_backend_init (NGtkBackend *self);
 
 /**
  * Start the main event loop
@@ -68,7 +68,7 @@ void ngtk_backend_init (NGtkBackend *self);
  *
  * @since 0.9
  */
-void ngtk_backend_start_main_loop (NGtkBackend *self);
+NGTK_EXPORT void ngtk_backend_start_main_loop (NGtkBackend *self);
 
 /**
  * Quit the main event loop
@@ -77,7 +77,7 @@ void ngtk_backend_start_main_loop (NGtkBackend *self);
  *
  * @since 0.9
  */
-void ngtk_backend_quit_main_loop (NGtkBackend *self);
+NGTK_EXPORT void ngtk_backend_quit_main_loop (NGtkBackend *self);
 
 /**
  * Free all the resources that the backend allocated during it's `init`
@@ -91,7 +91,7 @@ void ngtk_backend_quit_main_loop (NGtkBackend *self);
  *
  * @since 0.9
  */
-void ngtk_backend_quit (NGtkBackend *self);
+NGTK_EXPORT void ngtk_backend_quit (NGtkBackend *self);
 
 /**
  * Create a new root window
@@ -102,7 +102,7 @@ void ngtk_backend_quit (NGtkBackend *self);
  *
  * @since 0.9
  */
-NGtkContainer* ngtk_backend_create_root_window (NGtkBackend *self, const char *title);
+NGTK_EXPORT NGtkContainer* ngtk_backend_create_root_window (NGtkBackend *self, const char *title);
 
 /**
  * Create a new button
@@ -114,7 +114,7 @@ NGtkContainer* ngtk_backend_create_root_window (NGtkBackend *self, const char *t
  *
  * @since 0.9
  */
-NGtkComponent* ngtk_backend_create_button (NGtkBackend *self, NGtkContainer* parent, const char *text);
+NGTK_EXPORT NGtkComponent* ngtk_backend_create_button (NGtkBackend *self, NGtkContainer* parent, const char *text);
 
 /**
  * Create a new label
@@ -126,7 +126,7 @@ NGtkComponent* ngtk_backend_create_button (NGtkBackend *self, NGtkContainer* par
  *
  * @since 0.9
  */
-NGtkComponent* ngtk_backend_create_label (NGtkBackend *self, NGtkContainer* parent, const char *text);
+NGTK_EXPORT NGtkComponent* ngtk_backend_create_label (NGtkBackend *self, NGtkContainer* parent, const char *text);
 
 /**
  * Create a new text entry
@@ -142,7 +142,7 @@ NGtkComponent* ngtk_backend_create_label (NGtkBackend *self, NGtkContainer* pare
  *
  * @since 0.9
  */
-NGtkComponent* ngtk_backend_create_text_entry (NGtkBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
+NGTK_EXPORT NGtkComponent* ngtk_backend_create_text_entry (NGtkBackend *self, NGtkContainer* parent, const char *initial_text, int max_text_len);
 
 /**
  * Return the current component which owns the focus
@@ -152,7 +152,7 @@ NGtkComponent* ngtk_backend_create_text_entry (NGtkBackend *self, NGtkContainer*
  *
  * @since 0.9
  */
-NGtkComponent* ngtk_backend_get_focus_holder (NGtkBackend *self);
+NGTK_EXPORT NGtkComponent* ngtk_backend_get_focus_holder (NGtkBackend *self);
 
 /**
  * Change the current component which owns the focus to a specified
@@ -166,7 +166,7 @@ NGtkComponent* ngtk_backend_get_focus_holder (NGtkBackend *self);
  *
  * @since 0.9
  */
-int ngtk_backend_set_focus_holder (NGtkBackend *self, NGtkComponent* new_focus);
+NGTK_EXPORT int ngtk_backend_set_focus_holder (NGtkBackend *self, NGtkComponent* new_focus);
 
 /**
  * Transfer the focus to the next focusable component. This will
@@ -178,7 +178,7 @@ int ngtk_backend_set_focus_holder (NGtkBackend *self, NGtkComponent* new_focus);
  *
  * @since 0.9
  */
-NGtkComponent* ngtk_backend_focus_to_next (NGtkBackend *self);
+NGTK_EXPORT NGtkComponent* ngtk_backend_focus_to_next (NGtkBackend *self);
 
 /**
  * Get the root window of this backend
@@ -189,7 +189,7 @@ NGtkComponent* ngtk_backend_focus_to_next (NGtkBackend *self);
  *
  * @since 0.9
  */
-NGtkContainer* ngtk_backend_get_root_window (NGtkBackend *self);
+NGTK_EXPORT NGtkContainer* ngtk_backend_get_root_window (NGtkBackend *self);
 
 /**
  * Get a read-only list of the components that are currently allocated
@@ -208,7 +208,7 @@ NGtkContainer* ngtk_backend_get_root_window (NGtkBackend *self);
  *
  * @since 0.9
  */
-const NGtkList* ngtk_backend_get_all_components (NGtkBackend *self);
+NGTK_EXPORT const NGtkList* ngtk_backend_get_all_components (NGtkBackend *self);
 
 /**
  * Print a message to the user in a backend specific way
@@ -217,7 +217,7 @@ const NGtkList* ngtk_backend_get_all_components (NGtkBackend *self);
  * @param format The printing format (printf style)
  * @param ... The format string arguments
  */
-void ngtk_backend_print (NGtkBackend *self, const char *format, ...);
+NGTK_EXPORT void ngtk_backend_print (NGtkBackend *self, const char *format, ...);
 #define ngtk_print ngtk_backend_print
 
 /**
@@ -227,7 +227,7 @@ void ngtk_backend_print (NGtkBackend *self, const char *format, ...);
  * @param format The printing format (printf style)
  * @param ... The format string arguments
  */
-void ngtk_backend_debug (NGtkBackend *self, const char *format, ...);
+NGTK_EXPORT void ngtk_backend_debug (NGtkBackend *self, const char *format, ...);
 #define ngtk_debug ngtk_backend_debug
 
 /**
@@ -238,7 +238,7 @@ void ngtk_backend_debug (NGtkBackend *self, const char *format, ...);
  * @param format The printing format (printf style)
  * @param ... The format string arguments
  */
-void ngtk_backend_error (NGtkBackend *self, const char *format, ...);
+NGTK_EXPORT void ngtk_backend_error (NGtkBackend *self, const char *format, ...);
 #define ngtk_error ngtk_backend_error
 
 #endif

@@ -16,7 +16,7 @@ backend-xlib: .PHONY backend-basic dist_dir
 
 backend-windows: .PHONY backend-basic dist_dir
 	cd windows; $(MAKE) $(MFLAGS)
-	$(NGTK_MKD) -o $(dist_dir)/libngtk-backend-windows$(DLEXT) basic/libngtk-backend-basic.a windows/libngtk-backend-windows.a
+	$(NGTK_MKD) -o $(dist_dir)/libngtk-backend-windows$(DLEXT) ../dist/libngtk$(DLEXT) basic/libngtk-backend-basic.a windows/libngtk-backend-windows.a
 
 clean-backend-nc: .PHONY clean-backend-basic
 	cd nc; $(MAKE) clean

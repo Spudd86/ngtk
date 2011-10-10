@@ -48,7 +48,7 @@ int ngtk_graphics_calc_text_cursor_end_width (NGtkGraphics *self)
 
 void ngtk_graphics_draw_text_cursor (NGtkGraphics *self, int x, int y)
 {
-	return NGTK_GRAPHICS_O2F (self) -> draw_text_cursor (self, x, y);
+	NGTK_GRAPHICS_O2F (self) -> draw_text_cursor (self, x, y);
 }
 
 void ngtk_graphics_draw_frame (NGtkGraphics *self, const NGtkRectangle *rect, int is_focus_frame)

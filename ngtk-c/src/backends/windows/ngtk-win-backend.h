@@ -56,5 +56,5 @@ void            ngtk_win_backend_register_window    (NGtkWinBackend *self, HWND 
 NGtkComponent*  ngtk_win_backend_unregister_window  (NGtkWinBackend *self, HWND wnd);
 NGtkComponent*  ngtk_win_backend_get_for_window     (NGtkWinBackend *self, HWND wnd);
 
-NGtkWinBackend* ngtk_win_backend_new ();
+NGTK_EXPORT NGtkWinBackend* ngtk_win_backend_new ();
 #endif

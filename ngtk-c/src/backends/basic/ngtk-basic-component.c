@@ -109,7 +109,8 @@ const char* ngtk_basic_component_get_text (NGtkComponent *self)
 
 void ngtk_basic_component_set_text (NGtkComponent *self, const char *text)
 {
-	char *str = strdup (text);
+	char *str = ngtk_new_array (char, strlen (text) + 1);
+	strcpy (str, text);
 	NGTK_BASIC_COMPONENT_O2D (self) -> text = text;
 	ngtk_interface_send_signal (ngtk_object_cast (self, NGTK_COMPONENT_TYPE), "component::text", str, TRUE);
 	ngtk_free (str);

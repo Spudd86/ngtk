@@ -54,7 +54,7 @@ typedef struct _NGtkComponentF {
  *
  * @since 0.9
  */
-NGtkContainer* ngtk_component_get_parent  (NGtkComponent *self);
+NGTK_EXPORT NGtkContainer* ngtk_component_get_parent  (NGtkComponent *self);
 
 /**
  * Check if a component is enabled. Depending on the component, the
@@ -66,7 +66,7 @@ NGtkContainer* ngtk_component_get_parent  (NGtkComponent *self);
  *
  * @since 0.9
  */
-int            ngtk_component_get_enabled (NGtkComponent *self);
+NGTK_EXPORT int            ngtk_component_get_enabled (NGtkComponent *self);
 
 /**
  * Set the enabled status of a component.
@@ -78,7 +78,7 @@ int            ngtk_component_get_enabled (NGtkComponent *self);
  *
  * @since 0.9
  */
-void           ngtk_component_set_enabled (NGtkComponent *self, int enabled);
+NGTK_EXPORT void           ngtk_component_set_enabled (NGtkComponent *self, int enabled);
 
 /**
  * Check whether a component is visible. Note that a visible component
@@ -89,7 +89,7 @@ void           ngtk_component_set_enabled (NGtkComponent *self, int enabled);
  *
  * @since 0.9
  */
-int            ngtk_component_get_visible (NGtkComponent *self);
+NGTK_EXPORT int            ngtk_component_get_visible (NGtkComponent *self);
 
 /**
  * Set the visibility of a component
@@ -101,7 +101,7 @@ int            ngtk_component_get_visible (NGtkComponent *self);
  *
  * @since 0.9
  */
-void           ngtk_component_set_visible (NGtkComponent *self, int visible);
+NGTK_EXPORT void           ngtk_component_set_visible (NGtkComponent *self, int visible);
 
 /**
  * Check whether a component is focusable. THis is only the focusable
@@ -113,7 +113,7 @@ void           ngtk_component_set_visible (NGtkComponent *self, int visible);
  *
  * @since 0.9
  */
-int            ngtk_component_get_focusable (NGtkComponent *self);
+NGTK_EXPORT int            ngtk_component_get_focusable (NGtkComponent *self);
 /**
  * Get the text content of the component. This is component dependant
  * (for example, for windows the text is the title, for labels this is
@@ -124,7 +124,7 @@ int            ngtk_component_get_focusable (NGtkComponent *self);
  *
  * @since 0.9
  */
-const char*    ngtk_component_get_text    (NGtkComponent *self);
+NGTK_EXPORT const char*    ngtk_component_get_text    (NGtkComponent *self);
 
 /**
  * Set the text of a component
@@ -136,7 +136,7 @@ const char*    ngtk_component_get_text    (NGtkComponent *self);
  *
  * @since 0.9
  */
-void           ngtk_component_set_text    (NGtkComponent *self, const char *text);
+NGTK_EXPORT void           ngtk_component_set_text    (NGtkComponent *self, const char *text);
 
 /**
  * Ask a component to be redrawn.
@@ -151,6 +151,6 @@ void           ngtk_component_set_text    (NGtkComponent *self, const char *text
  *
  * @since 0.9
  */
-void           ngtk_component_redraw      (NGtkComponent *self);
+NGTK_EXPORT void           ngtk_component_redraw      (NGtkComponent *self);
 
 #endif

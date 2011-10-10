@@ -69,6 +69,11 @@ void ngtk_win_backend_start_main_loop (NGtkBasicBackend *self)
 	ngtk_win_start_main_loop (self);
 }
 
+void ngtk_win_backend_quit_main_loop (NGtkWinBackend *self)
+{
+	ngtk_win_quit_main_loop (self);
+}
+
 void ngtk_win_backend_quit (NGtkBasicBackend *self)
 {
 	ngtk_win_quit (self);
@@ -98,7 +103,7 @@ NGtkComponent* ngtk_win_backend_create_button (NGtkBasicBackend *self, NGtkConta
 
 NGtkComponent* ngtk_win_backend_create_label (NGtkBasicBackend *self, NGtkContainer* parent, const char *text)
 {
-	NGtkComponent *lab = ngtk_win_create_label_imp (self, text, FALSE, parent);;
+	NGtkComponent *lab = ngtk_win_create_label_imp (self, text, FALSE, parent);
 	NGtkInterface *in = ngtk_object_cast (self, NGTK_BACKEND_TYPE);
 
 	ngtk_interface_send_signal (in, "backend::create-lab",  lab, TRUE);

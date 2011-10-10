@@ -33,8 +33,8 @@ void HideOnClick (NGtkComponent *comp, const char* signame, void *sigdata, void 
 
 void QuitOnPress (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
 {
-	ngtk_debug (ngtk_base_get_backend (comp), "Received mouse event signal!");
 	NGtkMouseEvent *evnt = (NGtkMouseEvent*) sigdata;
+	ngtk_debug (ngtk_base_get_backend (comp), "Received mouse event signal!");
 	if (evnt->type == NGTK_MET_CLICK)
 		ngtk_backend_quit_main_loop (ngtk_base_get_backend (comp));
 }
@@ -73,6 +73,8 @@ int main (int argc, char **argv)
 	NGtkBackend *X = ngtk_nc_backend_new ();
 #elif defined (NGTK_USE_XLIB)
 	NGtkBackend *X = ngtk_xlib_backend_new ();
+#elif defined (NGTK_USE_WINDOWS)
+	NGtkBackend *X = ngtk_win_backend_new ();
 #else
 #error "No backend selected!"
 #endif

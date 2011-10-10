@@ -98,27 +98,27 @@ struct _ngtk_inteface {
 	NGtkList            listeners;
 };
 
-NGtkObject*    ngtk_object_new             ();
-void           ngtk_object_free            (NGtkObject *obj);
-NGtkInterface* ngtk_object_cast            (NGtkObject *obj, NGtkType type);
-int            ngtk_object_is_a            (NGtkObject *obj, NGtkType type);
-void           ngtk_object_ref             (NGtkObject *obj);
-void           ngtk_object_unref           (NGtkObject *obj);
-void           ngtk_object_connect_to      (NGtkObject *obj, const char* signal, NGtkListener listener, void *user_data);
-void           ngtk_object_send_signal     (NGtkObject *obj, const char* signal, void *sigdata);
-void           ngtk_object_push_destructor (NGtkObject *obj, NGtkDestructor dest);
+NGTK_EXPORT NGtkObject*    ngtk_object_new             ();
+NGTK_EXPORT void           ngtk_object_free            (NGtkObject *obj);
+NGTK_EXPORT NGtkInterface* ngtk_object_cast            (NGtkObject *obj, NGtkType type);
+NGTK_EXPORT int            ngtk_object_is_a            (NGtkObject *obj, NGtkType type);
+NGTK_EXPORT void           ngtk_object_ref             (NGtkObject *obj);
+NGTK_EXPORT void           ngtk_object_unref           (NGtkObject *obj);
+NGTK_EXPORT void           ngtk_object_connect_to      (NGtkObject *obj, const char* signal, NGtkListener listener, void *user_data);
+NGTK_EXPORT void           ngtk_object_send_signal     (NGtkObject *obj, const char* signal, void *sigdata);
+NGTK_EXPORT void           ngtk_object_push_destructor (NGtkObject *obj, NGtkDestructor dest);
 
-NGtkInterface* ngtk_interface_new          (NGtkObject *obj, NGtkType type);
-NGtkInterface* ngtk_interface_cast         (NGtkInterface *in, NGtkType type);
-int            ngtk_interface_is_a         (NGtkInterface *in, NGtkType type);
-NGtkObject*    ngtk_interface_get_object   (NGtkInterface *in);
-void           ngtk_interface_connect_to   (NGtkInterface *in, const char* signal, NGtkListener listener, void *user_data);
-void           ngtk_interface_send_signal  (NGtkInterface *in, const char* signal, void *sigdata, int also_object);
+NGTK_EXPORT NGtkInterface* ngtk_interface_new          (NGtkObject *obj, NGtkType type);
+NGTK_EXPORT NGtkInterface* ngtk_interface_cast         (NGtkInterface *in, NGtkType type);
+NGTK_EXPORT int            ngtk_interface_is_a         (NGtkInterface *in, NGtkType type);
+NGTK_EXPORT NGtkObject*    ngtk_interface_get_object   (NGtkInterface *in);
+NGTK_EXPORT void           ngtk_interface_connect_to   (NGtkInterface *in, const char* signal, NGtkListener listener, void *user_data);
+NGTK_EXPORT void           ngtk_interface_send_signal  (NGtkInterface *in, const char* signal, void *sigdata, int also_object);
 
 /* To be used by external destructors of the objects. When a destructor
  * wants to finish a certain interface of an object, this is what he
  * should call */
-void ngtk_interface_detach_and_free (NGtkInterface *in);
+NGTK_EXPORT void ngtk_interface_detach_and_free (NGtkInterface *in);
 
 
 #define NGTK_O2F_CAST(o,bit,type) ((type*)(ngtk_object_cast(o,bit)->functions))

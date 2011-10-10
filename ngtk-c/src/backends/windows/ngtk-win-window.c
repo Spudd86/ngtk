@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "ngtk-win.h"
 
-NGtkObject* ngtk_win_create_window (NGtkBackend *backend, const char* title, int visible)
+NGtkObject* ngtk_win_create_window_imp (NGtkBackend *self, const char* title, int visible)
 {
 	NGtkObject *obj;
 	NGtkInterface *inW, *inComp, *inCont;
@@ -29,7 +29,7 @@ NGtkObject* ngtk_win_create_window (NGtkBackend *backend, const char* title, int
 	
 	hwnd = CreateWindowExA (
 		WS_EX_CLIENTEDGE, /* A sunken edge border. Pretty sure we can just use 0=WS_EX_LEFT default */
-		ngtk_win_get_root_window_class_name (backend),
+		ngtk_win_get_root_window_class_name (self),
 		title,
 		WS_OVERLAPPEDWINDOW, /* Default window style - border and title bar */
 		CW_USEDEFAULT, CW_USEDEFAULT, /* Initial X and Y position of the window */
@@ -41,7 +41,7 @@ NGtkObject* ngtk_win_create_window (NGtkBackend *backend, const char* title, int
 		);
 
 	obj    = ngtk_object_new ();
-	inW    = ngtk_basic_base_create_interface (obj, backend);
+	inW    = ngtk_basic_base_create_interface (obj, self);
 	inComp = ngtk_win_component_create_interface (obj, hwnd, NULL, TRUE, TRUE, title, visible);
 	inCont = ngtk_win_container_create_interface (obj);
 
@@ -50,62 +50,42 @@ NGtkObject* ngtk_win_create_window (NGtkBackend *backend, const char* title, int
 	return obj;
 }
 
-NGtkObject* ngtk_win_create_button (const char* text, NGtkContainer *parent)
+NGtkObject* ngtk_win_create_label_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
+{
+	ngtk_assert (FALSE);
+	return NULL;
+}
+
+NGtkObject* ngtk_win_create_button_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
 {
 	NGtkObject *obj;
-	NGtkInterface *inW, *inComp, *inEG;
-	WNDPROC nativeButProc;
-
-	obj    = ngtk_object_new ();
-	inW    = ngtk_win_base_create_interface ();
-	inComp = ngtk_win_component_create_interface (TRUE, NULL, text, TRUE);
-	inEG   = ngtk_basic_event_generator_create_interface ();
-
-	ngtk_object_implement (obj, inW);
-	ngtk_object_implement (obj, inComp);
-	ngtk_object_implement (obj, inEG);
-
-	/* Creating the window will start generating messages that should be
-	 * handled, so we must have the object ready before doing this */
-
-	NGTK_WINBASE_I2D (inW)->hwnd = CreateWindowExA (
+	NGtkInterface *inW, *inComp;
+	
+	HWND hwnd = CreateWindowExA (
 		0, /* Default */
 		"BUTTON",
 		text,
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_TEXT, /* Regular push button */
 		0, 0, /* X, Y */
 		50, 50, /* Temporary untill someone will change it */
-		NGTK_WINBASE_O2D (parent)->hwnd, /* Parent window */
+		ngtk_win_component_get_hwnd (parent), /* Parent window */
 		NULL, /* Number ID */
-		NGtk_hInstance, /* Instance */
+		NGtk_Win_hInstance, /* Instance */
 		NULL /* The lParam passed with WM_CREATE message */
 		);
 
-	nativeButProc = (WNDPROC) GetWindowLong (NGTK_WINBASE_I2D (inW)->hwnd, GWL_WNDPROC);
-	NGTK_WINBASE_I2D (inW)->base_wndproc = nativeButProc;
-	SetWindowLong (NGTK_WINBASE_I2D (inW)->hwnd, GWL_WNDPROC, (LONG)ngtk_win_window_WndProc);
-
-	SetToHwnd (NGTK_WINBASE_I2D (inW)->hwnd, obj);
+	obj    = ngtk_object_new ();
+	inW    = ngtk_basic_base_create_interface (obj, self);
+	inComp = ngtk_win_component_create_interface (obj, hwnd, NULL, TRUE, TRUE, text, visible);
 
 	ngtk_container_add_child (parent, obj);
-	ngtk_component_set_visible (obj, TRUE);
-
+	ngtk_component_set_visible (obj, visible);
 
 	return obj;
 }
 
-NGtkObject* ngtk_win_create_window_imp (NGtkBackend *self, const char* title, int visible)
-{
-}
-
-NGtkObject* ngtk_win_create_label_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
-{
-}
-
-NGtkObject* ngtk_win_create_button_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
-{
-}
-
 NGtkObject* ngtk_win_create_text_entry_imp (NGtkBackend *self, NGtkContainer *parent, const char* initial_text, int visible, int max_text_len)
 {
+	ngtk_assert (FALSE);
+	return NULL;
 }

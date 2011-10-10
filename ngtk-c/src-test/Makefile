@@ -21,10 +21,16 @@ clean:
 	-rm main-*
 
 run-nc:
-	export LD_LIBRARY_PATH=../src/dist:../src/backends/dist; ./main-nc
+	export LD_LIBRARY_PATH=../src/dist:../src/backends/dist; ./main-nc$(EXEEXT)
 
 run-xlib:
-	export LD_LIBRARY_PATH=../src/dist:../src/backends/dist; ./main-xlib
+	export LD_LIBRARY_PATH=../src/dist:../src/backends/dist; ./main-xlib$(EXEEXT)
+
+run-win:
+	cp ../src/dist/*$(DLEXT) .
+	cp ../src/backends/dist/*$(DLEXT) .
+	export LD_LIBRARY_PATH=../src/dist:../src/backends/dist; ./main-win$(EXEEXT)
+	rm ./*$(DLEXT)
 
 debug-nc:
 	export LD_LIBRARY_PATH=../src/dist:../src/backends/dist; gdb ./main-nc

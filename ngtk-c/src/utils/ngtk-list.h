@@ -67,31 +67,31 @@ typedef void (*NGtkListDataApplyFunc) (void *data, void *extra_data);
  * Allocate a new NGtkListNode which is not connected to any other node,
  * and contains the given data pointer
  */
-NGtkListNode* ngtk_list_node_new              (void* data);
+NGTK_EXPORT NGtkListNode* ngtk_list_node_new              (void* data);
 
-void          ngtk_list_node_free             (NGtkListNode *node);
+NGTK_EXPORT void          ngtk_list_node_free             (NGtkListNode *node);
 
-void          ngtk_list_node_unlink_from_next (NGtkListNode *node);
+NGTK_EXPORT void          ngtk_list_node_unlink_from_next (NGtkListNode *node);
 
-void          ngtk_list_node_unlink_from_prev (NGtkListNode *node);
+NGTK_EXPORT void          ngtk_list_node_unlink_from_prev (NGtkListNode *node);
 
-void          ngtk_list_node_link             (NGtkListNode *first, NGtkListNode *second);
+NGTK_EXPORT void          ngtk_list_node_link             (NGtkListNode *first, NGtkListNode *second);
 
-NGtkList*     ngtk_list_new                   ();
+NGTK_EXPORT NGtkList*     ngtk_list_new                   ();
 
-void          ngtk_list_init                  (NGtkList* list);
+NGTK_EXPORT void          ngtk_list_init                  (NGtkList* list);
 
 NGtkListNode* ngtk_list_find                  (const NGtkList *list, void *data);
 
-int           ngtk_list_contains              (const NGtkList *list, void *data);
+NGTK_EXPORT int           ngtk_list_contains              (const NGtkList *list, void *data);
 
-int           ngtk_list_remove                (NGtkList *list, void *data);
+NGTK_EXPORT int           ngtk_list_remove                (NGtkList *list, void *data);
 
-int           ngtk_list_remove_node           (NGtkList *list, NGtkListNode *node);
+NGTK_EXPORT int           ngtk_list_remove_node           (NGtkList *list, NGtkListNode *node);
 
-void          ngtk_list_append                (NGtkList *list, void *data);
+NGTK_EXPORT void          ngtk_list_append                (NGtkList *list, void *data);
 
-void          ngtk_list_prepend               (NGtkList *list, void *data);
+NGTK_EXPORT void          ngtk_list_prepend               (NGtkList *list, void *data);
 
 /**
  * Free all the memory associated with a given list. If the list is not
@@ -103,14 +103,14 @@ void          ngtk_list_prepend               (NGtkList *list, void *data);
  * type \ref NGtkList and not by ngtk_list_new), use \ref
  * ngtk_list_clear to free all the memory associated with the list
  */
-void          ngtk_list_free                  (NGtkList *list);
+NGTK_EXPORT void          ngtk_list_free                  (NGtkList *list);
 
 /**
  * Similar to \ref ngtk_list_clear, but also calls the given
  * \ref NGtkFreeFunc on each element of the list before removing it from
  * the list. This can be used to free the data inserted to the list.
  */
-void          ngtk_list_clear_with_free_func  (NGtkList *list, NGtkFreeFunc func);
+NGTK_EXPORT void          ngtk_list_clear_with_free_func  (NGtkList *list, NGtkFreeFunc func);
 
 /**
  * Empty a given list from all of it's contents. This will remoe all the
@@ -119,11 +119,11 @@ void          ngtk_list_clear_with_free_func  (NGtkList *list, NGtkFreeFunc func
  *
  * This function does NOT free the data that was inserted to the list!
  */
-void          ngtk_list_clear                 (NGtkList *list);
+NGTK_EXPORT void          ngtk_list_clear                 (NGtkList *list);
 
-int           ngtk_list_is_empty              (const NGtkList *list);
+NGTK_EXPORT int           ngtk_list_is_empty              (const NGtkList *list);
 
-NGtkList*     ngtk_list_duplicate             (const NGtkList *list);
+NGTK_EXPORT NGtkList*     ngtk_list_duplicate             (const NGtkList *list);
 
 /**
  * A read-only iterator on the list. This means you may not modify the

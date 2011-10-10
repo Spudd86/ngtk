@@ -39,6 +39,6 @@ typedef struct _ngtk_base_f {
  *
  * @since 0.9
  */
-NGtkBackend* ngtk_base_get_backend (NGtkBase *self);
+NGTK_EXPORT NGtkBackend* ngtk_base_get_backend (NGtkBase *self);
 
 #endif

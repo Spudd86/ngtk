@@ -55,5 +55,7 @@
 #define ngtk_assert(expr) NGTK_MACRO_DO_NOTHING ()
 #endif
 
+#define NGTK_EXPORT __declspec(dllexport)
+
 #define ngtk_assert_not_reached() assert (FALSE)
 #endif

@@ -49,7 +49,7 @@ typedef struct _NGtkContainerF {
 /* The following functions only wrap calls instead of doing them
  * directly from the NGtkContainerF object */
 
-NGtkComponentList* ngtk_container_get_children  (NGtkContainer *self);
+NGTK_EXPORT NGtkComponentList* ngtk_container_get_children  (NGtkContainer *self);
 
 /**
  * Set the location of a child component relative to it's parent.
@@ -64,7 +64,7 @@ NGtkComponentList* ngtk_container_get_children  (NGtkContainer *self);
  *
  * @since 0.9
  */
-void               ngtk_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
+NGTK_EXPORT void               ngtk_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
 
 /**
  * Set the layout object of a container
@@ -74,7 +74,7 @@ void               ngtk_container_place_child   (NGtkContainer *self, NGtkCompon
  *
  * @since 0.9
  */
-void               ngtk_container_set_layout    (NGtkContainer *self, NGtkLayout *layout);
+NGTK_EXPORT void               ngtk_container_set_layout    (NGtkContainer *self, NGtkLayout *layout);
 
 /**
  * Ask a comntainer to lay out it's children inside it's boundries using
@@ -84,7 +84,7 @@ void               ngtk_container_set_layout    (NGtkContainer *self, NGtkLayout
  *
  * @since 0.9
  */
-void               ngtk_container_pack          (NGtkContainer *self);
+NGTK_EXPORT void               ngtk_container_pack          (NGtkContainer *self);
 
 /**
  * A method for a child to register itself with it's parent container.
@@ -96,7 +96,7 @@ void               ngtk_container_pack          (NGtkContainer *self);
  *
  * @since 0.9
  */
-void               ngtk_container_add_child     (NGtkContainer *self, NGtkComponent* child);
+NGTK_EXPORT void               ngtk_container_add_child     (NGtkContainer *self, NGtkComponent* child);
 
 /**
  * A method for a child to unregister itself from it's parent container.
@@ -108,6 +108,6 @@ void               ngtk_container_add_child     (NGtkContainer *self, NGtkCompon
  *
  * @since 0.9
  */
-void               ngtk_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
+NGTK_EXPORT void               ngtk_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
 
 #endif

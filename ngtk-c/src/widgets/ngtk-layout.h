@@ -50,6 +50,6 @@ typedef struct _NGtkLayoutF {
  *
  * @since 0.9
  */
-void ngtk_layout_pack (NGtkLayout *self, NGtkContainer *cont, int width, int height);
+NGTK_EXPORT void ngtk_layout_pack (NGtkLayout *self, NGtkContainer *cont, int width, int height);
 
 #endif

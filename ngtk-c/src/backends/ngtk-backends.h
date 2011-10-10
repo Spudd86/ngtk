@@ -26,7 +26,7 @@
 #ifdef     NGTK_USE_NC
 #  include "nc/ngtk-nc.h"
 #elif defined NGTK_USE_WINDOWS
-#  include "windows/ngtk-windows-defs.h"
+#  include "windows/ngtk-win.h"
 #elif defined NGTK_USE_XLIB
 #  include "xlib/ngtk-xlib.h"
 #else
