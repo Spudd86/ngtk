@@ -98,6 +98,7 @@ static void component_keyed (NGtkComponent* comp, int ch)
 	switch (ch)
 	{
 	case KEY_ENTER:
+	case '\n':
 		event.key = NGTK_KKEY_ENTER;
 		break;
 	case KEY_BACKSPACE:
