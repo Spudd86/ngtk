@@ -34,7 +34,7 @@ NGtkInterface* ngtk_win_component_create_interface (NGtkObject *obj, HWND hwnd, 
 	NGTK_COMPONENT_I2F (in) -> set_text    = ngtk_win_component_set_text;
 	NGTK_COMPONENT_I2F (in) -> set_visible = ngtk_win_component_set_visible;
 
-	SetParent (hwnd, ngtk_win_component_get_hwnd (parent));
+	SetParent ((parent != NULL) ? ngtk_win_component_get_hwnd (parent) : NULL, hwnd);
 	SetWindowLongA (hwnd, GWL_WNDPROC, (LONG) ngtk_win_general_WndProc);
 	ngtk_win_call_after_compononet_creation (obj);
 

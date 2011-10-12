@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\backends">
+      <UniqueIdentifier>{c2f16649-ec90-44fd-be25-81b5e3785d10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\backends\windows">
+      <UniqueIdentifier>{97b7422f-f19d-4925-8906-c1f7169eecfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\backends\basic">
+      <UniqueIdentifier>{d426d1af-5c86-4f27-a18e-5e84424cc1de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\widgets">
+      <UniqueIdentifier>{a7452b97-2a9a-4a4a-af86-1ea51595921d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{11f0a636-19c0-413e-a98c-13f4737eb32a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\backends">
+      <UniqueIdentifier>{739e28b1-9e3a-49a4-bfd3-42ea73a48103}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\backends\basic">
+      <UniqueIdentifier>{2c576218-4482-42c2-a2ed-68ea7ed42de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\backends\windows">
+      <UniqueIdentifier>{10ed4b2b-7147-44e0-a117-6e729ec7cf86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\widgets">
+      <UniqueIdentifier>{b8233eb3-0a6f-4820-b24b-0c118509db45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\object-system">
+      <UniqueIdentifier>{c263d885-071e-4474-b7a7-abf9f6c72917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{8ea46733-793d-4cac-b121-113e429c206f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\object-system">
+      <UniqueIdentifier>{fe83de66-fc45-48d2-86cd-ed3b64755c5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\layouts">
+      <UniqueIdentifier>{0259e605-b1f0-494c-9ed0-febd8aafa81a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\layouts">
+      <UniqueIdentifier>{55f309e3-5df1-4bd6-b847-16e1c98ae267}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\object-system\ngtk-object.c">
+      <Filter>Source Files\object-system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\ngtk-list.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\ngtk-memory.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\widgets\ngtk-component.c">
+      <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\widgets\ngtk-container.c">
+      <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\widgets\ngtk-layout.c">
+      <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\widgets\ngtk-backend.c">
+      <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\widgets\ngtk-base.c">
+      <Filter>Source Files\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-graphics.c">
+      <Filter>Source Files\backends\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-text-entry.c">
+      <Filter>Source Files\backends\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-backend.c">
+      <Filter>Source Files\backends\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-base.c">
+      <Filter>Source Files\backends\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-component.c">
+      <Filter>Source Files\backends\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-container.c">
+      <Filter>Source Files\backends\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\windows\ngtk-win-defs.c">
+      <Filter>Source Files\backends\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\windows\ngtk-win-window.c">
+      <Filter>Source Files\backends\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\windows\ngtk-win-backend.c">
+      <Filter>Source Files\backends\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\windows\ngtk-win-component.c">
+      <Filter>Source Files\backends\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\windows\ngtk-win-container.c">
+      <Filter>Source Files\backends\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\layouts\ngtk-grid-layout.c">
+      <Filter>Source Files\layouts</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\object-system\ngtk-object.h">
+      <Filter>Header Files\object-system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\ngtk-list.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\ngtk-macros.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\ngtk-memory.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\ngtk-misc-types.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\ngtk-utils.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-backend.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-base.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-component.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-container.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-event-codes.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-layout.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-widget-types.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\ngtk-widgets.h">
+      <Filter>Header Files\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-backend.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-base.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-component.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-container.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-graphics.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-text-entry.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-types.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic.h">
+      <Filter>Header Files\backends\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win-component.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win-container.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win-defs.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win-widget-types.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win-window.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\windows\ngtk-win-backend.h">
+      <Filter>Header Files\backends\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backends\ngtk-backends.h">
+      <Filter>Header Files\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ngtk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\layouts\ngtk-grid-layout.h">
+      <Filter>Header Files\layouts</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

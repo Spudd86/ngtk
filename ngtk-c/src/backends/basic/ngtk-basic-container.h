@@ -43,4 +43,7 @@ void               ngtk_basic_container_place_child      (NGtkContainer *self, N
 void               ngtk_basic_container_set_layout       (NGtkContainer *self, NGtkLayout *layout);
 void               ngtk_basic_container_pack             (NGtkContainer *self);
 
+/* Non interface functions */
+NGtkLayout*        ngtk_basic_container_get_layout       (NGtkContainer *self);
+
 #endif

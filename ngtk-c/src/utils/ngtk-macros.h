@@ -39,6 +39,11 @@
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
+#ifndef ABS
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+#endif
+
+
 #define NGTK_IN_RANGE(val,min,max) ((min) <= (val) && (val) <= (max))
 #define NGTK_BIT_MASK(bit) ( ((unsigned long long)1) << ((bit)-1))
 
@@ -57,5 +62,6 @@
 
 #define NGTK_EXPORT __declspec(dllexport)
 
+#define NGTK_ELEMENT_COUNT(ar) (sizeof(ar)/sizeof((ar)[0]))
 #define ngtk_assert_not_reached() assert (FALSE)
 #endif

@@ -93,14 +93,15 @@ static int CALLBACK ngtk_win_mouse_handle (NGtkComponent* wc, HWND hwnd, UINT ms
 
 			ngtk_interface_send_signal (ngtk_object_cast (wc, NGTK_COMPONENT_TYPE), "event::mouse", &m, TRUE);
 			
-			if (m.type == NGTK_MET_UP)
+			if (m.type == NGTK_MET_DOWN)
+				last_but_press_here[but_press_index] = hwnd;
+			else if (m.type == NGTK_MET_UP)
 			{
 				if (last_but_press_here[but_press_index] == hwnd)
 				{
 					m.type = NGTK_MET_CLICK;
 					ngtk_interface_send_signal (ngtk_object_cast (wc, NGTK_COMPONENT_TYPE), "event::mouse", &m, TRUE);
 				}
-				last_but_press_here[but_press_index] = hwnd;
 			}
 		}
 		return 1;
@@ -186,8 +187,8 @@ LRESULT CALLBACK ngtk_win_general_WndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 	
 	backend = ngtk_base_get_backend (ww);
 
-	ngtk_win_mouse_handle (ww, hwnd, msg, wParam, lParam);
 	ngtk_win_container_handle (ww, hwnd, msg, wParam, lParam);
+	ngtk_win_mouse_handle (ww, hwnd, msg, wParam, lParam);
 	
 	switch (msg)
 	{

@@ -52,8 +52,30 @@ NGtkObject* ngtk_win_create_window_imp (NGtkBackend *self, const char* title, in
 
 NGtkObject* ngtk_win_create_label_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
 {
-	ngtk_assert (FALSE);
-	return NULL;
+	NGtkObject *obj;
+	NGtkInterface *inW, *inComp;
+	
+	HWND hwnd = CreateWindowExA (
+		0, /* Default */
+		"STATIC",
+		text,
+		WS_CHILD | WS_VISIBLE | SS_LEFTNOWORDWRAP, /* Regular push button */
+		0, 0, /* X, Y */
+		50, 50, /* Temporary untill someone will change it */
+		ngtk_win_component_get_hwnd (parent), /* Parent window */
+		NULL, /* Number ID */
+		NGtk_Win_hInstance, /* Instance */
+		NULL /* The lParam passed with WM_CREATE message */
+		);
+
+	obj    = ngtk_object_new ();
+	inW    = ngtk_basic_base_create_interface (obj, self);
+	inComp = ngtk_win_component_create_interface (obj, hwnd, NULL, TRUE, TRUE, text, visible);
+
+	ngtk_container_add_child (parent, obj);
+	ngtk_component_set_visible (obj, visible);
+
+	return obj;
 }
 
 NGtkObject* ngtk_win_create_button_imp (NGtkBackend *self, const char* text, int visible, NGtkContainer *parent)
@@ -86,6 +108,31 @@ NGtkObject* ngtk_win_create_button_imp (NGtkBackend *self, const char* text, int
 
 NGtkObject* ngtk_win_create_text_entry_imp (NGtkBackend *self, NGtkContainer *parent, const char* initial_text, int visible, int max_text_len)
 {
-	ngtk_assert (FALSE);
-	return NULL;
+	NGtkObject *obj;
+	NGtkInterface *inW, *inComp;
+	
+	HWND hwnd = CreateWindowExA (
+		0, /* Default */
+		"EDIT",
+		initial_text,
+		/* Regular one-line text entry field. Note that text edit widgets are
+		 * limited to a text matching the view size. Adding ES_AUTOHSCROOL*/
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
+		0, 0, /* X, Y */
+		150, 150, /* Temporary untill someone will change it */
+		ngtk_win_component_get_hwnd (parent), /* Parent window */
+		NULL, /* Number ID */
+		NGtk_Win_hInstance, /* Instance */
+		NULL /* The lParam passed with WM_CREATE message */
+		);
+
+	SendMessage (hwnd, EM_LIMITTEXT, max_text_len + 1, NULL);
+	obj    = ngtk_object_new ();
+	inW    = ngtk_basic_base_create_interface (obj, self);
+	inComp = ngtk_win_component_create_interface (obj, hwnd, NULL, TRUE, TRUE, initial_text, visible);
+
+	ngtk_container_add_child (parent, obj);
+	ngtk_component_set_visible (obj, visible);
+
+	return obj;
 }

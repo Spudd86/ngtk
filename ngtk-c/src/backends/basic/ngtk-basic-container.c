@@ -35,6 +35,8 @@ NGtkInterface* ngtk_basic_container_create_interface (NGtkObject *obj)
 	in->functions = ngtk_new (NGtkContainerF);
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_basic_container_get_children;
 	NGTK_CONTAINER_I2F (in) -> add_child    = ngtk_basic_container_add_child;
+	NGTK_CONTAINER_I2F (in) -> set_layout   = ngtk_basic_container_set_layout;
+	NGTK_CONTAINER_I2F (in) -> pack         = ngtk_basic_container_pack;
 	NGTK_CONTAINER_I2F (in) -> remove_child = ngtk_basic_container_remove_child;
 	NGTK_CONTAINER_I2F (in) -> place_child  = ngtk_basic_container_place_child;
 	in->functions_free = ngtk_free;
@@ -91,4 +93,9 @@ void ngtk_basic_container_set_layout (NGtkContainer *self, NGtkLayout *layout)
 
 void ngtk_basic_container_pack (NGtkContainer *self)
 {
+}
+
+NGtkLayout* ngtk_basic_container_get_layout (NGtkContainer *self)
+{
+	return NGTK_BASIC_CONTAINER_O2D (self) -> layout;
 }

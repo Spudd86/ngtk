@@ -28,6 +28,7 @@ NGtkInterface*     ngtk_win_container_create_interface (NGtkObject *obj);
 
 void               ngtk_win_container_add_child     (NGtkContainer *self, NGtkComponent* child);
 #define            ngtk_win_container_get_children  ngtk_basic_container_get_children
+void               ngtk_win_container_pack          (NGtkContainer *self);
 void               ngtk_win_container_remove_child  (NGtkContainer *self, NGtkComponent* child);
 void               ngtk_win_container_place_child   (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect);
 

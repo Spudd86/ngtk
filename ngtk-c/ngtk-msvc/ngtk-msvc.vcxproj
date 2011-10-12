@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{378FF22C-7AAF-422A-B647-B58049F86674}</ProjectGuid>
+    <RootNamespace>ngtkmsvc</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-backend.c" />
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-base.c" />
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-component.c" />
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-container.c" />
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-graphics.c" />
+    <ClCompile Include="..\src\backends\basic\ngtk-basic-text-entry.c" />
+    <ClCompile Include="..\src\backends\windows\ngtk-win-backend.c" />
+    <ClCompile Include="..\src\backends\windows\ngtk-win-component.c" />
+    <ClCompile Include="..\src\backends\windows\ngtk-win-container.c" />
+    <ClCompile Include="..\src\backends\windows\ngtk-win-defs.c" />
+    <ClCompile Include="..\src\backends\windows\ngtk-win-window.c" />
+    <ClCompile Include="..\src\layouts\ngtk-grid-layout.c" />
+    <ClCompile Include="..\src\object-system\ngtk-object.c" />
+    <ClCompile Include="..\src\utils\ngtk-list.c" />
+    <ClCompile Include="..\src\utils\ngtk-memory.c" />
+    <ClCompile Include="..\src\widgets\ngtk-backend.c" />
+    <ClCompile Include="..\src\widgets\ngtk-base.c" />
+    <ClCompile Include="..\src\widgets\ngtk-component.c" />
+    <ClCompile Include="..\src\widgets\ngtk-container.c" />
+    <ClCompile Include="..\src\widgets\ngtk-layout.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-backend.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-base.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-component.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-container.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-graphics.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-text-entry.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic-types.h" />
+    <ClInclude Include="..\src\backends\basic\ngtk-basic.h" />
+    <ClInclude Include="..\src\backends\ngtk-backends.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win-backend.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win-component.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win-container.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win-defs.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win-widget-types.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win-window.h" />
+    <ClInclude Include="..\src\backends\windows\ngtk-win.h" />
+    <ClInclude Include="..\src\layouts\ngtk-grid-layout.h" />
+    <ClInclude Include="..\src\ngtk.h" />
+    <ClInclude Include="..\src\object-system\ngtk-object.h" />
+    <ClInclude Include="..\src\utils\ngtk-list.h" />
+    <ClInclude Include="..\src\utils\ngtk-macros.h" />
+    <ClInclude Include="..\src\utils\ngtk-memory.h" />
+    <ClInclude Include="..\src\utils\ngtk-misc-types.h" />
+    <ClInclude Include="..\src\utils\ngtk-utils.h" />
+    <ClInclude Include="..\src\widgets\ngtk-backend.h" />
+    <ClInclude Include="..\src\widgets\ngtk-base.h" />
+    <ClInclude Include="..\src\widgets\ngtk-component.h" />
+    <ClInclude Include="..\src\widgets\ngtk-container.h" />
+    <ClInclude Include="..\src\widgets\ngtk-event-codes.h" />
+    <ClInclude Include="..\src\widgets\ngtk-layout.h" />
+    <ClInclude Include="..\src\widgets\ngtk-widget-types.h" />
+    <ClInclude Include="..\src\widgets\ngtk-widgets.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

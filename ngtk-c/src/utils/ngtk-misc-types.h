@@ -37,6 +37,17 @@ typedef struct _ngtk_point {
 	(  NGTK_IN_RANGE (x0, (prect)->x, (prect)->x + (prect)->w - 1) \
 	&& NGTK_IN_RANGE (y0, (prect)->y, (prect)->y + (prect)->h - 1) )
 
+/* Idea: Two segments on one axis intersect if the starting point
+ *       of one of them is inside the other. We apply this to both
+ *       X and Y, and if both intersect then the rectangles intersect
+ */
+#define ngtk_rect_interesects(rect1,rect2) \
+	(  (  NGTK_IN_RANGE ((rect1)->x, (rect2)->x, (rect2)->x + (rect2)->w - 1)  \
+	   || NGTK_IN_RANGE ((rect2)->x, (rect1)->x, (rect1)->x + (rect1)->w - 1)) \
+	&& (  NGTK_IN_RANGE ((rect1)->y, (rect2)->y, (rect2)->y + (rect2)->h - 1)  \
+	   || NGTK_IN_RANGE ((rect2)->y, (rect1)->y, (rect1)->y + (rect1)->h - 1)) \
+    )
+
 /** A type for functions that free memory */
 typedef void (*NGtkFreeFunc) (void *data);
 /**

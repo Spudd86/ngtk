@@ -26,6 +26,7 @@ NGtkInterface* ngtk_win_container_create_interface (NGtkObject *obj)
 
 	NGTK_CONTAINER_I2F (in) -> add_child    = ngtk_win_container_add_child;
 	NGTK_CONTAINER_I2F (in) -> get_children = ngtk_win_container_get_children;
+	NGTK_CONTAINER_I2F (in) -> pack         = ngtk_win_container_pack;
 	NGTK_CONTAINER_I2F (in) -> place_child  = ngtk_win_container_place_child;
 	NGTK_CONTAINER_I2F (in) -> remove_child = ngtk_win_container_remove_child;
 
@@ -46,4 +47,17 @@ void ngtk_win_container_place_child (NGtkContainer *self, NGtkComponent* child, 
 {
 	SetWindowPos (ngtk_win_component_get_hwnd (child), HWND_TOP, rect->x, rect->y, rect->w, rect->h, SWP_NOZORDER);
 	ngtk_basic_container_place_child (self, child, rect);
+}
+
+void ngtk_win_container_pack (NGtkContainer *self)
+{
+	if (ngtk_basic_container_get_layout (self) != NULL)
+	{
+		RECT r;
+
+		GetClientRect (ngtk_win_component_get_hwnd (self), &r);
+
+		ngtk_layout_pack (ngtk_basic_container_get_layout (self), self,
+			r.right - r.left, r.bottom - r.top);
+	}
 }
