@@ -264,21 +264,27 @@ static void emit_signal (void *src, NGtkList *listeners, const char *signal, voi
 
 void ngtk_object_connect_to (NGtkObject *obj, const char* signal, NGtkListener listener, void *user_data)
 {
+	ngtk_assert (obj != NULL);
+	ngtk_assert (listener != NULL);
 	append_listener (&obj->listeners, signal, listener, user_data);
 }
 
 void ngtk_object_send_signal (NGtkObject* obj, const char* signal, void *sigdata)
 {
+	ngtk_assert (obj != NULL);
 	emit_signal (obj, &obj->listeners, signal, sigdata);
 }
 
 void ngtk_interface_connect_to (NGtkInterface *in, const char* signal, NGtkListener listener, void *user_data)
 {
+	ngtk_assert (in != NULL);
+	ngtk_assert (listener != NULL);
 	append_listener (&in->listeners, signal, listener, user_data);
 }
 
 void ngtk_interface_send_signal (NGtkInterface* in, const char* signal, void *sigdata, int also_object)
 {
+	ngtk_assert (in != NULL);
 	emit_signal (in, &in->listeners, signal, sigdata);
 	if (also_object && in->object)
 		ngtk_object_send_signal (in->object, signal, sigdata);

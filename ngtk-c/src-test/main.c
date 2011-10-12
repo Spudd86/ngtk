@@ -115,6 +115,8 @@ void CommonKeyboardHandler (void *src, const char* signame, void *sigdata, void 
 		ErasePressed ();
 	else if (key == NGTK_KKEY_ENTER)
 		ComputePressed ();
+	else if (key == 'Q' || key == 'q')
+		ngtk_backend_quit_main_loop (ngtk_base_get_backend ((NGtkComponent*) src));
 	else
 		someUpdate = FALSE;
 
@@ -239,8 +241,11 @@ int main (int argc, char **argv)
 		ngtk_grid_layout_add (gl, lab, &gui[i].rect);
 //		printf ("Adding \"%s\" at (%d,%d) %dx%d\n", gui[i].text, gui[i].rect.x, gui[i].rect.y, gui[i].rect.w, gui[i].rect.h);
 		ngtk_component_set_visible (lab, TRUE);
-		ngtk_object_connect_to (lab, "event::mouse", gui[i].mouse_handler, NULL);
-		ngtk_object_connect_to (lab, "event::keyboard", gui[i].keyboard_handler, NULL);
+
+		if (gui[i].mouse_handler != NULL)
+			ngtk_object_connect_to (lab, "event::mouse", gui[i].mouse_handler, NULL);
+		if (gui[i].keyboard_handler != NULL)
+			ngtk_object_connect_to (lab, "event::keyboard", gui[i].keyboard_handler, NULL);
 
 		if (i == 0)
 			op = lab;
@@ -264,6 +269,7 @@ int main (int argc, char **argv)
 	ngtk_backend_quit (X);
 
 	ngtk_object_free (X);
+	ngtk_object_free (gl);
 
 	return EXIT_SUCCESS;
 }
