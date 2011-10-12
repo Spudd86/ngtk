@@ -10,17 +10,19 @@ ngtk-core: dist/libngtk$(DLEXT)
 
 dist/libngtk$(DLEXT): ngtk-subdirs
 	mkdir -p dist
-	$(NGTK_MKD) object-system/*.a utils/*.a widgets/*.a -o dist/libngtk$(DLEXT)
+	$(NGTK_MKD) object-system/*.a utils/*.a widgets/*.a layouts/*.a -o dist/libngtk$(DLEXT)
 
 ngtk-subdirs:
 	cd object-system; $(MAKE) $(MFLAGS)
 	cd utils;         $(MAKE) $(MFLAGS)
 	cd widgets;       $(MAKE) $(MFLAGS)
+	cd layouts;       $(MAKE) $(MFLAGS)
 
 clean: .PHONY
 	cd object-system; $(MAKE) $(MFLAGS) clean
 	cd utils;         $(MAKE) $(MFLAGS) clean
 	cd widgets;       $(MAKE) $(MFLAGS) clean
+	cd layouts;       $(MAKE) $(MFLAGS) clean
 
 	cd backends;      $(MAKE) $(MFLAGS) clean-backend-nc
 	cd backends;      $(MAKE) $(MFLAGS) clean-backend-xlib
