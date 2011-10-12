@@ -28,6 +28,7 @@
 typedef struct _ngtk_xlib_component_d {
 	NGtkRectangle  area;
 	Window         wnd;
+	int            zero_size_hide;
 } NGtkXlibComponentD;
 
 #define NGTK_XLIB_COMPONENT_O2D(comp) NGTK_O2D_CAST(comp,NGTK_COMPONENT_TYPE,NGtkXlibComponentD,1)

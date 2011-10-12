@@ -44,6 +44,8 @@ NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContai
 	xcd->area.y = default_position.y;
 	xcd->area.w = default_position.w;
 	xcd->area.h = default_position.h;
+	xcd->zero_size_hide = xcd->area.w == 0 || xcd->area.h == 0;
+
 	xcd->wnd = XCreateSimpleWindow (
 		/* Connection to X server */
 		disp,
@@ -84,7 +86,7 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 {
 	int old_val = ngtk_component_get_visible (self);
 
-	if (old_val != visible)
+	if (old_val != visible && ! NGTK_XLIB_COMPONENT_O2D (self) -> zero_size_hide)
 	{
 		Window           wnd  = ngtk_xlib_component_get_window (self);
 		NGtkXlibBackend *xb   = ngtk_base_get_backend (self);
@@ -114,13 +116,27 @@ void ngtk_xlib_component_put_to (NGtkComponent *self, const NGtkRectangle *new_a
 	NGtkXlibComponentD *xcd = NGTK_XLIB_COMPONENT_O2D (self);
 	NGtkXlibBackend    *xb  = ngtk_base_get_backend (self);
 
+	int new_zero_size_hide = new_area->h == 0 || new_area->w == 0;
+	int old_zero_size_hide = xcd->zero_size_hide;
+	int visible = ngtk_component_get_visible (self);
+
 	xcd->area.x = new_area->x;
 	xcd->area.y = new_area->y;
 	xcd->area.w = new_area->w;
 	xcd->area.h = new_area->h;
 
 	if (! already_there)
-		XMoveResizeWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd, new_area->x, new_area->y, new_area->w, new_area->h);
+	{
+		if (new_zero_size_hide && visible && ! old_zero_size_hide)
+			XUnmapWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd);
+		else if (! new_zero_size_hide)
+			XMoveResizeWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd, new_area->x, new_area->y, new_area->w, new_area->h);
+
+		if (! new_zero_size_hide && old_zero_size_hide && visible)
+			XMapWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd);
+
+		xcd->zero_size_hide = new_zero_size_hide;
+	}
 }
 
 Window ngtk_xlib_component_get_window (NGtkComponent *self)
