@@ -201,7 +201,7 @@ void ComputePressed ()
 	text_buf_pos = sprintf (text_buf, "%f", ABS (result));
 	current_number_has_dot = FALSE;
 	for (i = 0; i < text_buf_pos; i++)
-		if (current_number_has_dot = (text_buf[i] == '.'))
+		if ((current_number_has_dot = (text_buf[i] == '.')))
 			break;
 	has_minus = result < 0;
 

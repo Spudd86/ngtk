@@ -30,35 +30,15 @@
 
 NGtkComponent *number, *op;
 
-/* Calculator Logic in Pseudo Code:
- *
- * On "Op":
- * - If CurrentOp == NOP:
- * -     Current = Prev
- * -     Single Type
- * - Else:
- * - Compute 
- * On "Compute":
- * NUMBER:
- * : "Op":
- * : -> prev = current, current = 
- * : 
- * : "Digit"/"Erase" -> NUMBER1 (change number)
- * : "Compute"       -> NUMBER1 (do nothing)
- *
- * NUMBER2:
- * : "COMPUTE"
- *
- */
-
 void UpdateGUI ()
 {
 	ngtk_component_set_text (number, GetNumberToDisplay ());
 	ngtk_component_set_text (op, GetOpToDisplay ());
 }
 
-void NumberClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void NumberClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
+	NGtkComponent *comp = (NGtkComponent*) src;
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 	{
 		DigitPressed (ngtk_component_get_text (comp) [0]);
@@ -66,7 +46,7 @@ void NumberClick (NGtkComponent *comp, const char* signame, void *sigdata, void 
 	}
 }
 
-void DotClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void DotClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 	{
@@ -75,8 +55,9 @@ void DotClick (NGtkComponent *comp, const char* signame, void *sigdata, void *li
 	}
 }
 
-void OpClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void OpClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
+	NGtkComponent *comp = (NGtkComponent*) src;
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 	{
 		OpPressed (ngtk_component_get_text (comp) [0]);
@@ -84,7 +65,7 @@ void OpClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lis
 	}
 }
 
-void EraseClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void EraseClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 	{
@@ -93,21 +74,21 @@ void EraseClick (NGtkComponent *comp, const char* signame, void *sigdata, void *
 	}
 }
 
-void ComputeClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void ComputeClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 		ComputePressed ();
 	UpdateGUI ();
 }
 
-void ClearClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void ClearClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 		ClearPressed ();
 	UpdateGUI ();
 }
 
-void ToggleClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void ToggleClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 	{
@@ -116,7 +97,7 @@ void ToggleClick (NGtkComponent *comp, const char* signame, void *sigdata, void 
 	}
 }
 
-void CommonKeyboardHandler (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void CommonKeyboardHandler (void *src, const char* signame, void *sigdata, void *lisdata)
 {
 	NGtkKeyboardEventKey key = ((NGtkKeyboardEvent*)sigdata)->key;
 	int someUpdate = TRUE;
@@ -141,8 +122,9 @@ void CommonKeyboardHandler (NGtkComponent *comp, const char* signame, void *sigd
 		UpdateGUI ();
 }
 
-void QuitClick (NGtkComponent *comp, const char* signame, void *sigdata, void *lisdata)
+void QuitClick (void *src, const char* signame, void *sigdata, void *lisdata)
 {
+	NGtkComponent *comp = (NGtkComponent*) src;
 	if (((NGtkMouseEvent*) sigdata)->type == NGTK_MET_CLICK)
 		ngtk_backend_quit_main_loop (ngtk_base_get_backend (comp));
 }
@@ -174,8 +156,8 @@ typedef struct {
  * |---+---+---+---+---|
  * | 7 | 8 | 9 | * |   |
  * |---+---+---+---| = |
- * |   0   | . | / |   |
- * +-------+---+---+---+
+ * | 0 |+/-| . | / |   |
+ * +---+---+---+---+---+
  * |       Quit        |
  * +-------------------+
  *
@@ -215,7 +197,6 @@ const static WidgetSpecs gui[] = {
 
 int main (int argc, char **argv)
 {
-	char text[MAX_STR+1] = { '\0' };
 	NGtkGridLayout *gl;
 
 #ifdef NGTK_USE_NC
@@ -254,7 +235,7 @@ int main (int argc, char **argv)
 		default:
 			ngtk_assert (FALSE);
 		}
-		
+
 		ngtk_grid_layout_add (gl, lab, &gui[i].rect);
 //		printf ("Adding \"%s\" at (%d,%d) %dx%d\n", gui[i].text, gui[i].rect.x, gui[i].rect.y, gui[i].rect.w, gui[i].rect.h);
 		ngtk_component_set_visible (lab, TRUE);
@@ -266,7 +247,7 @@ int main (int argc, char **argv)
 		else if (i == 1)
 			number = lab;
 	}
-	
+
 	ClearPressed ();
 	UpdateGUI ();
 

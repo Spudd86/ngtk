@@ -60,7 +60,11 @@
 #define ngtk_assert(expr) NGTK_MACRO_DO_NOTHING ()
 #endif
 
+#ifdef _WIN32
 #define NGTK_EXPORT __declspec(dllexport)
+#else
+#define NGTK_EXPORT
+#endif
 
 #define NGTK_ELEMENT_COUNT(ar) (sizeof(ar)/sizeof((ar)[0]))
 #define ngtk_assert_not_reached() assert (FALSE)
