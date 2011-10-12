@@ -117,6 +117,47 @@ static int CALLBACK ngtk_win_mouse_handle (NGtkComponent* wc, HWND hwnd, UINT ms
 	}
 }
 
+static int CALLBACK ngtk_win_keyboard_handle (NGtkComponent* wc, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	NGtkKeyboardEvent evnt;
+
+	if (msg == WM_KEYDOWN)
+	{
+		switch (wParam)
+		{
+		case VK_LEFT:
+			evnt.key = NGTK_KKEY_ARROW_LEFT; break;
+		case VK_DOWN:
+			evnt.key = NGTK_KKEY_ARROW_DOWN; break;
+		case VK_RIGHT:
+			evnt.key = NGTK_KKEY_ARROW_RIGHT; break;
+		case VK_UP:
+			evnt.key = NGTK_KKEY_ARROW_UP; break;
+		default:
+			return 0;
+		}
+	}
+	else if (msg == WM_CHAR)
+	{
+		if (wParam == '\b')
+			evnt.key = NGTK_KKEY_BACKSPACE;
+		else if  (wParam == '\r')
+			evnt.key = NGTK_KKEY_ENTER;
+		else if  (wParam == ' ')
+			evnt.key = NGTK_KKEY_SPACE;
+		else if (wParam >= NGTK_KKEY_MIN_CHAR && wParam <= NGTK_KKEY_MAX_CHAR)
+			evnt.key = wParam;
+		else
+			evnt.key = NGTK_KKEY_OTHER;
+	}
+	else
+		return 0;
+
+	ngtk_interface_send_signal (ngtk_object_cast (wc, NGTK_COMPONENT_TYPE), "event::keyboard", &evnt, TRUE);
+
+	return 1;
+}
+
 static int CALLBACK ngtk_win_container_handle (NGtkContainer* wc, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	NGtkBackend *backend = ngtk_base_get_backend (wc);
@@ -189,6 +230,7 @@ LRESULT CALLBACK ngtk_win_general_WndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 
 	ngtk_win_container_handle (ww, hwnd, msg, wParam, lParam);
 	ngtk_win_mouse_handle (ww, hwnd, msg, wParam, lParam);
+	ngtk_win_keyboard_handle (ww, hwnd, msg, wParam, lParam);
 	
 	switch (msg)
 	{
