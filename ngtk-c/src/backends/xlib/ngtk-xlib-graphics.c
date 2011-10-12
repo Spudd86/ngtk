@@ -39,7 +39,7 @@ NGtkXlibGraphics* ngtk_xlib_graphics_create (NGtkComponent *comp)
 	xgd = ngtk_new (NGtkXlibGraphicsD);
 	inG->imp_data[0] = xgd;
 	ngtk_xlib_graphics_data_init (xgd, comp);
-	inG->imp_data_free[0] = NULL;
+	inG->imp_data_free[0] = ngtk_free;
 
 	inG->functions = ngtk_new (NGtkGraphicsF);
 	NGTK_GRAPHICS_I2F (inG) -> clear = ngtk_xlib_graphics_clear;

@@ -61,7 +61,6 @@ NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContai
 		);
 	in->imp_data_free[1] = ngtk_free;
 
-	ngtk_debug (backend, "XSelectInput (%p, %lu, %lu)", disp, xcd->wnd, NGTK_XLIB_EVENT_MASK);
 	XSelectInput (disp, xcd->wnd, NGTK_XLIB_EVENT_MASK);
 
 	ngtk_basic_backend_component_register (obj);
@@ -93,12 +92,10 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 
 		if (visible)
 		{
-			ngtk_debug (xb, "XMapWindow (%p, %lu)", disp, wnd);
 			XMapWindow (disp, wnd);
 		}
 		else
 		{
-			ngtk_debug (xb, "XUnmapWindow (%p, %lu)", disp, wnd);
 			XUnmapWindow (disp, wnd);
 		}
 	}
