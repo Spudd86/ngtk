@@ -28,7 +28,7 @@ NGtkLayout* ngtk_grid_layout_new (NGtkContainer *cont, int xSize, int ySize)
 
 void ngtk_grid_layout_destroy (NGtkGridLayout *self)
 {
-	ngtk_list_clear (& NGTK_GRID_LAYOUT_O2D (self) -> areas);
+	ngtk_list_clear_with_free_func (& NGTK_GRID_LAYOUT_O2D (self) -> areas, ngtk_free);
 	ngtk_list_clear (& NGTK_GRID_LAYOUT_O2D (self) -> comps);
 
 	ngtk_interface_detach_and_free (ngtk_object_cast (self, NGTK_LAYOUT_TYPE));
