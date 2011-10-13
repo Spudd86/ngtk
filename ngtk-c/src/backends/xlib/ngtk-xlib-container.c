@@ -20,6 +20,8 @@
 
 #include "ngtk-xlib.h"
 
+/* Basically, nothing interesting happens in this file */
+
 NGtkInterface* ngtk_xlib_container_create_interface (NGtkObject *obj)
 {
 	NGtkInterface *in = ngtk_basic_container_create_interface (obj);
@@ -44,7 +46,6 @@ void ngtk_xlib_container_remove_child (NGtkContainer *self, NGtkComponent* child
 
 void ngtk_xlib_container_place_child (NGtkContainer *self, NGtkComponent* child, NGtkRectangle *rect)
 {
-	/* TODO: since we allow only one window in the NCurses backend */
 	ngtk_xlib_component_put_to (child, rect, FALSE);
 	ngtk_basic_container_place_child (self, child, rect);
 }

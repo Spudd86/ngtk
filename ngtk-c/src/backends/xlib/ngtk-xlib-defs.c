@@ -40,7 +40,7 @@ void ngtk_xlib_init (NGtkXlibBackend *self)
 	int i = 0;
 
 	display_name = getenv ("DISPLAY");
-//	if (display_name == NULL) display_name = ":0";
+	if (display_name == NULL) display_name = ":0";
 
 	/* Open a connection to the X server */
 	xbd->display = XOpenDisplay (display_name);
@@ -155,16 +155,13 @@ static void handle_mouse_button_event (NGtkXlibBackend *self, XButtonEvent evnt)
 		nevent.type = NGTK_MET_DOWN;
 		last_but_press_here[mouse_but_index] = evnt.window;
 
-//		/* A clicked object should receive the keyboard focus, iff it's
-//		 * an event-generator.
-//		 * TODO: Fix focus handling in the Xlib backend. Specifically,
-//		 * do we need to manually keep track of focus for widgets inside
-//		 * a window? */
-//		if (widget != NULL && ngtk_object_is_a (widget, NGTK_EVENT_GENERATOR_TYPE))
-//			ngtk_event_generator_grab_keyboard_focus (widget);
+		/* TODO: in the future, focus on this widget */
 	}
 	else /* if (type == ButtonRelease) */
 	{
+		/* If we have a mouse release, and it's on the same widget where
+		 * the last press of this button occured, then we have a click
+		 */
 		if (last_but_press_here[mouse_but_index] == evnt.window)
 			also_fire_click = TRUE;
 
@@ -195,6 +192,9 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 	while (! ngtk_xlib_backend_should_quit (self))
 	{
 		XEvent event;
+
+		/* Retrieve the next event from the event Queue, or block untill
+		 * such an event is received */
 		XNextEvent (xbd->display, &event);
 
 		/* See NGTK_XLIB_EVENT_MASK in ngtk-xlib-defs.h */
@@ -226,6 +226,8 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 			break;
 		}
 
+		/* Support detection of mouse motion events. This is mostly
+		 * experimental and was not in the requirements */
 		case MotionNotify:
 		{
 			XMotionEvent mevent = event.xmotion;
@@ -253,8 +255,14 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 
 		case KeyPress:
 		{
-			//Window wnd = //event.xbutton.window;
-			//NGtkComponent *comp = ngtk_xlib_backend_get_for_window (self, wnd);
+			/* Due to a problem with Xlib, the window inside the event
+			 * structure isn't what we mean to have as the focus holder.
+			 * I had lots of trouble convincing Xlib to set the focus
+			 * correctly, so I'm managing the focus myself inside the
+			 * backend object, and whenever a keyboard key is typed,
+			 * I send the event to my own focus holder.
+			 * See http://stackoverflow.com/questions/7617630/xsetinputfocus-fails
+			 */
 			NGtkComponent *comp = ngtk_backend_get_focus_holder (self);
 			KeySym keysym;
 			int has_keysym;
@@ -337,6 +345,7 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 			break;
 		}
 
+		/* Sent when a window was actually destroyed */
 		case DestroyNotify:
 		{
 			Window wnd = event.xdestroywindow.window;
@@ -344,6 +353,7 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 
 			ngtk_xlib_component_call_on_window_destroyed (xb);
 
+			/* Quit if this was the root window */
 			if (xb == ngtk_xlib_root_window)
 			{
 				ngtk_backend_quit_main_loop (self);
@@ -351,6 +361,8 @@ void ngtk_xlib_start_main_loop (NGtkXlibBackend *self)
 			break;
 		}
 
+		/* A message from the window manager. Earlier we registered for
+		 * a message when the user tries to close the window */
 		case ClientMessage:
 			if (event.xclient.data.l[0] == xbd->window_close_atom
 				&& event.xclient.window == ngtk_xlib_component_get_window (ngtk_xlib_root_window))
@@ -382,6 +394,7 @@ void ngtk_xlib_quit (NGtkXlibBackend *self)
 	/* Free the root window */
 	if (bbd->root_window)
 	{
+		/* Freeing the root window will free it's children */
 		ngtk_object_free (bbd->root_window);
 		bbd->root_window = NULL;
 	}
@@ -402,29 +415,3 @@ void ngtk_xlib_quit (NGtkXlibBackend *self)
 	/* Close the connection to the X server */
 	XCloseDisplay (xbd->display);
 }
-
-#if FALSE
-NGtkContainer* ngtk_xlib_create_root_window (const char* title)
-{
-	if (ngtk_xlib_root_window == NULL)
-		ngtk_xlib_root_window = ngtk_xlib_create_window_imp (title, FALSE);
-
-	XSetWMProtocols (xlib_display, ngtk_xlib_base_get_window (ngtk_xlib_root_window), &xlib_window_close_atom, 1);
-	return ngtk_xlib_root_window;
-}
-
-NGtkComponent* ngtk_xlib_create_button (NGtkContainer* parent, const char* text)
-{
-	return ngtk_xlib_create_button_imp (text, FALSE, parent);
-}
-
-NGtkComponent* ngtk_xlib_create_label (NGtkContainer* parent, const char* text)
-{
-	return ngtk_xlib_create_label_imp (text, FALSE, parent);
-}
-
-NGtkComponent* ngtk_xlib_create_text_entry (NGtkContainer* parent, const char* text)
-{
-	return NULL;
-}
-#endif

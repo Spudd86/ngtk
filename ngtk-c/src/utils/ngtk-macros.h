@@ -43,7 +43,8 @@
 #define ABS(a) (((a) < 0) ? -(a) : (a))
 #endif
 
-
+/** Check if a value is in the range between two given values
+ * (including thos values) */
 #define NGTK_IN_RANGE(val,min,max) ((min) <= (val) && (val) <= (max))
 #define NGTK_BIT_MASK(bit) ( ((unsigned long long)1) << ((bit)-1))
 

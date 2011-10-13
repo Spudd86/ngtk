@@ -20,6 +20,10 @@
 
 #include "ngtk-xlib.h"
 
+/* A class of wrappers around XLib graphics, to attach them to common
+ * shared widget drawing logic. Unless you are interested in drawing
+ * lines and stuff, skip this */
+
 static void ngtk_xlib_graphics_data_init (NGtkXlibGraphicsD *dd, NGtkComponent *comp);
 static void ngtk_xlib_graphics_destroy (NGtkGraphics *self);
 

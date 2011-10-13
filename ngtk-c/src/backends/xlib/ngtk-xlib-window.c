@@ -23,6 +23,11 @@
 #include <stdio.h>
 #include <string.h>
 
+/* This file contains the creation functions for all the widget types */
+
+/** The pack method of the main window - this is responsible for
+ * refreshing the window size structures, and then using the layout to
+ * reposition all the children. */
 static void pack_main_window (NGtkContainer *self)
 {
 	NGtkRectangle new_area;

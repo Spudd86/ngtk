@@ -132,6 +132,12 @@ NGTK_EXPORT NGtkList*     ngtk_list_duplicate             (const NGtkList *list)
  */
 #define       ngtk_list_foreach(iter,list)    for ((iter) = (list)->first; (iter) != NULL; (iter) = (iter)->next)
 
+/**
+ * ATwo synchronized read-only iterators on two lists. This means you
+ * may not modify the list structure while the iteration is in process
+ * (you may however modify the list data).
+ */
+
 #define       ngtk_list_2foreach(iter1,list1,iter2,list2)    \
     for ((iter1) = (list1)->first, (iter2) = (list2)->first; \
 	     (iter1) != NULL && (iter2 != NULL);                 \

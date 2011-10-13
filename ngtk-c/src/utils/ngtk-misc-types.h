@@ -51,7 +51,6 @@ typedef struct _ngtk_point {
 /** A type for functions that free memory */
 typedef void (*NGtkFreeFunc) (void *data);
 /**
- * /typedef
  * A type for functions that free memory and receive an additional
  * pointer that may be needed for freeing the data.
  * */

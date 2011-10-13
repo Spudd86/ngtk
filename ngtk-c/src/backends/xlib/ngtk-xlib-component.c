@@ -33,6 +33,10 @@ NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContai
 	Window parent_window = BadWindow;
 	Display *disp = ngtk_xlib_backend_get_X_display (backend);
 
+	/* Every X screen has a root_window - this is a window that covers
+	 * the entire screen. If we want  to create a "Top-Level" window,
+	 * then it's direct parent should be the root_window of the matching
+	 * X screen */
 	if (parent == NULL)
 		parent_window = ngtk_xlib_backend_get_X_root_window (backend);
 	else
@@ -63,10 +67,17 @@ NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContai
 		);
 	in->imp_data_free[1] = ngtk_free;
 
+	/* Set the mask of events that we would like to be notified about */
 	XSelectInput (disp, xcd->wnd, NGTK_XLIB_EVENT_MASK);
 
+	/* Call to add this component to the general component list, and to
+	 * emit the signal saying that a component was craeted on the
+	 * backend */
 	ngtk_basic_backend_component_register (obj);
+	/* Assert that this component was registered succesfully */
 	ngtk_assert (ngtk_xlib_backend_get_for_window (backend, xcd->wnd) == obj);
+	/* When the component is destroyed, don't forget to unregister
+	 * it from the backend! */
 	ngtk_object_push_destructor (obj, ngtk_basic_backend_component_unregister);
 
 	NGTK_COMPONENT_I2F (in) -> set_enabled = ngtk_xlib_component_set_enabled;
@@ -79,6 +90,8 @@ NGtkInterface* ngtk_xlib_component_create_interface (NGtkObject *obj, NGtkContai
 void ngtk_xlib_component_set_enabled (NGtkComponent *self, int enabled)
 {
 	ngtk_basic_component_set_enabled (self, enabled);
+	/* The enabled property has a visual feedback that should be
+	 * updated */
 	ngtk_xlib_component_redraw (self);
 }
 
@@ -86,6 +99,9 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 {
 	int old_val = ngtk_component_get_visible (self);
 
+	/* If we are indeed changing the visibility status, and if we are
+	 * not locked in hidden mode due to a zero size, then there is a
+	 * reason to consider doing something */
 	if (old_val != visible && ! NGTK_XLIB_COMPONENT_O2D (self) -> zero_size_hide)
 	{
 		Window           wnd  = ngtk_xlib_component_get_window (self);
@@ -107,6 +123,8 @@ void ngtk_xlib_component_set_visible (NGtkComponent *self, int visible)
 void ngtk_xlib_component_set_text (NGtkComponent *self, const char *text)
 {
 	ngtk_basic_component_set_text (self, text);
+	/* The text property has a visual feedback that should be
+	 * updated */
 	ngtk_component_redraw (self);
 }
 
@@ -125,13 +143,20 @@ void ngtk_xlib_component_put_to (NGtkComponent *self, const NGtkRectangle *new_a
 	xcd->area.w = new_area->w;
 	xcd->area.h = new_area->h;
 
+	/* Do we really need to do something? */
 	if (! already_there)
 	{
+		/* If the widget wasn't hidden previously (not because of zero
+		 * size and not because of the visible property), then if it
+		 * now gets a zero size, it should be hidden */
 		if (new_zero_size_hide && visible && ! old_zero_size_hide)
 			XUnmapWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd);
+		/* Otherwise, if the new size is valid, we should resize */
 		else if (! new_zero_size_hide)
 			XMoveResizeWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd, new_area->x, new_area->y, new_area->w, new_area->h);
 
+		/* If previously we were hidden only because of a zero size, and
+		 * now the new size is legitimate, then map the window */
 		if (! new_zero_size_hide && old_zero_size_hide && visible)
 			XMapWindow (ngtk_xlib_backend_get_X_display (xb), xcd->wnd);
 

@@ -124,8 +124,9 @@ int ngtk_list_remove_node (NGtkList *list, NGtkListNode *node)
 void ngtk_list_append (NGtkList *list, void *data)
 {
 	NGtkListNode *nn = ngtk_list_node_new (data);
-	if (list->first == NULL /* && list->last == NULL */)
+	if (list->first == NULL)
 	{
+		ngtk_assert (list->last == NULL);
 		list->first = list->last = nn;
 	}
 	else
@@ -138,8 +139,9 @@ void ngtk_list_append (NGtkList *list, void *data)
 void ngtk_list_prepend (NGtkList *list, void *data)
 {
 	NGtkListNode *nn = ngtk_list_node_new (data);
-	if (list->first == NULL /* && list->last == NULL */)
+	if (list->first == NULL)
 	{
+		ngtk_assert (list->last == NULL);
 		list->first = list->last = nn;
 	}
 	else
