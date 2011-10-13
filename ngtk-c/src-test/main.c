@@ -239,7 +239,6 @@ int main (int argc, char **argv)
 		}
 
 		ngtk_grid_layout_add (gl, lab, &gui[i].rect);
-//		printf ("Adding \"%s\" at (%d,%d) %dx%d\n", gui[i].text, gui[i].rect.x, gui[i].rect.y, gui[i].rect.w, gui[i].rect.h);
 		ngtk_component_set_visible (lab, TRUE);
 
 		if (gui[i].mouse_handler != NULL)

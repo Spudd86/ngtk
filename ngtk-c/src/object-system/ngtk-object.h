@@ -66,9 +66,12 @@ typedef struct _ngtk_listener_info {
 	void         *lisdata;
 } NGtkListenerInfo;
 
-
+/** The type of an object destructor function */
 typedef void (*NGtkDestructor)  (NGtkObject *obj);
+/** The type of an interface destructor function */
+typedef void (*NGtkDestructorI) (NGtkInterface *in);
 
+/** The internal representation of an object (\ref NGtkObject) */
 struct _ngtk_object {
 	/** A bitmask of the implemented interfaces */
 	NGtkObjectTypeMask  interface_mask;
@@ -92,6 +95,7 @@ struct _ngtk_object {
 };
 
 
+/** The internal representation of an interface (\ref NGtkInterface) */
 struct _ngtk_inteface {
 	/** The object containing this interface */
 	NGtkObject         *object;
@@ -182,7 +186,8 @@ NGTK_EXPORT void           ngtk_interface_send_signal  (NGtkInterface *in, const
 NGTK_EXPORT void ngtk_interface_detach_and_free (NGtkInterface *in);
 
 
-/** Given an object, return the functions struct of the desired
+/** \def NGTK_O2F_CAST
+ * Given an object, return the functions struct of the desired
  * interface and cast it to the given type. Minimal type checking is
  * included to assert that the object does implement the interface.
  * @param o The object (NGtkObject*)
@@ -190,7 +195,8 @@ NGTK_EXPORT void ngtk_interface_detach_and_free (NGtkInterface *in);
  * @param type The type of the functions struct
  */
 #define NGTK_O2F_CAST(o,bit,type) ((type*)(ngtk_object_cast(o,bit)->functions))
-/** Given an object, return the data struct of the desired
+/** \def NGTK_O2D_CAST
+ * Given an object, return the data struct of the desired
  * interface and cast it to the given type. Minimal type checking is
  * included to assert that the object does implement the interface.
  * @param o The object (NGtkObject*)
@@ -200,9 +206,11 @@ NGTK_EXPORT void ngtk_interface_detach_and_free (NGtkInterface *in);
  */
 #define NGTK_O2D_CAST(o,bit,type,pos) ((type*)(ngtk_object_cast(o,bit)->imp_data[(pos)]))
 
-/** Similar to \ref NGTK_O2F_CAST, but receives an interface */
+/** \def NGTK_I2F_CAST
+ * Similar to \ref NGTK_O2F_CAST, but receives an interface */
 #define NGTK_I2F_CAST(i,bit,type) ((type*)(ngtk_interface_cast(i,bit)->functions))
-/** Similar to \ref NGTK_O2D_CAST, but receives an interface */
+/** \def NGTK_I2D_CAST
+ * Similar to \ref NGTK_O2D_CAST, but receives an interface */
 #define NGTK_I2D_CAST(i,bit,type,pos) ((type*)(ngtk_interface_cast(i,bit)->imp_data[(pos)]))
 
 /** @} */

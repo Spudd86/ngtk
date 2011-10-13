@@ -217,15 +217,8 @@ LRESULT CALLBACK ngtk_win_general_WndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 {
 	NGtkComponent *ww = GetFromHwnd (hwnd);
 	NGtkBackend   *backend;
+	WNDPROC        base_proc = ngtk_win_component_get_base_wnd_proc (ww);
 
-	/* Upon creation of the window (and the following messages), we still
-	 * won't have the object pointer set into the HWND object, so in these
-	 * cases we have nothing to do */
-	if (ww == NULL)
-	{
-		return DefWindowProc (hwnd, msg, wParam, lParam);
-	}
-	
 	backend = ngtk_base_get_backend (ww);
 
 	ngtk_win_container_handle (ww, hwnd, msg, wParam, lParam);
@@ -235,16 +228,21 @@ LRESULT CALLBACK ngtk_win_general_WndProc (HWND hwnd, UINT msg, WPARAM wParam, L
 	switch (msg)
 	{
 	case WM_DESTROY: /* The window was destroyed */
+
+		/* Remove any association of from the component to the HWND,
+		 * and restore the original WndProc for finishing the destruction */
 		ngtk_win_component_call_on_wnd_destroy (ww);
+
 		/* Properties must be removed before the window is destroyed */
 		RemoveFromHwnd (hwnd);
+
 		break;
 
 	default:
 		break;
 	}
 
-	return CallWindowProc (ngtk_win_component_get_base_wnd_proc (ww), hwnd, msg, wParam, lParam);
+	return CallWindowProc (base_proc, hwnd, msg, wParam, lParam);
 }
 
 static void register_root_window_class ()
@@ -346,7 +344,13 @@ void ngtk_win_quit_main_loop (NGtkBackend *backend)
 
 void ngtk_win_quit (NGtkBackend *backend)
 {
-	
+	NGtkList *all_comps = ngtk_backend_get_all_components (backend);
+
+	while (! ngtk_list_is_empty (all_comps))
+		ngtk_object_free ((NGtkObject*) all_comps->first->data);
+
+	if (ngtk_backend_get_root_window (backend) != NULL)
+		ngtk_free (ngtk_backend_get_root_window (backend));
 }
 
 LPCSTR ngtk_win_get_root_window_class_name (NGtkBackend *backend)

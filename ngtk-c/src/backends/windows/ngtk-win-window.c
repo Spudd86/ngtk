@@ -126,7 +126,7 @@ NGtkObject* ngtk_win_create_text_entry_imp (NGtkBackend *self, NGtkContainer *pa
 		NULL /* The lParam passed with WM_CREATE message */
 		);
 
-	SendMessage (hwnd, EM_LIMITTEXT, max_text_len + 1, NULL);
+	SendMessage (hwnd, EM_LIMITTEXT, max_text_len + 1, 0);
 	obj    = ngtk_object_new ();
 	inW    = ngtk_basic_base_create_interface (obj, self);
 	inComp = ngtk_win_component_create_interface (obj, hwnd, NULL, TRUE, TRUE, initial_text, visible);

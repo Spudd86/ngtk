@@ -20,6 +20,7 @@
 
 #include "ngtk-win.h"
 
+static void ngtk_win_component_destructor (NGtkComponent *self);
 NGtkInterface* ngtk_win_component_create_interface (NGtkObject *obj, HWND hwnd, NGtkContainer *parent, int enabled, int focusable, const char* text, int visible)
 {
 	NGtkInterface *in = ngtk_basic_component_create_interface (obj, parent, enabled, focusable, text, visible);
@@ -27,7 +28,7 @@ NGtkInterface* ngtk_win_component_create_interface (NGtkObject *obj, HWND hwnd, 
 
 	in->imp_data[1]      = wcd;
 	wcd->hwnd            = hwnd;
-	wcd->base_wndproc    = (WNDPROC) GetWindowLong (hwnd, GWL_WNDPROC);
+	wcd->base_wndproc    = (WNDPROC) GetWindowLongPtrA (hwnd, GWL_WNDPROC);
 	in->imp_data_free[1] = ngtk_free;
 	
 	NGTK_COMPONENT_I2F (in) -> set_enabled = ngtk_win_component_set_enabled;
@@ -35,10 +36,25 @@ NGtkInterface* ngtk_win_component_create_interface (NGtkObject *obj, HWND hwnd, 
 	NGTK_COMPONENT_I2F (in) -> set_visible = ngtk_win_component_set_visible;
 
 	SetParent ((parent != NULL) ? ngtk_win_component_get_hwnd (parent) : NULL, hwnd);
-	SetWindowLongA (hwnd, GWL_WNDPROC, (LONG) ngtk_win_general_WndProc);
+
+	ngtk_basic_backend_component_register (obj);
+	ngtk_object_push_destructor (obj, ngtk_basic_backend_component_unregister);
+	ngtk_object_push_destructor (obj, ngtk_win_component_destructor);
+
+	/* Register the component in the HWND, so that we can get the component
+	 * from the HWND object */
 	ngtk_win_call_after_compononet_creation (obj);
+	/* Only now when the above link was made, switch to our WndProc which
+	 * relies on the object */
+	SetWindowLongPtrA (hwnd, GWL_WNDPROC, (LONG) ngtk_win_general_WndProc);
 
 	return in;
+}
+
+static void ngtk_win_component_destructor (NGtkComponent *self)
+{
+	if (NGTK_WIN_COMPONENT_O2D (self)->hwnd != NULL)
+		DestroyWindow (NGTK_WIN_COMPONENT_O2D (self)->hwnd);
 }
 
 void ngtk_win_component_set_enabled (NGtkComponent *self, int enabled)
@@ -71,5 +87,16 @@ WNDPROC ngtk_win_component_get_base_wnd_proc (NGtkComponent *self)
 
 void ngtk_win_component_call_on_wnd_destroy (NGtkComponent *self)
 {
-	NGTK_WIN_COMPONENT_O2D (self)->hwnd = NULL;
+	NGtkWinComponentD *wcd = NGTK_WIN_COMPONENT_O2D (self);
+
+	/* Since this is called on the WM_DESTROY signal, we should
+	 * switch back to the original WndProc since we are done handling
+	 * this window. Let the system handle the destruction.
+	 * Also note that since we remove the HWND<->component association
+	 * on the WM_DESTROY call, we can't use our own WndProc anymore!
+	 */
+	SetWindowLongPtrA (wcd->hwnd, GWL_WNDPROC, (LONG) wcd->base_wndproc);
+	/* Mark that we are no longer associated with any HWND, so that we
+	 * won't try in the destructor to destroy an already destroyed HWND */
+	wcd->hwnd = NULL;
 }

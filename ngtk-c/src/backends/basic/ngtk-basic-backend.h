@@ -25,6 +25,8 @@
 
 typedef NGtkBackend NGtkBasicBackend;
 
+/** A struct containing the data which is typically used by common
+ * backend implementations */
 typedef struct _ngtk_basic_backend_d {
 	NGtkContainer     *root_window;
 	NGtkComponent     *focus_holder;
